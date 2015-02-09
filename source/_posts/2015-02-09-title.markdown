@@ -35,17 +35,14 @@ Octpress + GitHubでのブログの立ち上げ方法をまとめました．
 1. GitHubに登録する(メールアドレスの認証も済ませておく[3](#github_account))．
 2. GitHubリポジトリを作成する(リポジトリ名は「*username*.github.io」)．
 3. [公式サイト](http://octopress.org/docs/setup/)を参考にセットアップを行う．
-	1. OctpressをGitHubからクローン
-
+	1. OctpressをGitHubからクローン  
 		`git clone git://github.com/imathis/octopress.git octopress`
 	2. `cd octopress`
 	3. `gem install bundler`
 	4. `bundle install`
-	5. デフォルトのテーマインストール
-
+	5. デフォルトのテーマインストール  
 		`rake install` 
-4. 動作確認．`http://localhost:4000/`にアクセスして，ブログのプレビューが表示されればOK．
-
+4. 動作確認．`http://localhost:4000/`にアクセスして，ブログのプレビューが表示されればOK．  
 	`rake preview`
 4. `rake setup_github_pages`([公式サイト](http://octopress.org/docs/deploying/github/))
 5. ブログのタイトルなどの初期設定(`_config.yml`)
@@ -104,21 +101,16 @@ description:
 
 [公式サイト](http://octopress.org/docs/blogging/)を参考に手順をまとめる．
 
-1. 記事のテンプレートを作成
-
+1. 記事のテンプレートを作成  
 	`rake new_post\[title\]`
 2. 生成された`source/_posts/20XX-XX-XX-title.markdown`を編集して保存．
-3. 静的ページの生成
-
+3. 静的ページの生成  
 	`rake generate`
-4. 記事の確認．`localhost:4000`にアクセスしてみる．
-
+4. 記事の確認．`localhost:4000`にアクセスしてみる．  
 	`rake preview` 
-5. 投稿する．デプロイ一発．楽．
-
+5. 投稿する．デプロイ一発．楽．  
 	`rake deploy`
-6. ソースもpush
-
+6. ソースもpush  
 	```
 	git add .
 	git commit -m 'comment'
