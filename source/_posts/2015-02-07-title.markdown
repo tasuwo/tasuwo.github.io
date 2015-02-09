@@ -1,0 +1,19 @@
+---
+layout: post
+title: "ブログ開設"
+date: 2015-02-07 21:03:31 +0900
+comments: true
+categories: [雑記]
+---
+
+　開設しました．
+
+<!-- more -->
+
+　前々からブログを開設したいなぁとは思っていたのだけど，PHPで作ったサイトは保守が面倒だったし，Wordpressもあまりやる気が出ないために()途中で投げてしまった．  
+
+　ちょっとしたメモ書きを気軽に公開できたりしないだろうかと思っていたところ，[Octpress](http://octopress.org) と [GitHub Pages](https://pages.github.com) を組み合わせて，Markdownでブログ記事を作成するやり方を発見した．  
+
+　Markdown記法は最近使い始めていたし，Gitの勉強もしたいなぁと思っていたので，早速[ここ](http://blog.shiroyama.us/blog/2014/02/26/octopress/)を参考に開設した．何より無料なのがいいね．  
+
+勉強した技術的なことなどを備忘録として公開していく予定．

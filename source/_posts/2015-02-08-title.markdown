@@ -1,0 +1,282 @@
+---
+layout: post
+title: "Emacsについて 01"
+date: 2015-02-08 19:36:18 +0900
+comments: true
+categories: [Emacs]
+---
+
+##1. はじめに
+
+Emacsを使おうと思うので調べたこととやったことをメモする．  
+
+<!-- more -->
+
+使用環境は以下．  
+
+* Mac OS X Yosemite 10.10.1
+
+##2. 関連知識
+
+###2.1 基本コマンド
+
+使いそうなコマンドをメモしておく[1](#emacs_keybind_01) [2](#emacs_keybind_02)．  
+何か不便に感じた時はそれを実現するコマンドがないかその都度調べる．
+
+* C-：コントロールキー(Ctrl)
+* M-：メタキー(Alt，Esc．Altは長押し．Escは1回押し．)
+
+####2.1.1 とりあえず
+
+|key|desc|notes|
+|---|---|---|
+|C-g|コマンド中断|困った時に|
+
+####2.1.2 移動
+
+|key|desc|notes|
+|---|---|---|
+|C-u|上||
+|C-n|下||
+|C-u|上||
+|C-f|次|Forward|
+|C-b|前|Back|
+|M-f|1単語次||
+|M-b|1単語前||
+|C-e|行末|Endのe|
+|C-a|行頭|ABC...のa|
+|C-v|次ページ||
+|M-v|前ページ||
+|M-<|ファイル先頭||
+|M->|ファイル末尾||
+|M-g g|任意の行へ移動||
+
+####2.1.3 操作
+
+|key|desc|notes|
+|---|---|---|
+|C-d|delete||
+|C-h|back space||
+|M-d|1単語delete||
+|M-BS|1単語back space||
+|C-k|行末まで削除||
+|C-d|カーソル位置の文字を削除||
+|C-space|領域始点||
+|M-w|領域コピー||
+|C-w|領域カット||
+|C-y|貼り付け||
+
+####2.1.4 その他
+
+|key|desc|notes|
+|---|---|---|
+|C-s|前方検索||
+|C-r|後方検索||
+|C-x num|ウインドウ分割||
+|C-x o|ウインドウ移動||
+
+###2.2 初期化
+
+初期化についてまとめる．  
+最初触ったら後はそんなに気にすることはないんじゃないかという予想．  
+  
+Emacsのドキュメント[3](#emacs_doc)を読む．  
+Emacsは，最初にLispプログラムを読み込んで初期化する[4](#init_01) [5](#init_02)．  
+有効なファイル名は以下．
+
+* ~/.emacs( ~/.emacs.el )
+* ~/.emacs.d/init.el
+
+`$HOME`からまず`~/.emacs(~/.emacs.el)`を探して，あれば読み込む．  
+なかった場合は`~/.emacs.d/init.el`を探して，読み込む．  
+読みこみたくない場合は`-p`，他のユーザの初期化ファイルを読み込みたい場合は`-u`．  
+上記は個人用で，サイト用(PC毎，全ユーザ共通)の設定ファイルは以下が利用可能．  
+
+* default.el
+* site-start.el
+
+個人設定で`inhibit-default-init nil`と指定すると，`default.el`は読み込まれない．  
+`-no-site-file`オプションを指定すると，`site-start.el`は読み込まれない．  
+  
+起動時の読み込み順は以下．  
+
+1. サイト設定(`site-start.el`)
+2. 個人設定(`.emacs`等)
+3. デフォルト設定(`default.el`)
+
+サイト設定とデフォルト設定は，EmacsがLisp Libraryを読み込みに行くパス内に存在すれば読み込まれる．記述目的は以下[6](init_how_to_use)．  
+
+* サイト設定： Emacs環境を用意した担当者が，標準的なものを設定
+* 個人設定：個人用の設定
+* デフォルト設定：個人設定がない場合，あるいは使うとしたらコレ，という設定
+
+設定はEmacs Lispで記述する．  
+具体的な設定の書き方は別項で説明する．
+
+具体的に何かをしたい場合，[このサイト](http://www.gfd-dennou.org/member/uwabami/cc-env/EmacsBasic.html#fn.1)が参考になりそう．
+
+###2.3 ライブラリ
+
+Emacsが読み込むライブラリについて触れる[7](#emacs_library_01) [8](#emacs_library_02)．  
+Lispコードを含むファイルをライブラリ(Library)と呼ぶ．  
+基本的にEmacs Lispで書く(拡張子は`.el`)．  
+Emacs Lispコードはバイトコード(拡張子は`.elc`)にコンパイルされる．  
+理由は，その方がロードも実行も早いから．加えて容量も小さい．  
+  
+Emacs Lispファイルは以下のようにロードする．  
+ロードすると，対象ファイル内のすべての式を評価する．
+
+```emacs
+M-x load-file filename
+```
+
+探索の手順は以下．見つけた時点でロードする．  
+見つからなかった場合はエラーとなる．
+
+1. *filename.elc*を探す．
+2. *filename.el*を探す．
+3. *filename*を探す．
+
+`load path`に存在すれば，ファイル名を指定しなくとも以下の方法で良い．
+Emacs Lispの`load path`に存在するすべてのディレクトリを探索する．
+同名の`.el`と`.elc`があった場合，`.elc`が実行される．
+
+```
+M-x load-library
+```
+
+`load path`は変数`load-path`として定義されている．  
+これはファイルのロード時に探索するディレクトリのリストになっている．  
+環境変数`EMACSLOADPATH`が設定されていれば，その値で初期化される．  
+もしくは，`emacs/src/paths.h`に指定されたデフォルト値になる．
+ 
+自作ライブラリ等が別のフォルダにある場合は，`load path`に追加する．  
+パスを追加する方法をいくつかあげる．
+
+1. cshの場合，`.login`ファイルに設定する
+
+```
+setenv EMACSLOADPATH .:/user/bil/emacs:/usr/lib/emacs/lisp
+```
+
+2. shの場合
+
+```
+export EMACSLOADPATH
+EMACSLOADPATH=.:/user/bil/emacs:/usr/local/lib/emacs/lisp
+```
+
+3. `.emacs`ファイルに設定する
+
+```
+;; これとか
+(setq load-path
+      (append (list nil "/user/bil/emacs"
+                    "/usr/local/lisplib"
+                    "~/emacs")
+              load-path))
+
+;; これとか
+(add-to-list 'load-path "/path/to/my/lisp/library")
+```
+
+ここまでは，「ほ〜ん」って感じ．  
+具体的に何かをしたい場合，[このサイト](http://th.nao.ac.jp/MEMBER/zenitani/elisp-j.html)が参考になりそう．
+
+###2.4 scratchバッファ
+
+scratchバッファは，Emacs Lisp の実行環境であり，Emacs の設定を試し書きできる場所．  
+Terminalからだと，以下で起動できる[9](#emacs_scratch)．
+
+```
+C-x b *scratch*
+```
+
+`C-j`で式を評価できる．  
+`C-h f`で関数のヘルプが見れる．  
+`C-h v`で変数の値が見れる．
+
+##3. やったこと
+
+満を持して，色々やっていく．  
+まずは，とりあえずやりたいことをまとめる．  
+
+* Markdownをかけるようにして，さくっとブログを更新したい．
+* カラースキームの設定をしたい．
+
+満を持してといいつつ，今回は何もしていない．  
+次回に持ち越し．
+
+###3.1 最新版インストール
+
+MacにはEmacsがデフォルトで入っている．
+
+```bash
+$ emacs version
+GNU Emacs 22.1.1
+Copyright (C) 2007 Free Software Foundation, Inc.
+GNU Emacs comes with ABSOLUTELY NO WARRANTY.
+You may redistribute copies of Emacs
+under the terms of the GNU General Public License.
+For more information about these matters, see the file named COPYING.
+```
+
+最新ではないので，最新版をいれる[10](#emacs_inst_01) [11](#emacs_inst_02) [12](#emacs_inst_03)．
+
+```bash
+$ brew install emacs --cocoa
+```
+
+`/Applications/`にシンボリックリンクを貼る．
+
+```bash
+$ brew linkapps
+```
+
+確認．
+
+```bash
+$ emacs version
+GNU Emacs 24.4.1
+Copyright (C) 2014 Free Software Foundation, Inc.
+GNU Emacs comes with ABSOLUTELY NO WARRANTY.
+You may redistribute copies of Emacs
+under the terms of the GNU General Public License.
+For more information about these matters, see the file named COPYING.
+```
+
+インストールできた．
+
+##4. 次回やること
+
+感想．Lispの勉強になりそう．  
+エディターは使いこなすまでやってなんぼだと思っているので積極的に使っていく．  
+  
+今回はほぼ何もしてないので，次回はパッケージ管理辺りを調べながら，具体的に色々設定していきたいと思う．
+
+<!--
+次回の参考
+http://totem3.hatenablog.jp/entry/2014/11/13/090715
+http://e-arrows.sakura.ne.jp/2010/02/vim-to-emacs.html
+http://gongo.hatenablog.com/entry/2014/05/09/230836
+http://d.hatena.ne.jp/rubikitch/20100201/elispsyntax
+http://totem3.hatenablog.jp/entry/2014/11/12/083115
+http://moonstruckdrops.github.io/blog/2013/03/24/markdown-mode/
+-->
+  
+  
+  
+##参考文献
+
+>1. <a name="emacs_keybint_01"></a>[Emacsのキーボードショートカット一覧](http://www.hpcs.cs.tsukuba.ac.jp/~yonemoto/pukiwiki/index.php?Emacs%2F%A5%B7%A5%E7%A1%BC%A5%C8%A5%AB%A5%C3%A5%C8)  
+>2. <a name="emacs_keybind_02"></a>[GNUEmacs の学習](http://www.geocities.co.jp/SiliconValley-Bay/1553/linux/emacs.html)  
+>3. <a name="emacs_doc"></a>[The Emacs Editor](http://www.gnu.org/software/emacs/manual/html_node/emacs/)  
+>4. <a name="init_01"></a>[49.4.4 How Emacs Finds Your Init File](http://www.gnu.org/software/emacs/manual/html_node/emacs/Find-Init.html#Find-Init)    
+>5. <a name="init_02"></a>[16. `.emacs' ファイル](http://www.math.s.chiba-u.ac.jp/~matsu/lisp/emacs-lisp-intro-jp_17.html)  
+>6. <a name="init_how_to_use"></a>[Ubuntu の site-start.el](http://www.ki.nu/~makoto/diary/2009/10/05/1.html)  
+>7. <a name="emacs_library_01"></a>[27.8 Libraries of Lisp Code for Emacs](http://www.gnu.org/software/emacs/manual/html_node/emacs/Lisp-Libraries.html#Lisp-Libraries)  
+>8. <a name="emacs_library_02"></a>[13.1 プログラムでロードする方法](http://www.fan.gr.jp/~ring/doc/elisp_19/elisp-jp_15.html)
+>9. <a name="emacs_scratch"></a>[うわっ...私のEmacs、使いにくすぎ？だったら...ｶｽﾀﾏｲｽﾞｼﾔｯｾｰ!!ﾀﾞｧﾀﾞｧｼｴﾘｲｪｯｽｯｼｪｰｼｮｰﾍｲﾍｲ!!!](http://d.hatena.ne.jp/sandai/20120304/p2)  
+>10. <a name="emacs_inst_01"></a>[HomebrewでEmacsをインストール。](http://blog.yug1224.com/2013/10/29/emacs/)  
+>11. <a name="emacs_inst_02"></a>[Macでemacsを設定しよう](http://tb-lab.hatenablog.jp/entry/2013/10/22/225853)  
+>12. <a name="emacs_inst_03"></a>[Macで本家EmacsとHomebrew IMEパッチ版とEmacs Mac PortとAquamacsを比べてみる。](http://www.sevencredit.com/2014/07/02/580/)  

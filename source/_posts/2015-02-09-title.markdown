@@ -1,0 +1,182 @@
+---
+layout: post
+title: "GitHub + Octpress でブログ作成"
+date: 2015-02-10 02:19:59 +0900
+comments: true
+categories: [GitHub, Octpress]
+---
+
+Octpress + GitHubでのブログの立ち上げ方法をまとめました．
+
+<!-- more -->
+
+##1. はじめに
+
+###1.1 今日の目的
+
+* octpress + github の基礎知識
+* 記事をdeployした際に自動的にツイート
+
+###1.2 あとまわし
+
+* emacsについて その2
+
+
+##2. GitHub + Octpressでブログを立ち上げる
+
+調べれば簡単にできるけど，自分用にまとめる．  
+ページ見つつ思い出しつつ書くので，記述が足りない部分があるかもしれない．
+
+###2.1 Octpressの導入と準備
+
+記事の投稿ができるまで．
+以下，簡略手順[2](#oct_tejun)．  
+
+1. GitHubに登録する(メールアドレスの認証も済ませておく[3](#github_account))．
+2. GitHubリポジトリを作成する(リポジトリ名は「*username*.github.io」)．
+3. [公式サイト](http://octopress.org/docs/setup/)を参考にセットアップを行う．
+	1. OctpressをGitHubからクローン
+
+		`git clone git://github.com/imathis/octopress.git octopress`
+	2. `cd octopress`
+	3. `gem install bundler`
+	4. `bundle install`
+	5. デフォルトのテーマインストール
+
+		`rake install` 
+4. 動作確認．`http://localhost:4000/`にアクセスして，ブログのプレビューが表示されればOK．
+
+	`rake preview`
+4. `rake setup_github_pages`([公式サイト](http://octopress.org/docs/deploying/github/))
+5. ブログのタイトルなどの初期設定(`_config.yml`)
+
+####2.1.1 手順4の補足
+GitHubにデプロイするファイルを生成する．
+
+```bash
+$ rake setup_github_pages
+
+Enter the read/write url for your repository
+(For example, 'git@github.com:your_username/your_username.github.io.git)
+           or 'https://github.com/your_username/your_username.github.io')
+Repository url: git@github.com:srym/srym.github.io.git
+Added remote git@github.com:srym/srym.github.io.git as origin
+Set origin as default remote
+Master branch renamed to 'source' for committing your blog source files
+rm -rf _deploy
+mkdir _deploy
+cd _deploy
+Initialized empty Git repository in /Users/shiroyama/playGround/octopress/_deploy/.git/
+[master (root-commit) dacfaa2] Octopress init
+ 1 file changed, 1 insertion(+)
+ create mode 100644 index.html
+cd -
+```
+
+GitHub Pagesのリポジトリが自動的にoriginに指定される．
+
+```bash
+$ git remote -v
+octopress       git://github.com/imathis/octopress.git (fetch)
+octopress       git://github.com/imathis/octopress.git (push)
+origin          git@github.com:srym/srym.github.io.git (fetch)
+origin          git@github.com:srym/srym.github.io.git (push)
+```
+
+####2.1.2 手順5の補足
+
+[公式サイト](http://octopress.org/docs/configuring/)を参考に．  
+config.ymlの記述は以下のようになっている．  
+好みに編集する．
+
+```
+# _config.yml
+
+url: http://blog.shiroyama.us
+title: 白山軟件有限公司
+subtitle: 東洋太平洋ブログ三日坊主チャンピオンのブログ
+author: Fumihiko Shiroyama
+simple_search: http://google.com/search
+description:
+```
+
+###2.2 記事の作成/投稿
+
+[公式サイト](http://octopress.org/docs/blogging/)を参考に手順をまとめる．
+
+1. 記事のテンプレートを作成
+
+	`rake new_post\[title\]`
+2. 生成された`source/_posts/20XX-XX-XX-title.markdown`を編集して保存．
+3. 静的ページの生成
+
+	`rake generate`
+4. 記事の確認．`localhost:4000`にアクセスしてみる．
+
+	`rake preview` 
+5. 投稿する．デプロイ一発．楽．
+
+	`rake deploy`
+6. ソースもpush
+
+	```
+	git add .
+	git commit -m 'comment'
+	git push origin source
+	```
+
+_config.ymlに記述されていたurlにアクセスすれば確認できる．  
+投稿の反映に10分ほどかかる場合があるので，あせらないで待つ．
+
+###2.3 その他
+
+####2.3.1 ブログテーマ
+
+[ここ](https://github.com/imathis/octopress/wiki/3rd-Party-Octopress-Themes)から選ぶと良い．
+
+####2.3.2 「つづきをよむ」ボタンを追加
+
+```
+<!-- more -->
+```
+
+####2.3.3 タグ
+
+```
+# One category
+categories: Sass
+
+# Multiple categories example 1
+categories: [CSS3, Sass, Media Queries]
+
+# Multiple categories example 2
+categories:
+- CSS3
+- Sass
+- Media Queries
+```
+
+##3. 記事をdeployした際に自動的にツイート
+
+ありました[1](#auto_tweet)．  
+Octpressの設定で簡単に連携もできるらしいので調べておく．
+夜が遅いので今日はここまで．
+
+##4. 次回への持ち越し
+
+* 各コマンドがやっていること
+	* 少し理解が足りない部分がある
+	* この記事に説明を追記するかもしれない
+* 自動ツイート
+	* 調べてみる
+* emacsのパッケージ管理について
+	* 上記が終わったら
+
+
+##参考文献
+>1. <a name="auto_tweet"></a>[最新記事があるか判別する](https://github.com/kawaken/kawaken.github.io/blob/master/_posts/2013-09-17-drone.ioを使ってgithub-pagesの更新情報をtwitterに自動投稿する.md)  
+>2. <a name="oct_tejun"></a>[GitHub Pages + Octopress カスタマイズ](http://qiita.com/syui/items/07365ed24eef63602233)  
+>3. <a name="github_account"></a>[github アカウント作成方法](http://ounziw.com/2012/08/10/github-create/)  
+>4. <a name="sankou_01"></a>[Octopressはじめました](http://www.miukoba.net/blog/2013/01/05/start-octopress/)  
+>5. <a name="sankou_03"></a>[Octpress始めました](http://moonstruckdrops.github.io/blog/2013/03/21/start-octpress/)  
+>6. <a name="sankou_04"></a>[エンジニアのブログは Octopress が最適](http://blog.shiroyama.us/blog/2014/02/26/octopress/)
