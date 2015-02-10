@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "GitHub + Octpress でブログ作成"
-date: 2015-02-10 02:19:59 +0900
+date: 2015-02-09 03:19:59 +0900
 comments: true
 categories: [GitHub, Octpress]
 ---
