@@ -1,129 +1,138 @@
 ---
 layout: post
-title: "YosemiteでCommon Lispの環境構築"
-date: 2015-02-11 03:57:56 +0900
+title: "Yosemite + Lisp + Lispbuilder-SDL"
+date: 2015-02-11 04:19:11 +0900
 comments: true
 categories: [lisp, 環境構築]
 ---
 
 ##Motivation
 
-以前[この本](http://www.amazon.co.jp/コーディングを支える技術-%7E成り立ちから学ぶプログラミング作法-WEB-PRESS-plus/dp/477415654X/ref=sr_1_1?ie=UTF8&qid=1423594846&sr=8-1&keywords=コーディングを支える技術)を読んでLispを知った．  
-どんなもんかなと触ってみたくて...という軽い気持ちで触れることに．  
-結構奥が深いようで楽しみという初心者並みの感想．  
-自分用に環境構築時のメモ．  
+以下の記事を読んだ．
+
+>[ＯＯエンジニアの輪！～ 第 21 回 川合史朗 さんの巻 ～](http://www.ogis-ri.co.jp/otc/hiroba/others/OORing/interview21.html)  
+>[これがプログラミングの神髄だ! ファイナルファンタジーのプログラマーが明かす秘密とLispトークバトル!](http://d.hatena.ne.jp/shi3z/20140123/1390429115)  
 
 <!-- more -->
 
-以下，自分のPC環境
+なるほどね．  
+なんだ，Lispでゲーム作れるんじゃん!  
+  
+差し当たって，界隈では有名なpdfらしい以下を参考にして勉強している．  
 
-* Mac OS X Yosemite 10.10.1
+>[Common LispでSTGを作りますが何か](http://www.usamimi.info/~ide/programe/stg_doc/stg-commonlisp.pdf)  
 
-##1. Common Lisp
-###1.1 基礎知識
+PDFでの学習内容には特に触れない．  
+環境構築の際に色々つまづいたので，それについてメモしておく．
 
-そもそもどんなものが必要なのか？ざっくり言うと以下．
+##1. 環境構築
 
-* Lisp処理系
-	* つまりコンパイラ(インタプリタ)．
-* ライブラリ管理ツール
-	* 名前の通り
+###1.1 ライブラリのインストール
+前回の記事より，Lispの環境はできているので, ゲーム作成に必要な以下のライブラリをインストールする.
 
-###1.2 実際にインストール
+* Lispbuilder-SDL
 
-それぞれ種類があるけど，それは各自調べて欲しい．  
-今回は情報をよく見かけた以下を選んだ．  
+冊子によると, ライブラリ間の依存関係等もあり色々ダウンロードしなくてはならないらしい.   
+試しに色々検索してみると以下のサイトがヒット．
 
-* Lisp処理系
-	* SBCL Compiler
-* ライブラリ管理ツール
-	* Quicklisp
+>[lispbuilder-sdl on mac](http://d.hatena.ne.jp/Nos/20140824/1408869981)  
+>[lispbuilder-sdlのインストール(SBCL編)](http://lambdasakura.hatenablog.com/entry/20110112/1294819728)  
+>[Unable to load sdl-gfx in quicklisp](http://stackoverflow.com/questions/6714714/unable-to-load-sdl-gfx-in-quicklisp)
 
-前提として，Homebrewが導入されている必要がある．  
-手順は以下．  
+先人の苦しんだ後が伺える. とりあえず必要なlispbuilderは以下とされている.  
 
-1. Homebrewを用いてSBCLをダウンロード ( `brew install sblc` )
-2. QuickLispを[公式サイト](http://www.quicklisp.org/beta/#installation)からダウンロード. `quicklisp.lisp`をDLすれば良い.
-3. SBCLから`quicklisp.lisp`を実行する. Terminalで `sbcl --load quicklisp.lisp` を入力. SBCLが起動する.
-4. `(quicklisp-quickstart:install)`とタイプし, Returnを押下. Quicklispのインストールルーチンが開始される.
-5. インストール終了後, `(ql:add-to-init-file) `とタイプする. これにより, SBCL起動時, 自動的にQuicklispがロードされる.
+* win32-lispbuilder-sdl-gfx-binaries-2.0.13.tgz* win32-lispbuilder-sdl-ttf-binaries-2.0.9.tgz* win32-lispbuilder-sdl-mixer-binaries-1.2.11.tgz
+* win32-lispbuilder-sdl-image-binaries-1.2.10.tgz
+* win32-lispbuilder-sdl-binaries-1.2.14.tgz* lispbuilder-sdl-ttf-0.3.0.tgz* lispbuilder-sdl-mixer-0.4.tgz* lispbuilder-sdl-image-0.5.0.tgz* lispbuilder-sdl-gfx-0.7.0.tgz* lispbuilder-sdl-0.9.8.1.tgz
 
-これでSBCLとQuicklispのインストールは終了．  
-lispファイルを実行したい場合は `sbcl --load <file>` とすれば良い.   
-ライブラリを追加したい場合は`(ql:quickload "libraryname")` とすれば良い.  
+　OS指定のないファイルは, Quicklisp導入時点でダウンロードされているため必要ない. 自分の環境はMacOS X Yosemiteなので, 以下をダウンロード.
 
-##3. Sublime Text3 + Common Lisp
+* max-lispbuilder-sdl-binaries-1.2.14.tar
+* max-lispbuilder-sdl-gfx-binaries-2.0.16.tar
+* max-lispbuilder-sdl-image-binaries-1.2.10.tar
+* max-lispbuilder-sdl-mixer-binaries-1.2.11.tar
+* max-lispbuilder-sdl-ttf-binaries-2.0.10.tar
 
-ST3をよく使うので，連携させて使ってみたいと思った．
-必要なものは1つ．
+解凍後, READMEを読む．  
+すると，`~.framework`を`Library/Frameworks`へ移動すれば良いと書かれているので従う．
 
-* SublimeREPL
-	* REPL = Read-eval-print loop
-	* 評価/表示の繰り返し = 対話型評価環境のこと(インタプリタとは違うらしい...)
-	* 利用可能な言語は多数ある
-		* Emacs lisp
-		* Ruby
-		* Python
-		* Scheme処理系
-		* Haskell
-		* OCaml
+####補足
+正直, 環境構築に失敗して色々やりすぎて, どれが本当は必要で, どれが必要ないのかわからない.   
+SDLパッケージはhomebrewでもダウンロード可能だが，うまくいかずに上記の方法で落ち着いた．  
+一から環境構築する機会があれば試すことにする．  
 
-###3.1 インストール
-パッケージコントロールからインストールしておしまい．  
-Sublime Textにおいて`Preferences > Package Control`でInstall Packageを選択し, インストールする. 
-これにより, SBCLのREPLにsublimeを介してアクセスできるようになる. アクセス方法は, `Tools > SublimeREPL > Common Lisp > SBCL` .  
+###1.2 インストール後の確認
 
-また，複数のCommon Lisp処理系に対応させるために最新版にしたほうがいいらしい．  
- `Preferences > Package Control`から, Add Repositoryを選択し, URL`https://github.com/wuub/SublimeREPL` を入力.   
-これにより, 最新版をインストール可能.
+きちんとインストールできているか確認する.   
+以下を実行する.
 
-###3.2 キーバインディングの設定
-いちいちメニューから選択してREPLを起動するのは面倒なので, キーバインディングを設定する. `Sublime Text > Preferences > Key Bindings - User`を開き, 以下を入力 & 保存.
 ```
-[
-    {
-        "keys": ["super+ctrl+h"],
-        "command": "repl_open",
-        "args": {
-            "type": "subprocess",
-            "encoding": "utf8",
-            "cmd": ["sbcl", "-i"],
-            "cwd": "$file_path",
-            "external_id": "lisp",
-            "syntax": "Packages/Lisp/Lisp.tmLanguage"
-        }
-    }
-]
+(ql:quickload "lispbuilder-sdl")
+(ql:quickload "lispbuilder-sdl-examples")
+
+(sdl-examples:mandelbrot)
 ```
-これで, `⌘ Command + ^ Control + H`からSBCL REPLを開くことができる. ちなみに, ファイルパスはSublimeでどこのファイルを開いたか? に依存する. `/path/to/main.lisp`をSublimeで開き, `⌘ Command + ^ Control + H` を押下しSBCLを起動したなら, パスは`/path/to/`に通っているので, そこに存在するlispファイルをloadできる.
 
-###3.3 ビルドシステムの設定
-Sublime上で記述したCLファイルがあった時, コマンド一つでビルドできたら便利だ.   
-ということで, ビルドシステムの設定を行う. `Tools > Build System > New Build System...`とし, 次のような記述を行う.
+　サンプルが動けば成功. ちなみに`(do-external-symbols (s :sdl-examples) (when (fboundp s) (print s)))`とするとデモ一覧が見られるので, 好きなモノを実行してみると良いかもしれない.  
+
+あとは，PDFを参考にガシガシやっていけば良い．
+
+###1.3 トラブルシューティング
+####トラブル01
 ```
-{
-    "shell_cmd": "/usr/local/bin/sbcl --disable-debugger --load $file",
-    "working_dir": "$file_path"
-}
+* (ql:quickload "lispbuilder-sdl-image")
+
+...
+
+debugger invoked on a LOAD-FOREIGN-LIBRARY-ERROR in thread
+#<THREAD "main thread" RUNNING {1002C175F3}>:
+  Unable to find framework SDL_image
 ```
-ファイル名を`SBCL.sublime-build`として保存する. これにより, ビルドシステムから`SBCL`を選ぶことが可能になる.   
-CLファイルを記述中に`⌘ Command + B`を押下すれば, 即座にコンパイル & 実行できるようになった.
+```
+(ql:quickload "lispbuilder-sdl-gfx")
 
-##4. 次回
+...
 
-今回は手元にまとめていたものを公開する形だった．  
-なので新しいことをしたわけじゃない．  
-学業の方がひと段落つきそうなので，そしたら残っているやりたいことや新しいことに挑戦していきたいなぁ．  
-Lispについては勉強の仕方と，簡単なゲームを作った記録を公開していく予定．  
-まだまだ勉強したてなので精進したい．
+Unable to load any of the alternatives:                                         
+   ("libSDL_gfx.dylib" (:FRAMEWORK "SDL_gfx"))
+   [Condition of type CFFI:LOAD-FOREIGN-LIBRARY-ERROR]
+```
+```
+(ql:quickload "lispbuilder-sdl-gfx")
 
-###参考文献
->[Sublime Text 2でCommon Lispを書くための環境設定](http://blog.8arrow.org/entry/2013/12/19/183508)  
->[SublimeREPL](https://github.com/wuub/SublimeREPL)  
->[Setting up a Common Lisp environment on OS X with Sublime Text 3](http://marktrapp.com/blog/2014/01/20/lisp-with-os-x-sublime-text/)  
->[QuickLisp - Common Lisp Wiki](http://ja.common-lisp.wikia.com/wiki/QuickLisp)   
->[ASDF](http://cl.cddddr.org/index.cgi?ASDF)   
->[モダンCommon Lisp: Quicklispによるライブラリ環境](http://dev.ariel-networks.com/wp/archives/365)  
->[SBCL(Steel Bank Common Lisp) - 紫藤のWiki](https://sites.google.com/site/shidoinfo/Home/programing-lang/関数型プログラミング言語/lisp/common-lisp/common-lisp-処理系/sbclsteel-bank-common-lisp)   
->[SBCL - Steel Bank Common Lisp - LispUser.net](http://lispuser.net/commonlisp/sbcl.html)   
->[Steel Bank Common Lisp - Wikipedia](http://en.wikipedia.org/wiki/Steel_Bank_Common_Lisp)
+...
+
+#<THREAD "main thread" RUNNING {1002C175F3}>:
+  Unable to find framework SDL_image
+```
+
+以上のようなエラーの場合, SDL_gfxやSDL_imageがLibrary/Frameworkにインストールできていない. 
+
+####トラブル02
+```
+(ql:quickload "lispbuilder-sdl")
+
+Unable to load any of the alternatives:
+   ((:FRAMEWORK "cocoahelper") (:DEFAULT "cocoahelper"))
+   [Condition of type CFFI:LOAD-FOREIGN-LIBRARY-ERROR]
+```
+上記のような場合, cocoahelperがmakeされていない. `~quicklisp/dists/quicklisp/software/lispbuilder-20110619-svn/lispbuilder-sdl/cocoahelper`へ`cd`し, `make`を実行し, 再び以下を実行するとよい.
+
+>[Unable to load sdl-gfx in quicklisp](http://stackoverflow.com/questions/6714714/unable-to-load-sdl-gfx-in-quicklisp)
+
+##2. 今後の課題
+
+前回から続けて記事を書いている．  
+これもまとめていたものを公開する形になる．  
+前回の環境構築はうまくいったがこちらでなぜか二日ぐらい潰れた(特に画像が表示されなかった)ので，自分と同じような人の参考になればいいと思う．  
+Lispに関しては，(そのうち)実際に作ったものを公開していく．  
+
+##参考文献
+>[ＯＯエンジニアの輪！～ 第 21 回 川合史朗 さんの巻 ～](http://www.ogis-ri.co.jp/otc/hiroba/others/OORing/interview21.html)  
+>[これがプログラミングの神髄だ! ファイナルファンタジーのプログラマーが明かす秘密とLispトークバトル!](http://d.hatena.ne.jp/shi3z/20140123/1390429115)  
+>[Common LispでSTGを作りますが何か](http://www.usamimi.info/~ide/programe/stg_doc/stg-commonlisp.pdf)  
+>[lispbuilder-sdl on mac](http://d.hatena.ne.jp/Nos/20140824/1408869981)  
+>[lispbuilder-sdlのインストール(SBCL編)](http://lambdasakura.hatenablog.com/entry/20110112/1294819728)  
+>[Unable to load sdl-gfx in quicklisp](http://stackoverflow.com/questions/6714714/unable-to-load-sdl-gfx-in-quicklisp)  
+>[Unable to load sdl-gfx in quicklisp](http://stackoverflow.com/questions/6714714/unable-to-load-sdl-gfx-in-quicklisp)  
+>[windowsでsbcl + lispbuilder-sdl](http://d.hatena.ne.jp/Nos/20141004/1412445272)  
