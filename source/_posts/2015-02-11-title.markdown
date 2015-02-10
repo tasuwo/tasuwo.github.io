@@ -6,8 +6,6 @@ comments: true
 categories: [lisp, 環境構築]
 ---
 
-#MacでCommon Lispの環境構築
-
 ##Motivation
 
 以前[この本](http://www.amazon.co.jp/コーディングを支える技術-%7E成り立ちから学ぶプログラミング作法-WEB-PRESS-plus/dp/477415654X/ref=sr_1_1?ie=UTF8&qid=1423594846&sr=8-1&keywords=コーディングを支える技術)を読んでLispを知った．  
