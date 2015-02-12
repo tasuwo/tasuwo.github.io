@@ -1,12 +1,12 @@
 ---
 layout: post
-title: "GitHub + Octpress でブログ作成"
+title: "GitHub + octopress でブログ作成"
 date: 2015-02-09 03:19:59 +0900
 comments: true
-categories: [GitHub, Octpress]
+categories: [GitHub, octopress]
 ---
 
-Octpress + GitHubでのブログの立ち上げ方法をまとめました．
+octopress + GitHubでのブログの立ち上げ方法をまとめました．
 
 <!-- more -->
 
@@ -14,7 +14,7 @@ Octpress + GitHubでのブログの立ち上げ方法をまとめました．
 
 ###1.1 今日の目的
 
-* octpress + github の基礎知識
+* octopress + github の基礎知識
 * 記事をdeployした際に自動的にツイート
 
 ###1.2 あとまわし
@@ -22,20 +22,32 @@ Octpress + GitHubでのブログの立ち上げ方法をまとめました．
 * emacsについて その2
 
 
-##2. GitHub + Octpressでブログを立ち上げる
+##2. GitHub + Octopressでブログを立ち上げる
 
 調べれば簡単にできるけど，自分用にまとめる．  
 ページ見つつ思い出しつつ書くので，記述が足りない部分があるかもしれない．
 
-###2.1 Octpressの導入と準備
+自分の環境
+
+* PC：MacBook Air, Core i5 1.8GHz, Mem 4GB
+* OS：OS X Yosemite 10.10.1
+
+必要なもの  
+
+* Ruby
+* Octopress
+* Github
+
+###2.1 Octopressの導入と準備(2015/2/12追記：Rubyについて)
 
 記事の投稿ができるまで．
 以下，簡略手順[2](#oct_tejun)．  
 
+1. Rubyとbundleのインストール([Mac + Ruby + Octopress + Github でブログの作成](http://salinger.github.io/blog/2013/01/14/1/))
 1. GitHubに登録する(メールアドレスの認証も済ませておく[3](#github_account))．
 2. GitHubリポジトリを作成する(リポジトリ名は「*username*.github.io」)．
 3. [公式サイト](http://octopress.org/docs/setup/)を参考にセットアップを行う．
-	1. OctpressをGitHubからクローン  
+	1. octopressをGitHubからクローン  
 		`git clone git://github.com/imathis/octopress.git octopress`
 	2. `cd octopress`
 	3. `gem install bundler`
@@ -148,10 +160,47 @@ categories:
 - Media Queries
 ```
 
+####2.3.4 コメント欄の追加(2015/2/12追記)
+
+Disqusに登録する必要がある．  
+登録時，サイトの登録を行うはず．
+ここでshortnameを設定するので，これを設定ファイル(`_config.yml`)に追記する．  
+
+```
+# Disqus Comments
+disqus_short_name: your_short_name
+disqus_show_comment_count: true
+```
+
+shortnameを後から確認したい場合．  
+サイトにログインし，右上の歯車をクリックし，`Admin > Settings`の，`Site Identity`にある．
+
+```
+Your website's shortname is *******.
+This is used to uniquely identify your website on Disqus. It cannot be changed.
+```
+
+>[Octopressにコメントを追加する](http://blog.morizotter.com/2012/07/01/octopressにコメントを追加する/)  
+>[Mac + Ruby + Octopress + Github でブログの作成](http://salinger.github.io/blog/2013/01/14/1/)  
+
+####2.4.5 プロフィールをサイドバーに表示(2015/2/12追記)
+
+1. `source/_includes/custom/asides/about.html`を編集する．
+2. `_config.yml`において，サイドバーに`custom/asides/about.html`を追加する．
+
+```
+# list each of the sidebar modules you want to include, in the order you want them to appear.
+# To add custom asides, create files in /source/_includes/custom/asides/ and add them to the list like 'custom/asides/custom_aside_name.html'
+# ↓ここにパスを追加
+default_asides: [custom/asides/about.html, asides/recent_posts.html, custom/asides/category_list.html, custom/asides/tag_cloud.html, asides/github.html, asides/twitter.html, asides/delicious.html, asides/pinboard.html, asides/googleplus.html]
+```
+
+>[Octopress - プロフィール表示を追加！](http://www.mk-mode.com/octopress/2012/12/17/octopress-add-profile/)
+
 ##3. 記事をdeployした際に自動的にツイート
 
 ありました[1](#auto_tweet)．  
-Octpressの設定で簡単に連携もできるらしいので調べておく．
+octopressの設定で簡単に連携もできるらしいので調べておく．
 夜が遅いので今日はここまで．
 
 ##4. 次回への持ち越し
