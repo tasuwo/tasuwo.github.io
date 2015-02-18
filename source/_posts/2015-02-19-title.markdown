@@ -39,3 +39,6 @@ Windows用に書かれている本なので，Macで実行するためには工�
 [Land of Lisp](http://www.amazon.co.jp/Land-Lisp-M-D-Conrad-Barski/dp/4873115876/ref=sr_1_1?ie=UTF8&qid=1424274333&sr=8-1&keywords=land+on+lisp)を買いました．  
 読みきれるだろうか．読み切りたい．  
 積み本が増える...
+
+###参考サイト
+>[初めてのC言語で『30日でできる！OS自作入門』の通りに初めてのOSを作ってみた](http://d.hatena.ne.jp/sandai/20120728/p2)  
