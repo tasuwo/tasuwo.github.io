@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "自作OS1日目"
-date: 2015-02-19 00:28:46 +0900
+date: 2015-02-17 00:28:46 +0900
 comments: true
 categories: 
 - 自作OS
