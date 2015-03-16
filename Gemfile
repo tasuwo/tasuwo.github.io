@@ -17,3 +17,5 @@ group :development do
 end
 
 gem 'sinatra', '~> 1.4.2'
+gem 'redcarpet', '~> 3.1'
+gem 'albino', '~> 1.3.3'
