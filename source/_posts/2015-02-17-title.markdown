@@ -8,7 +8,7 @@ categories:
 ---
 
 
-#Motivation
+##Motivation
 
 前々から勉強しようと思っていた[この本]()にやっと手をつけました．
 

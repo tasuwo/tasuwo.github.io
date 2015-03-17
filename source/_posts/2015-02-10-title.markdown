@@ -7,7 +7,7 @@ categories: [lisp, 環境構築]
 ---
 
 
-#Motivation
+##Motivation
 
 以前[この本](http://www.amazon.co.jp/コーディングを支える技術-%7E成り立ちから学ぶプログラミング作法-WEB-PRESS-plus/dp/477415654X/ref=sr_1_1?ie=UTF8&qid=1423594846&sr=8-1&keywords=コーディングを支える技術)を読んでLispを知った．どんなもんかなと触ってみたくて...という軽い気持ちで触れることに．結構奥が深いようで楽しみという初心者並みの感想．自分用に環境構築時のメモしておく．
 

@@ -49,7 +49,7 @@ Emacs22以降は，`~/.emacs.d/`以下に設定ファイル群をまとめてお
 よって，この`load parh`を設定しておく必要がある．`load path`は変数`load-path`として定義されているため，これを書き換えればよい．
 初期化ファイルである`init.el`に，以下を追記する．
 
-```
+```lisp
 ;; load-pathの追加関数
 (defun add-to-load-path (&rest paths)
   (let (path)
@@ -70,7 +70,7 @@ Emacs22以降は，`~/.emacs.d/`以下に設定ファイル群をまとめてお
 
 途中フォントの設定があるが，Emacsで使用可能なフォント一覧は`(font-family-list)`をscratchバッファ実行すれば良い．
 
-```
+```lisp
 ;; 文字コード
 ;; WindowsとMacでわける
 (set-language-environment "Japanese")
@@ -186,7 +186,7 @@ Emacsのパッケージは，リポジトリにまとまって公開されてい
 
 上記のようなリポジトリを登録したのちに，インストールしたいパッケージを指定する，という流れになる．リポジトリ情報は`package-archives`変数に格納されているので，新規に追加する場合はこれをいじる．以下が設定例．
 
-```
+```lisp
 (require 'package)
 
 ;; MELPAを追加
