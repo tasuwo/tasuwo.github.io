@@ -6,46 +6,49 @@ comments: true
 categories: [lisp, 環境構築]
 ---
 
-##Motivation
+#Motivation
 
 以下の記事を読んだ．
 
->[ＯＯエンジニアの輪！～ 第 21 回 川合史朗 さんの巻 ～](http://www.ogis-ri.co.jp/otc/hiroba/others/OORing/interview21.html)  
->[これがプログラミングの神髄だ! ファイナルファンタジーのプログラマーが明かす秘密とLispトークバトル!](http://d.hatena.ne.jp/shi3z/20140123/1390429115)  
+>[ＯＯエンジニアの輪！～ 第 21 回 川合史朗 さんの巻 ～](http://www.ogis-ri.co.jp/otc/hiroba/others/OORing/interview21.html)
+>[これがプログラミングの神髄だ! ファイナルファンタジーのプログラマーが明かす秘密とLispトークバトル!](http://d.hatena.ne.jp/shi3z/20140123/1390429115)
 
 <!-- more -->
 
-なるほどね．  
-なんだ，Lispでゲーム作れるんじゃん!  
-  
-差し当たって，界隈では有名なpdfらしい以下を参考にして勉強している．  
+なるほどね．なんだ，Lispでゲーム作れるんじゃん!
+差し当たって，界隈では有名なpdfらしい以下を参考にして勉強している．
 
->[Common LispでSTGを作りますが何か](http://www.usamimi.info/~ide/programe/stg_doc/stg-commonlisp.pdf)  
+>[Common LispでSTGを作りますが何か](http://www.usamimi.info/~ide/programe/stg_doc/stg-commonlisp.pdf)
 
-PDFでの学習内容には特に触れない．  
-環境構築の際に色々つまづいたので，それについてメモしておく．
+PDFでの学習内容には特に触れない．環境構築の際に色々つまづいたので，それについてメモしておく．
 
-##1. 環境構築
+#1. 環境構築
 
-###1.1 ライブラリのインストール
+##1.1 ライブラリのインストール
 前回の記事より，Lispの環境はできているので, ゲーム作成に必要な以下のライブラリをインストールする.
 
 * Lispbuilder-SDL
 
-冊子によると, ライブラリ間の依存関係等もあり色々ダウンロードしなくてはならないらしい.   
-試しに色々検索してみると以下のサイトがヒット．
+冊子によると, ライブラリ間の依存関係等もあり色々ダウンロードしなくてはならないらしい.試しに色々検索してみると以下のサイトがヒット．
 
->[lispbuilder-sdl on mac](http://d.hatena.ne.jp/Nos/20140824/1408869981)  
->[lispbuilder-sdlのインストール(SBCL編)](http://lambdasakura.hatenablog.com/entry/20110112/1294819728)  
+>[lispbuilder-sdl on mac](http://d.hatena.ne.jp/Nos/20140824/1408869981)
+>[lispbuilder-sdlのインストール(SBCL編)](http://lambdasakura.hatenablog.com/entry/20110112/1294819728)
 >[Unable to load sdl-gfx in quicklisp](http://stackoverflow.com/questions/6714714/unable-to-load-sdl-gfx-in-quicklisp)
 
-先人の苦しんだ後が伺える. とりあえず必要なlispbuilderは以下とされている.  
+先人の苦しんだ後が伺える. とりあえず必要なlispbuilderは以下とされている.
 
-* win32-lispbuilder-sdl-gfx-binaries-2.0.13.tgz* win32-lispbuilder-sdl-ttf-binaries-2.0.9.tgz* win32-lispbuilder-sdl-mixer-binaries-1.2.11.tgz
+* win32-lispbuilder-sdl-gfx-binaries-2.0.13.tgz
+* win32-lispbuilder-sdl-ttf-binaries-2.0.9.tgz
+* win32-lispbuilder-sdl-mixer-binaries-1.2.11.tgz
 * win32-lispbuilder-sdl-image-binaries-1.2.10.tgz
-* win32-lispbuilder-sdl-binaries-1.2.14.tgz* lispbuilder-sdl-ttf-0.3.0.tgz* lispbuilder-sdl-mixer-0.4.tgz* lispbuilder-sdl-image-0.5.0.tgz* lispbuilder-sdl-gfx-0.7.0.tgz* lispbuilder-sdl-0.9.8.1.tgz
+* win32-lispbuilder-sdl-binaries-1.2.14.tgz
+* lispbuilder-sdl-ttf-0.3.0.tgz
+* lispbuilder-sdl-mixer-0.4.tgz
+* lispbuilder-sdl-image-0.5.0.tgz
+* lispbuilder-sdl-gfx-0.7.0.tgz
+* lispbuilder-sdl-0.9.8.1.tgz
 
-　OS指定のないファイルは, Quicklisp導入時点でダウンロードされているため必要ない. 自分の環境はMacOS X Yosemiteなので, 以下をダウンロード.
+OS指定のないファイルは, Quicklisp導入時点でダウンロードされているため必要ない. 自分の環境はMacOS X Yosemiteなので, 以下をダウンロード.
 
 * max-lispbuilder-sdl-binaries-1.2.14.tar
 * max-lispbuilder-sdl-gfx-binaries-2.0.16.tar
@@ -53,18 +56,14 @@ PDFでの学習内容には特に触れない．
 * max-lispbuilder-sdl-mixer-binaries-1.2.11.tar
 * max-lispbuilder-sdl-ttf-binaries-2.0.10.tar
 
-解凍後, READMEを読む．  
-すると，`~.framework`を`Library/Frameworks`へ移動すれば良いと書かれているので従う．
+解凍後, READMEを読む．すると，`~.framework`を`Library/Frameworks`へ移動すれば良いと書かれているので従う．
 
-####補足
-正直, 環境構築に失敗して色々やりすぎて, どれが本当は必要で, どれが必要ないのかわからない.   
-SDLパッケージはhomebrewでもダウンロード可能だが，うまくいかずに上記の方法で落ち着いた．  
-一から環境構築する機会があれば試すことにする．  
+###補足
+正直, 環境構築に失敗して色々やりすぎて, どれが本当は必要で, どれが必要ないのかわからない．SDLパッケージはhomebrewでもダウンロード可能だが，うまくいかずに上記の方法で落ち着いた．一から環境構築する機会があれば試すことにする．
 
-###1.2 インストール後の確認
+##1.2 インストール後の確認
 
-きちんとインストールできているか確認する.   
-以下を実行する.
+きちんとインストールできているか確認する．以下を実行する．
 
 ```
 (ql:quickload "lispbuilder-sdl")
@@ -73,12 +72,13 @@ SDLパッケージはhomebrewでもダウンロード可能だが，うまくい
 (sdl-examples:mandelbrot)
 ```
 
-　サンプルが動けば成功. ちなみに`(do-external-symbols (s :sdl-examples) (when (fboundp s) (print s)))`とするとデモ一覧が見られるので, 好きなモノを実行してみると良いかもしれない.  
+サンプルが動けば成功. ちなみに`(do-external-symbols (s :sdl-examples) (when (fboundp s) (print s)))`とするとデモ一覧が見られるので, 好きなモノを実行してみると良いかもしれない.
 
 あとは，PDFを参考にガシガシやっていけば良い．
 
-###1.3 トラブルシューティング
-####トラブル01
+##1.3 トラブルシューティング
+
+###トラブル01
 ```
 * (ql:quickload "lispbuilder-sdl-image")
 
@@ -93,7 +93,7 @@ debugger invoked on a LOAD-FOREIGN-LIBRARY-ERROR in thread
 
 ...
 
-Unable to load any of the alternatives:                                         
+Unable to load any of the alternatives:
    ("libSDL_gfx.dylib" (:FRAMEWORK "SDL_gfx"))
    [Condition of type CFFI:LOAD-FOREIGN-LIBRARY-ERROR]
 ```
@@ -106,9 +106,9 @@ Unable to load any of the alternatives:
   Unable to find framework SDL_image
 ```
 
-以上のようなエラーの場合, SDL_gfxやSDL_imageがLibrary/Frameworkにインストールできていない. 
+以上のようなエラーの場合, SDL_gfxやSDL_imageがLibrary/Frameworkにインストールできていない.
 
-####トラブル02
+###トラブル02
 ```
 (ql:quickload "lispbuilder-sdl")
 
@@ -116,23 +116,22 @@ Unable to load any of the alternatives:
    ((:FRAMEWORK "cocoahelper") (:DEFAULT "cocoahelper"))
    [Condition of type CFFI:LOAD-FOREIGN-LIBRARY-ERROR]
 ```
-上記のような場合, cocoahelperがmakeされていない. `~quicklisp/dists/quicklisp/software/lispbuilder-20110619-svn/lispbuilder-sdl/cocoahelper`へ`cd`し, `make`を実行し, 再び以下を実行するとよい.
+
+上記のような場合, cocoahelperがmakeされていない.`~quicklisp/dists/quicklisp/software/lispbuilder-20110619-svn/lispbuilder-sdl/cocoahelper`へ`cd`し, `make`を実行し, 再び以下を実行するとよい.
 
 >[Unable to load sdl-gfx in quicklisp](http://stackoverflow.com/questions/6714714/unable-to-load-sdl-gfx-in-quicklisp)
 
-##2. 今後の課題
+#2. 今後の課題
 
-前回から続けて記事を書いている．  
-これもまとめていたものを公開する形になる．  
-前回の環境構築はうまくいったがこちらでなぜか二日ぐらい潰れた(特に画像が表示されなかった)ので，自分と同じような人の参考になればいいと思う．  
-Lispに関しては，(そのうち)実際に作ったものを公開していく．  
+前回から続けて記事を書いている．これもまとめていたものを公開する形になる．
+前回の環境構築はうまくいったがこちらでなぜか二日ぐらい潰れた(特に画像が表示されなかった)ので，自分と同じような人の参考になればいいと思う．Lispに関しては，(そのうち)実際に作ったものを公開していく．
 
-##参考文献
->[ＯＯエンジニアの輪！～ 第 21 回 川合史朗 さんの巻 ～](http://www.ogis-ri.co.jp/otc/hiroba/others/OORing/interview21.html)  
->[これがプログラミングの神髄だ! ファイナルファンタジーのプログラマーが明かす秘密とLispトークバトル!](http://d.hatena.ne.jp/shi3z/20140123/1390429115)  
->[Common LispでSTGを作りますが何か](http://www.usamimi.info/~ide/programe/stg_doc/stg-commonlisp.pdf)  
->[lispbuilder-sdl on mac](http://d.hatena.ne.jp/Nos/20140824/1408869981)  
->[lispbuilder-sdlのインストール(SBCL編)](http://lambdasakura.hatenablog.com/entry/20110112/1294819728)  
->[Unable to load sdl-gfx in quicklisp](http://stackoverflow.com/questions/6714714/unable-to-load-sdl-gfx-in-quicklisp)  
->[Unable to load sdl-gfx in quicklisp](http://stackoverflow.com/questions/6714714/unable-to-load-sdl-gfx-in-quicklisp)  
->[windowsでsbcl + lispbuilder-sdl](http://d.hatena.ne.jp/Nos/20141004/1412445272)  
+#参考文献
+>[ＯＯエンジニアの輪！～ 第 21 回 川合史朗 さんの巻 ～](http://www.ogis-ri.co.jp/otc/hiroba/others/OORing/interview21.html)
+>[これがプログラミングの神髄だ! ファイナルファンタジーのプログラマーが明かす秘密とLispトークバトル!](http://d.hatena.ne.jp/shi3z/20140123/1390429115)
+>[Common LispでSTGを作りますが何か](http://www.usamimi.info/~ide/programe/stg_doc/stg-commonlisp.pdf)
+>[lispbuilder-sdl on mac](http://d.hatena.ne.jp/Nos/20140824/1408869981)
+>[lispbuilder-sdlのインストール(SBCL編)](http://lambdasakura.hatenablog.com/entry/20110112/1294819728)
+>[Unable to load sdl-gfx in quicklisp](http://stackoverflow.com/questions/6714714/unable-to-load-sdl-gfx-in-quicklisp)
+>[Unable to load sdl-gfx in quicklisp](http://stackoverflow.com/questions/6714714/unable-to-load-sdl-gfx-in-quicklisp)
+>[windowsでsbcl + lispbuilder-sdl](http://d.hatena.ne.jp/Nos/20141004/1412445272)

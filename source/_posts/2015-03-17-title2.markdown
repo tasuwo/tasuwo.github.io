@@ -16,13 +16,11 @@ gemとかbundlerとかevmとかrbenvとか，言葉は聞いたことあるし�
 
 ##そもそもRubyとは
 
-日本人発のスクリプト言語...?くらいの知識しかない．
+日本人発のスクリプト言語...?くらいの知識しかない．一言で言い表すなら，オブジェクト指向スクリプト言語，ということらしい．
 
 >[公式](https://www.ruby-lang.org/ja/)
 
-一言で言い表すなら，オブジェクト指向スクリプト言語，ということらしい．
-
-##1. 設計思想
+#1. 設計思想
 
 Wikipediaもあるけど，インタビュー記事とかも見つけたのでざっと読んでみる．
 
@@ -38,24 +36,22 @@ Wikipediaもあるけど，インタビュー記事とかも見つけたので�
 
 まつもと氏の言語愛から生まれた言語なんだね．
 
-##2. 環境構築
+#2. 環境構築
 
 公式サイトを見ると，インストール方法は以下のように示されている．
 
 * Linux/Unix
     * システムのパッケージ管理ツール
     * rbenv，RVM等のサードパーティ製のツール
-
 * OS X
     * rbenv，RVM等のサードパーティ製のツール
-
 * Windows
     * RubyInstaller
 
 わざわざ管理ツールを用いてインストールするのは，Rubyはバージョン更新が早く，バージョンによってはアプリケーションが動作しないことがよくあるから，だと思う．たぶん．
 当方Macのため，今回はrbenvとRVMの概要についてまとめる．
 
-###2.1 rbenv
+##2.1 rbenv
 
 複数バージョンのRubyを管理できる．
 
@@ -67,14 +63,14 @@ Wikipediaもあるけど，インタビュー記事とかも見つけたので�
 >[rbenvおよびbundlerの基本的な使用方法](https://www.qoosky.net/references/128/)
 >[Rubyのrvmやgemってなんだ？て調べたらrbenvが出てきたの巻](http://mukaer.com/archives/2012/03/09/rubyrvmgemrbenv/)
 
-###2.2 RVM
+##2.2 RVM
 
 略はそのまま，Ruby Version Manager．
 複数のRubyのインストール及び管理をサポートする．
 
 >[rvm.io](http://rvm.io)
 
-###2.3 その他の方法
+##2.3 その他の方法
 
 その他の方法として，システムのパッケージマネージャを用いる方法がある．
 
@@ -85,12 +81,11 @@ Wikipediaもあるけど，インタビュー記事とかも見つけたので�
 * OS X
     * homebrew
 
-###2.4 MacにおけるRuby
+##2.4 MacにおけるRuby
 
-Mac OS X には`ruby 2.2.0`，OS X Moutain Lion, Lion, Snow Leopardには`1.8.7`が含まれている．
-また，Homebrewを用いると簡単にインストールが可能．
+Mac OS X には`ruby 2.2.0`，OS X Moutain Lion, Lion, Snow Leopardには`1.8.7`が含まれている．また，Homebrewを用いると簡単にインストールが可能．
 
-```
+```bash
 $ brew install ruby
 ```
 
@@ -98,22 +93,16 @@ $ brew install ruby
 >[Rubyのrvmやgemってなんだ？て調べたらrbenvが出てきたの巻](http://mukaer.com/archives/2012/03/09/rubyrvmgemrbenv/)  
 >[rbenv + ruby-build はどうやって動いているのか](http://takatoshiono.hatenablog.com/entry/2015/01/09/012040)
 
-##3. ライブラリ
+#3. ライブラリ
 
-###3.1 Gem
+##3.1 Gem
 
-Rubyではサードパーティ製のライブラリやアプリケーションが多く提供されている．
-これらは*Gem*という形式でパッケージングされ，公開されている．
+Rubyではサードパーティ製のライブラリやアプリケーションが多く提供されている．これらは`Gem`という形式でパッケージングされ，公開されている．有名なフレームワークである`Rails`も，Gem形式でパッケージ化されている．たまに，`.zip`や `.tar.gz`等のアーカイブ形式で配布されている場合もある．
 
-有名なフレームワークである Rails も，Gem形式でパッケージ化されている．
+##3.2 RubyGems
 
-たまに，.zip や .tar.gz 等のアーカイブ形式で配布されている場合もある．
-
-###3.2 RubyGems
-
-gemのためのパッケージ管理ツール．コマンド名は`gem`．
-gem形式のパッケージの公開，インストールを助けるシステムで，Ruby のバージョン 1.9 以降では標準添付されている．
-gem形式で公開されている様々なライブラリを使用できる窓口，ということかな．
+gemのためのパッケージ管理ツール．コマンド名は`gem`．gem形式のパッケージの公開，インストールを助けるシステムで，Ruby のバージョン 1.9 以降では標準添付されている．
+gem形式で公開されている様々なライブラリを使用できる窓口として動作するっぽい．
 
 * Gemファイルの検索
     * [RubyGems.org](https://rubygems.org)
@@ -131,24 +120,23 @@ gem形式で公開されている様々なライブラリを使用できる窓�
 >[初心者は覚えておきたいRubygemsのコマンドまとめ](http://qiita.com/muran001/items/14f34b735e0a6b4af98c)  
 >[Rubygemsのススメ | Rubyに慣れていない初心者さんへ](http://qiita.com/sumyapp/items/5ec58bf3567e557c24d7)
 
-###3.3 Bundler
+##3.3 Bundler
 
-アプリケーションが依存するgemを管理するツール．
-gem形式で公開されている．
+アプリケーションが依存するgemを管理するツール．gem形式で公開されている．
 
-アプリケーション開発の際，いくつも`gem install`していると，どのアプリケーションがどの gem に依存しているのか？必要なバージョンは？等の依存関係がわからなくなる．
-bundlerはこれを解決するためのツール．
+アプリケーション開発の際，いくつも`gem install`していると，どのアプリケーションがどの gem に依存しているのか？必要なバージョンは？等の依存関係がわからなくなる．bundlerはこれを解決するためのツール．
 
-インストール．
+###3.3.1 インストール
 
-```
-gem install bundler
+```bash
+$ gem install bundler
 ```
 
-アプリケーションのルートディレクトリ直下に，`Gemfile`というファイルを作成する．
-ここに，アプリケーションに依存する gem を記述しておく．
+###3.3.2 Gemfile
 
-```
+アプリケーションのルートディレクトリ直下に，`Gemfile`というファイルを作成する．ここに，アプリケーションに依存する gem を記述しておく．
+
+```ruby
 # 例
 source 'https://rubygems.org'
 gem "sinatra"
@@ -160,31 +148,32 @@ group :development do
   end
 ```
 
-`Gemfile`に従って，依存する gem をインストールする．
-`--path`を指定すると，gemのインストール先ディレクトリを指定できる．
+###3.3.3 依存gemのインストール
 
-```
-bundle install --path=./vendor/bundler
+`Gemfile`に従って，依存する gem をインストールする．`--path`を指定すると，gemのインストール先ディレクトリを指定できる．
+
+```bash
+$ bundle install --path=./vendor/bundler
 ```
 
 >[Bundler(公式)](http://bundler.io)
 >[Bundlerを使ったGemパッケージの管理](http://www.rubylife.jp/rails/ini/index2.html)
 >[Rubyで開発するときに入れておきたい三種のRubyGems](http://tech.kayac.com/archive/ruby3rubygems.html)
 
-##4. まとめ
+#4. まとめ
 
-###Rubyとは？
+##Rubyとは？
 
 Rubyは，*オブジェクト指向スクリプト言語*．
 特定の目的のために作成されたわけではなく，プログラマが楽しくプログラミングできるように設計された汎用的な言語，とされている．
 Webページを楽に制作できるフレームワーク*Rails*に採用されたことで広く認知されるようになった．
 
-###環境は？
+##環境は？
 
 Rubyはオープンソースであり，更新がめまぐるしい．
 そのため，複数バージョンを切り替えるための*rbenv*や*RVM*等のサードパーティ製のパッケージ管理ツールによってインストール・管理するのが一般的．
 
-###ライブラリは？
+##ライブラリは？
 
 また，ライブラリは*gem*という形式でパッケージングされている．
 *RubyGems*を用いてこれらのライブラリを利用できる．

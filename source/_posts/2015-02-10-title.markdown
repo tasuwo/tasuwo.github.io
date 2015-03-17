@@ -6,12 +6,10 @@ comments: true
 categories: [lisp, 環境構築]
 ---
 
-##Motivation
 
-以前[この本](http://www.amazon.co.jp/コーディングを支える技術-%7E成り立ちから学ぶプログラミング作法-WEB-PRESS-plus/dp/477415654X/ref=sr_1_1?ie=UTF8&qid=1423594846&sr=8-1&keywords=コーディングを支える技術)を読んでLispを知った．  
-どんなもんかなと触ってみたくて...という軽い気持ちで触れることに．  
-結構奥が深いようで楽しみという初心者並みの感想．  
-自分用に環境構築時のメモ．  
+#Motivation
+
+以前[この本](http://www.amazon.co.jp/コーディングを支える技術-%7E成り立ちから学ぶプログラミング作法-WEB-PRESS-plus/dp/477415654X/ref=sr_1_1?ie=UTF8&qid=1423594846&sr=8-1&keywords=コーディングを支える技術)を読んでLispを知った．どんなもんかなと触ってみたくて...という軽い気持ちで触れることに．結構奥が深いようで楽しみという初心者並みの感想．自分用に環境構築時のメモしておく．
 
 <!-- more -->
 
@@ -19,8 +17,8 @@ categories: [lisp, 環境構築]
 
 * Mac OS X Yosemite 10.10.1
 
-##1. Common Lisp
-###1.1 基礎知識
+#1. Common Lisp
+##1.1 基礎知識
 
 そもそもどんなものが必要なのか？ざっくり言うと以下．
 
@@ -29,30 +27,27 @@ categories: [lisp, 環境構築]
 * ライブラリ管理ツール
 	* 名前の通り
 
-###1.2 実際にインストール
+##1.2 実際にインストール
 
-それぞれ種類があるけど，それは各自調べて欲しい．  
-今回は情報をよく見かけた以下を選んだ．  
+それぞれ種類があるけど，今回は情報をよく見かけた以下を選んだ．
 
 * Lisp処理系
 	* SBCL Compiler
 * ライブラリ管理ツール
 	* Quicklisp
 
-前提として，Homebrewが導入されている必要がある．  
-手順は以下．  
+前提として，Homebrewが導入されている必要がある．手順は以下．
 
-1. Homebrewを用いてSBCLをダウンロード ( `brew install sblc` )
+1. Homebrewを用いてSBCLをダウンロード  
+`brew install sblc`
 2. QuickLispを[公式サイト](http://www.quicklisp.org/beta/#installation)からダウンロード. `quicklisp.lisp`をDLすれば良い.
 3. SBCLから`quicklisp.lisp`を実行する. Terminalで `sbcl --load quicklisp.lisp` を入力. SBCLが起動する.
 4. `(quicklisp-quickstart:install)`とタイプし, Returnを押下. Quicklispのインストールルーチンが開始される.
 5. インストール終了後, `(ql:add-to-init-file) `とタイプする. これにより, SBCL起動時, 自動的にQuicklispがロードされる.
 
-これでSBCLとQuicklispのインストールは終了．  
-lispファイルを実行したい場合は `sbcl --load <file>` とすれば良い.   
-ライブラリを追加したい場合は`(ql:quickload "libraryname")` とすれば良い.  
+これでSBCLとQuicklispのインストールは終了．lispファイルを実行したい場合は `sbcl --load <file>` とすれば良い.ライブラリを追加したい場合は`(ql:quickload "libraryname")` とすれば良い.
 
-##3. Sublime Text3 + Common Lisp
+#3. Sublime Text3 + Common Lisp
 
 ST3をよく使うので，連携させて使ってみたいと思った．
 必要なものは1つ．
@@ -68,17 +63,14 @@ ST3をよく使うので，連携させて使ってみたいと思った．
 		* Haskell
 		* OCaml
 
-###3.1 インストール
-パッケージコントロールからインストールしておしまい．  
-Sublime Textにおいて`Preferences > Package Control`でInstall Packageを選択し, インストールする. 
-これにより, SBCLのREPLにsublimeを介してアクセスできるようになる. アクセス方法は, `Tools > SublimeREPL > Common Lisp > SBCL` .  
+##3.1 インストール
+パッケージコントロールからインストールしておしまい．Sublime Textにおいて`Preferences > Package Control`でInstall Packageを選択し, インストールする．これにより, SBCLのREPLにsublimeを介してアクセスできるようになる. アクセス方法は, `Tools > SublimeREPL > Common Lisp > SBCL` ．
+また，複数のCommon Lisp処理系に対応させるために最新版にしたほうがいいらしい． `Preferences > Package Control`から，Add Repositoryを選択し， URL`https://github.com/wuub/SublimeREPL` を入力．これにより，最新版をインストール可能．
 
-また，複数のCommon Lisp処理系に対応させるために最新版にしたほうがいいらしい．  
- `Preferences > Package Control`から, Add Repositoryを選択し, URL`https://github.com/wuub/SublimeREPL` を入力.   
-これにより, 最新版をインストール可能.
+##3.2 キーバインディングの設定
 
-###3.2 キーバインディングの設定
-いちいちメニューから選択してREPLを起動するのは面倒なので, キーバインディングを設定する. `Sublime Text > Preferences > Key Bindings - User`を開き, 以下を入力 & 保存.
+いちいちメニューから選択してREPLを起動するのは面倒なので， キーバインディングを設定する. `Sublime Text > Preferences > Key Bindings - User`を開き，以下を入力 & 保存.
+
 ```
 [
     {
@@ -95,35 +87,35 @@ Sublime Textにおいて`Preferences > Package Control`でInstall Packageを選�
     }
 ]
 ```
+
 これで, `⌘ Command + ^ Control + H`からSBCL REPLを開くことができる. ちなみに, ファイルパスはSublimeでどこのファイルを開いたか? に依存する. `/path/to/main.lisp`をSublimeで開き, `⌘ Command + ^ Control + H` を押下しSBCLを起動したなら, パスは`/path/to/`に通っているので, そこに存在するlispファイルをloadできる.
 
-###3.3 ビルドシステムの設定
-Sublime上で記述したCLファイルがあった時, コマンド一つでビルドできたら便利だ.   
-ということで, ビルドシステムの設定を行う. `Tools > Build System > New Build System...`とし, 次のような記述を行う.
+##3.3 ビルドシステムの設定
+
+Sublime上で記述したCLファイルがあった時, コマンド一つでビルドできたら便利だ.ということで, ビルドシステムの設定を行う. `Tools > Build System > New Build System...`とし, 次のような記述を行う.
+
 ```
 {
     "shell_cmd": "/usr/local/bin/sbcl --disable-debugger --load $file",
     "working_dir": "$file_path"
 }
 ```
-ファイル名を`SBCL.sublime-build`として保存する. これにより, ビルドシステムから`SBCL`を選ぶことが可能になる.   
+
+ファイル名を`SBCL.sublime-build`として保存する. これにより, ビルドシステムから`SBCL`を選ぶことが可能になる.
 CLファイルを記述中に`⌘ Command + B`を押下すれば, 即座にコンパイル & 実行できるようになった.
 
-##4. 次回
+#4. 次回
 
-今回は手元にまとめていたものを公開する形だった．  
-なので新しいことをしたわけじゃない．  
-学業の方がひと段落つきそうなので，そしたら残っているやりたいことや新しいことに挑戦していきたいなぁ．  
-Lispについては勉強の仕方と，簡単なゲームを作った記録を公開していく予定．  
-まだまだ勉強したてなので精進したい．
+今回は手元にまとめていたものを公開する形だった．なので新しいことをしたわけじゃない．学業の方がひと段落つきそうなので，そしたら残っているやりたいことや新しいことに挑戦していきたいなぁ．
+Lispについては勉強の仕方と，簡単なゲームを作った記録を公開していく予定．まだまだ勉強したてなので精進したい．
 
-###参考文献
->[Sublime Text 2でCommon Lispを書くための環境設定](http://blog.8arrow.org/entry/2013/12/19/183508)  
->[SublimeREPL](https://github.com/wuub/SublimeREPL)  
->[Setting up a Common Lisp environment on OS X with Sublime Text 3](http://marktrapp.com/blog/2014/01/20/lisp-with-os-x-sublime-text/)  
->[QuickLisp - Common Lisp Wiki](http://ja.common-lisp.wikia.com/wiki/QuickLisp)   
->[ASDF](http://cl.cddddr.org/index.cgi?ASDF)   
->[モダンCommon Lisp: Quicklispによるライブラリ環境](http://dev.ariel-networks.com/wp/archives/365)  
->[SBCL(Steel Bank Common Lisp) - 紫藤のWiki](https://sites.google.com/site/shidoinfo/Home/programing-lang/関数型プログラミング言語/lisp/common-lisp/common-lisp-処理系/sbclsteel-bank-common-lisp)   
->[SBCL - Steel Bank Common Lisp - LispUser.net](http://lispuser.net/commonlisp/sbcl.html)   
+#参考文献
+>[Sublime Text 2でCommon Lispを書くための環境設定](http://blog.8arrow.org/entry/2013/12/19/183508)
+>[SublimeREPL](https://github.com/wuub/SublimeREPL)
+>[Setting up a Common Lisp environment on OS X with Sublime Text 3](http://marktrapp.com/blog/2014/01/20/lisp-with-os-x-sublime-text/)
+>[QuickLisp - Common Lisp Wiki](http://ja.common-lisp.wikia.com/wiki/QuickLisp)
+>[ASDF](http://cl.cddddr.org/index.cgi?ASDF)
+>[モダンCommon Lisp: Quicklispによるライブラリ環境](http://dev.ariel-networks.com/wp/archives/365)
+>[SBCL(Steel Bank Common Lisp) - 紫藤のWiki](https://sites.google.com/site/shidoinfo/Home/programing-lang/関数型プログラミング言語/lisp/common-lisp/common-lisp-処理系/sbclsteel-bank-common-lisp)
+>[SBCL - Steel Bank Common Lisp - LispUser.net](http://lispuser.net/commonlisp/sbcl.html)
 >[Steel Bank Common Lisp - Wikipedia](http://en.wikipedia.org/wiki/Steel_Bank_Common_Lisp)

@@ -40,7 +40,15 @@ markdown: redcarpet
 #    - footnotes
 #    - smart
 redcarpet:
-  extensions: ["hard_wrap"]
+  extensions: [
+      "hard_wrap",
+      "no_intra_emphasis",
+      "fenced_code_blocks",
+      "autolink",
+      "tables",
+      "footnotes",
+      "strikethrough",
+      "lax_html_blocks"]
 highlighter: pygments # default python pygments have been replaced by pygments.rb
 
 paginate: 10          # Posts per page on the blog index

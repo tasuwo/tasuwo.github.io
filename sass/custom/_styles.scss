@@ -187,3 +187,16 @@ div#urls {
 #content > div > article > footer > div > div.fb-like.fb_iframe_widget > span > iframe {
     margin-top: -7px;
 }
+
+// 追記
+
+h1.entry-title a { font-size: 0.8em; }
+h1 { font-size: 1.6em; }
+h2 { font-size: 1.3em; }
+h3 { font-size: 1em; }
+h4 { font-size: 0.9em; }
+
+ul{margin:1em 0 1em 2em;}
+ol{margin:1em 0 1em 2em;}
+ul li,ol li{margin-top:.5em;margin-bottom:.5em;}
+ul ul,ul ol,ol ol,ol ul{margin-top:0;margin-bottom:0;}

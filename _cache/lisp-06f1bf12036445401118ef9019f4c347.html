@@ -1,0 +1,9 @@
+<div class="highlight"><pre><span class="c1">;; markdown</span>
+<span class="p">(</span><span class="nv">autoload</span> <span class="ss">&#39;markdown-mode</span> <span class="s">&quot;markdown-mode.el&quot;</span> <span class="s">&quot;Major mode for editing Markdown files&quot;</span> <span class="no">t</span><span class="p">)</span>
+<span class="p">(</span><span class="k">setq</span> <span class="nv">auto-mode-alist</span> <span class="p">(</span><span class="nb">cons</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;\\.md&quot;</span> <span class="o">.</span> <span class="nv">gfm-mode</span><span class="p">)</span> <span class="nv">auto-mode-alist</span><span class="p">))</span>
+
+<span class="p">(</span><span class="nv">add-hook</span> <span class="ss">&#39;gfm-mode-hook</span>
+          <span class="o">&#39;</span><span class="p">(</span><span class="k">lambda</span> <span class="p">()</span>
+             <span class="p">(</span><span class="k">setq</span> <span class="nv">global-linum-mode</span> <span class="no">nil</span><span class="p">)</span>
+             <span class="p">(</span><span class="nv">electric-indent-local-mode</span> <span class="mi">-1</span><span class="p">)))</span>
+</pre></div>

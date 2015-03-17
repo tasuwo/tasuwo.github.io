@@ -1,0 +1,122 @@
+---
+layout: post
+title: "OctopressのCSSをいじる"
+date: 2015-03-17 15:01:37 +0900
+comments: true
+categories: [octopress]
+---
+
+やったこと．
+
+1. CSSを変更
+2. テーブル表記を修正・変更
+
+<!-- more -->
+
+#1. やったこと
+
+##1.1 CSSを変更
+
+`sass/custom/_styles.scss`の末尾に追記すれば反映される．
+
+```css
+// 追記
+h1.entry-title a { font-size: 0.8em; }
+h1 { font-size: 1.6em; }
+h2 { font-size: 1.3em; }
+h3 { font-size: 1em; }
+h4 { font-size: 0.9em; }
+
+ul{margin:1em 0 1em 2em;}
+ol{margin:1em 0 1em 2em;}
+ul li,ol li{margin-top:.5em;margin-bottom:.5em;}
+ul ul,ul ol,ol ol,ol ul{margin-top:0;margin-bottom:0;}
+```
+
+>[Octopressでフォントサイズを変える<](http://blog.textfile.org/20140920/font/)
+
+##1.2 テーブル表記を修正・変更
+
+テーブルがちゃんと表示されていないことに気づく．extensionが足りなかったらしい．`config.yml`を以下のように編集．
+
+```basic
+# markdown
+markdown: redcarpet
+redcarpet:
+  extensions: [
+      "hard_wrap",
+      "no_intra_emphasis",
+      "fenced_code_blocks",
+      "autolink",
+      "tables",
+      "footnotes",
+      "strikethrough",
+      "lax_html_blocks"
+      ]
+```
+
+ついでに，テーブルをいい感じのレイアウトに変更する．以下のような`source/stylesheets/data-table.css`を追加．
+
+```css
+* + table {
+    border-style:solid;
+    border-width:1px;
+    border-color:#e7e3e7;
+    margin: 10px 0 30px 0;
+    }
+
+* + table th, * + table td {
+    border-style:dashed;
+    border-width:1px;
+    border-color:#e7e3e7;
+    }
+
+* + table th {
+    border-style:solid;
+    font-weight:bold;
+    background: url("/images/noise.png?1330434582") repeat scroll left top #F7F3F7;
+    padding: 2px 9px;
+    }
+
+* + table td {
+    padding: 2px 9px;
+    }
+
+* + table th[align="left"], * + table td[align="left"] {
+    text-align:left;
+    }
+
+* + table th[align="right"], * + table td[align="right"] {
+    text-align:right;
+    }
+
+* + table th[align="center"], * + table td[align="center"] {
+    text-align:center;
+    }
+
+tr:nth-child(even){
+    background: url("/images/noise.png?1330434582") repeat scroll left top #F7F3F7;
+    }
+```
+
+`source/_includes/head.html`に以下を追記して反映させる．
+
+```html
+<link href="{{ root_url }}/stylesheets/data-table.css" rel="stylesheet" type="text/css">
+```
+
+>[Redcarpetを使ったmarkdown記法サンプル](http://whiskers.nukos.kitchen/2014/08/02/markdown.html)
+>[Octopressでテーブルをmarkdownで編集できるようにする](http://morizyun.github.io/blog/octopress-table-tag-css/)
+
+#2. 関連知識
+
+CSSを修正するときに参考になりそうなサイトをメモ．
+
+>[Octopressのスタイル設定とカスタマイズ](http://tokkonopapa.github.io/blog/2012/01/03/customizing-octopress-styles/)
+
+#3. 雑記
+
+前回の記事でプレビューを表示できるように四苦八苦していたけど，`rake preview`しながらファイル内容を変更しても動的に編集結果が反映されることに気づいた．これは便利だ．
+ただし，動的に変更を反映しているため，一度プレビューを終了すると次回プレビュー/デプロイ時に変更は反映されない．`rake generate`してから各操作を行うこと．
+
+ブログが少し見やすくなった気がする．ひとまずemacsとブログに関する諸々はこれでOKかな．

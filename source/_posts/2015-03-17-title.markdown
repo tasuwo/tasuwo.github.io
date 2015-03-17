@@ -8,23 +8,25 @@ categories: emacs
 
 やったことは以下
 
-* タブ，全角/半角スペースを可視化(whitespaceの導入)
-* タブをスペースで変換するように設定
-* Markdownにおける行頭タブの自動整形の無効化
-* GFMを利用する
+1. タブ，全角/半角スペースを可視化(whitespaceの導入)
+2. タブをスペースで変換するように設定
+3. Markdownにおける行頭タブの自動整形の無効化
+4. GFMを利用する
 
 それぞれまとめていく．
 
 <!-- more -->
 
-###whitespace導入
+#1. やったこと
+
+##1.1 whitespace導入
 
 >[whitespace-modeを使って、ファイルの保存時に行末のスペースや末尾の改行を削除する](http://qiita.com/itiut@github/items/4d74da2412a29ef59c3a)
 
 上記を参考に，whitespace-modeを導入．
 `(setq-default show-trailing-whitespace t)`と設定がかぶっていたので削除した．
 
-###タブをスペースに変換
+##1.2 タブをスペースに変換
 
 `(setq-default indent-tabs-mode nil)`を使っていたのだけど，タブがスペースに置換されない．
 そもそもどのタイミングで置換されていたのか?
@@ -35,7 +37,7 @@ categories: emacs
 普段入力するタブをスペースに置換するにはどうすればよいかと考えたけれど，単純にキーバインドに割り当てればよいだけだということに気づく．
 `init.el`内でのタブ周りの設定は以下．
 
-```
+```lisp
 ;; タブ幅
 (custom-set-variables '(tab-width 4))
 
@@ -45,7 +47,7 @@ categories: emacs
 
 これとは別に，キーバインドとして以下を設定したらうまくいった．
 
-```
+```lisp
 (global-set-key "\C-i" '(lambda ()
                           (interactive)
                           (let ((width tab-width)
@@ -60,7 +62,7 @@ categories: emacs
 スペース4つ分で代わりに置き換えようと思ったが，タブ幅の設定を反映できた方が良いと思ったのでこうなった．
 ちょっとやり方が苦しい．もっと上手い方法があるかもしれない．
 
-###Markdownにおける行頭タブの自動整形の無効化
+##1.3 Markdownにおける行頭タブの自動整形の無効化
 
 タブ入力した後に字句入力して改行するとタブが削除されてしまうのでなんとかしかった．
 これはつまり，直前にインデントがない場合，Emacs が余分なインデントだと判断して自動整形してしまっているのだと思われる．
@@ -73,7 +75,7 @@ Emacsはモードが設定されると，対応するモードフック変数に
 各モードのカスタマイズのためには，このモードフック変数を編集する．
 今回は，以下のように設定を追記して自動インデントを無効化した．
 
-```
+```lisp
 ;; markdown
 (autoload 'markdown-mode "markdown-mode.el" "Major mode for editing Markdown files" t)
 (setq auto-mode-alist (cons '("\\.md" . gfm-mode) auto-mode-alist))
@@ -87,16 +89,16 @@ Emacsはモードが設定されると，対応するモードフック変数に
 `global-linum-mode`は画面外にはみ出した文章の改行指定．
 コーディングでは全体の形が崩れるので無効にしておくが，Markdownは文章なので改行したほうが読みやすい．
 
-###GFMモードを利用する
+##1.4 GFMモードを利用する
 
 行末のスペースも削除されてしまうので，どうしようと思っていたが，GFMモードというものを利用すれば良いらしい．
 具体的な使い方は前項に示した．gfm-mode は markdown-mode.el 内に定義されているようだ．
 GFMモードを快適に利用したいので，さらに以下を設定していく．
 
-* OctopressでGFMが使用できるように設定する
-* GFMのプレビューができるようにする
+1. OctopressでGFMが使用できるように設定する
+2. GFMのプレビューができるようにする
 
-####OctopressでGFMが使用できるように設定する
+###1.4.1 OctopressでGFMが使用できるように設定する
 
 1. `Gemfile`に`gem 'redcarpet', '~> 3.1`を追記(他のgemがこのバージョンに依存していたため，参考サイトと違うバージョンを指定)
 2. なかったので，`gem 'albino', '~> 1.3.3'`も追加
@@ -114,13 +116,13 @@ redcarpet:
 
 >[Octopress で GitHub Flavored Markdown (GFM) を使う](http://blog.tdksk.com/2013/05/06/use-gfm-in-octopress.html)
 
-####emacs上からGFMのプレビューができるようにする
+###1.4.2 emacs上からGFMのプレビューができるようにする
 
 Grip は Markdown を GitHub Flavor に変換してプレビューできる．
 
 1. Gripをインストール
 
-```
+```bash
 $ sudo pip install grip
 ```
 
@@ -129,7 +131,7 @@ $ sudo pip install grip
 
 2. binファイルを作成し，パスの通ったディレクトリにおく
 
-```
+```bash
 $ which grip
 $ emacs /usr/local/bin/markdown
 
@@ -146,7 +148,7 @@ GFMモードでプレビューするためには，`--gfm`オプションを追�
 
 3. 設定の追加
 
-```
+```lisp
 ;; markdown mode
 (autoload 'markdown-mode "markdown-mode"
    "Major mode for editing Markdown files" t)
@@ -164,13 +166,13 @@ GFMモードでプレビューするためには，`--gfm`オプションを追�
 
 4. `C-c C-c p`，`C-c C- v`で実行
 
-####エラー
+###トラブルシューティング
 
 これでok...と思ったら，文字化けする上にちっともGitHub Flavor でない．
 
 試しに，Markdownファイルに対して直接`grip`を叩く．
 
-```
+```bash
 $ grip test.md
 ```
 
@@ -182,20 +184,20 @@ UnicodeDecodeError: 'utf8' codec can't decode byte 0xa4 in position 2: invalid s
 
 文字コード関連かと思い，対象ファイルの文字コードをnkfで調べる．
 
-```
+```bash
 $ nkf --guess test.md
 EUC-JP (LF)
 ```
 
 UTF-8に変換．
 
-```
+```bash
 $ nkf -u --overwrite test.md
 ```
 
 再び実行．
 
-```
+```bash
 $ nkf --guess test.md
 UTF-8 (LF)
 $ grip test.md
@@ -204,7 +206,7 @@ $ grip test.md
 うまくいった．
 ただ，エラーが表示されてしまう．
 
-```
+```bash
 /usr/local/lib/python2.7/site-packages/requests/packages/urllib3/connectionpool.py:769: InsecureRequestWarning: Unverified HTTPS request is being made. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.org/en/latest/security.html InsecureRequestWarning)
 ```
 
@@ -214,7 +216,7 @@ $ grip test.md
 
 >[Emacsのmarkdown-modeを使ってみる](http://blog.s-amemiya.com/development/emacsのmarkdown-modeを使ってみる/)  
 
-##今後やりたいことのメモ
+#2. 今後やりたいことのメモ
 
 * Emacsにおける文字コードの設定
 * 認証局関連の知識ほしい...([認証局を立ててぼろもうけしたいんですが＞無理な理由を理解しよう](http://qiita.com/kawaz/items/f90810b9ea823b6556a8))

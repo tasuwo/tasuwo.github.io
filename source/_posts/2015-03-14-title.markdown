@@ -6,52 +6,48 @@ comments: true
 categories: emacs
 ---
 
-研究会とか諸々で忙しかったため，久しぶりの更新．  
-Emacsの設定をしたので自分用にメモ．  
-基本設定と，Cakeを導入してのパッケージ管理を行いました．
+研究会とか諸々で忙しかったため，久しぶりの更新．Emacsの設定をしたので自分用にメモ．
+やったことは...
+
+* 基本設定
+* Caskを導入してのパッケージ管理
 
 <!-- more -->
 
-emacsの設定の話
-===============
+#1. インストール
 
-##1. インストール
+emacsのインストール．前回やった．
+homebrewでemacsをインストールしたため，インストール先は`/usr/local/Cellar`にある．`Emacs.app`をAppフォルダに移動しておく．
 
-emacsのインストール．前回やった．  
-homebrewでemacsをインストールしたため，インストール先は`/usr/local/Cellar`にある．`Emacs.app`をAppフォルダに移動しておく．  
+#2. ディレクトリ構成
 
-##2. ディレクトリ構成
+まず，ホームディレクトリがどこか確認する．Emacsを立ち上げて`C-x C-f`で`~/`を指定すれば分かる．
 
-まず，ホームディレクトリがどこか確認しよう．Emacsを立ち上げて`C-x C-f`で`~/`を指定すれば分かる．  
+ホームディレクトリに，設定を保存するための`.emacs.d`フォルダを作成する(自動生成されている場合もある)．下記のサイトを参考にすると．
 
-ホームディレクトリに，設定を保存するための`.emacs.d`フォルダを作成する．(自動生成されている場合もある)  
-下記のサイトを参考にすると．
+>[Emacs の基本設定](http://www.gfd-dennou.org/member/uwabami/cc-env/EmacsBasic.html)
 
->[Emacs の基本設定](http://www.gfd-dennou.org/member/uwabami/cc-env/EmacsBasic.html)  
-
-Emacs22以降は，`~/.emacs.d/`以下に設定ファイル群をまとめておくと便利だそう．このサイトはいろいろ作っているけど，よくわからないので最低限のものだけ作成する．  
-とりあえず，`inits`フォルダと`init.el`ファイルを作成する．それぞれの役割は以下．
+Emacs22以降は，`~/.emacs.d/`以下に設定ファイル群をまとめておくと便利だそう．このサイトはいろいろ作っているけど，よくわからないので最低限のものだけ作成する．とりあえず，`inits`フォルダと`init.el`ファイルを作成する．それぞれの役割は以下．
 
 * init.el
-	* Emacsの初期化ファイル
-	* ウインドウの大きさ，フォントの種類とか
-	* elispパッケージの読み込みとか
+    * Emacsの初期化ファイル
+    * ウインドウの大きさ，フォントの種類とか
+    * elispパッケージの読み込みとか
 * inits
 	* 各種設定ファイルをおく
 	* init-loaderの項で説明する
 
-##3. 設定を書く
+#3. 設定を書く
 
 下記サイトをとりあえず参考に．
 
 >[うわっ...私のEmacs、使いにくすぎ？だったら...ｶｽﾀﾏｲｽﾞｼﾔｯｾｰ!!ﾀﾞｧﾀﾞｧｼｴﾘｲｪｯｽｯｼｪｰｼｮｰﾍｲﾍｲ!!!](http://d.hatena.ne.jp/sandai/20120304/p2)
 
-###3.1 load-pathの設定
+##3.1 load-pathの設定
 
-いろいろなライブラリを利用できた方が便利だ．    
-EmacsのライブラリはEmacs Lispで記述されており，拡張子は`.el`である．`M-x load-library`を実行すると，`load-path`に存在するライブラリが読み込まれる．  
-よって，この`load parh`を設定しておく必要がある．`load path`は変数`load-path`として定義されているため，これを書き換えればよい．  
-初期化ファイルである`init.el`に，以下を追記する．  
+いろいろなライブラリを利用できた方が便利だ．EmacsのライブラリはEmacs Lispで記述されており，拡張子は`.el`である．`M-x load-library`を実行すると，`load-path`に存在するライブラリが読み込まれる．
+よって，この`load parh`を設定しておく必要がある．`load path`は変数`load-path`として定義されているため，これを書き換えればよい．
+初期化ファイルである`init.el`に，以下を追記する．
 
 ```
 ;; load-pathの追加関数
@@ -70,8 +66,8 @@ EmacsのライブラリはEmacs Lispで記述されており，拡張子は`.el`
 
 やり方はいろいろあると思うけど，関数として定義しておけば，追加が楽だ．
 
-###3.2 全体的な設定
- 
+##3.2 全体的な設定
+
 途中フォントの設定があるが，Emacsで使用可能なフォント一覧は`(font-family-list)`をscratchバッファ実行すれば良い．
 
 ```
@@ -164,28 +160,22 @@ EmacsのライブラリはEmacs Lispで記述されており，拡張子は`.el`
 (fset 'yes-or-no-p 'y-or-n-p)
 ```
 
-###3.3 追記
+##3.3 追記
 
-上記のような設定を`init.el`にだらだらと書いたら，`init-loader`なるものを見つけたので，後述する．
-また，`init.el`に設定を追記したものの，ちゃんと機能しているかが不安だ．  
-式の後ろで`C-x C-e`を実行するとlisp式を評価できるので，これで確認すると良い．
+上記のような設定を`init.el`にだらだらと書いたら，`init-loader`なるものを見つけたので，後述する．また，`init.el`に設定を追記したものの，ちゃんと機能しているかが不安というときは，式の後ろで`C-x C-e`を実行するとlisp式を評価できるので，これで確認すると良い．
 
-##4. パッケージ管理
+#4. パッケージ管理
 
-さて．  
-Emacsのパッケージ管理が必要となるが，どうやらいろいろあるようだ．  
+Emacsのパッケージ管理が必要となるが，どうやらいろいろあるようだ．
 
 * package.elを使う
 * Cask,Palletを使う
 
-後者の方が便利らしい．  
-よくわからないのでとりあえずどちらも見ておく．
+後者の方が便利らしい．よくわからないのでとりあえずどちらも見ておく．
 
-###4.1 package.el
+##4.1 package.el
 
->[package.el - Emacs JP](http://emacs-jp.github.io/packages/package-management/package-el.html)
-
-パッケージはリポジトリに格納されている．公開されているリポジトリが幾つかある．
+Emacsのパッケージは，リポジトリにまとまって公開されている．
 
 * GNU ELPA
 	* 公式のリポジトリ
@@ -194,9 +184,7 @@ Emacsのパッケージ管理が必要となるが，どうやらいろいろあ
 	* 非公式のリポジトリ
 	* リポジトリに変更があるたびに更新されるため，最新版をインストール可能
 
-上記のようなリポジトリを登録したのちに，インストールしたいパッケージを指定する，という流れになる．  
-リポジトリ情報は`package-archives`変数に格納されているので，新規に追加する場合はこれをいじる．  
-以下が設定例．
+上記のようなリポジトリを登録したのちに，インストールしたいパッケージを指定する，という流れになる．リポジトリ情報は`package-archives`変数に格納されているので，新規に追加する場合はこれをいじる．以下が設定例．
 
 ```
 (require 'package)
@@ -208,57 +196,50 @@ Emacsのパッケージ管理が必要となるが，どうやらいろいろあ
 (package-initialize)
 ```
 
-指定したパッケージをインストールするには，`M-x package-install`を実行する．更新は`M-x package-refresh-contents`．  
+指定したパッケージをインストールするには，`M-x package-install`を実行する．更新は`M-x package-refresh-contents`．
 
-以上がパッケージをインストールする流れになるが，環境が変わった際にいちいちパッケージをインストールしなおすのは面倒．そこで，`package.el`にインストールすべきパッケージを記載しておき，これを実行すれば同様の環境が構築できるようにしておく．  
+以上がパッケージをインストールする流れになるが，環境が変わった際にいちいちパッケージをインストールしなおすのは面倒．そこで，`package.el`にインストールすべきパッケージを記載しておき，これを実行すれば同様の環境が構築できるようにしておく．
 
-`(package-installed-p package-name)`で`package-name`がインストール済みかどうか確認できるため，これが`nil`を返すようなパッケージについてインストールすれば，同様の環境が構築できる．  
-`package.el`に必要なパッケージを記述し(例は省略)，`M-x eval-buffer`を実行することでパッケージ群をインストールできる．便利．
+`(package-installed-p package-name)`で`package-name`がインストール済みかどうか確認できるため，これが`nil`を返すようなパッケージについてインストールすれば，同様の環境が構築できる．`package.el`に必要なパッケージを記述し(例は省略)，`M-x eval-buffer`を実行することでパッケージ群をインストールできる．便利．
 
-###4.2 Cask
+>[package.el - Emacs JP](http://emacs-jp.github.io/packages/package-management/package-el.html)
 
-`package.el`は便利だなーと思ったけれど，最近だと`Cask`なるものを使うらしい．なんぞや．
+##4.2 Cask
 
->[Cask](https://github.com/cask/cask)  
->[Cask とは何であるのか、および init.el が非常にシンプルになった件](http://kiririmode.hatenablog.jp/entry/20141228/1419762171)  
->[Emacs Lispのテスト、依存性管理、CI](http://www.kaichan.info/blog/2014-02-23-emacs-cask.html)  
->[package.elから Caskに切り替えました](http://d.hatena.ne.jp/syohex/20140424/1398310931)
+`package.el`は便利だなーと思ったけれど，最近だと`Cask`なるものを使うらしい．`Cask`は，ざっくりいうとパッケージ管理システム．パッケージの依存関係をみながらライブラリを管理してくれる，のかな？
 
-ざっくりいうとパッケージ管理システム．パッケージの依存関係をみながらライブラリを管理してくれる，のかな？
+`package.el`もライブラリの依存関係を考慮して必要ライブラリを一括でダウンロードできるが，個人の設定であるため`~./emacs.d`にダウンロードするのが前提．
+よって，ライブラリ開発で利用するのには向かない．`Cask`は Cask ファイルに依存しているライブラリを記述することで，一括ダウンロードや`PATH`，`load-path`の調整をしてくれる．
 
-`package.el`もライブラリの依存関係を考慮して必要ライブラリを一括でダウンロードできるが，個人の設定であるため`~./emacs.d`にダウンロードするのが前提．  
-よって，ライブラリ開発で利用するのには向かない．  
-CaskはCaskファイルに依存しているライブラリを記述することで，一括ダウンロードや`PATH`，`load-path`の調整をしてくれる．
+###4.2.1 Caskのインストール
 
-####4.2.1 Caskのインストール
-
-```
-brew install cask
+```bash
+$ brew install cask
 ```
 
-####4.2.2 Caskファイルの初期化
+###4.2.2 Caskファイルの初期化
 
-`~/.emacs.d`(設定ファイルが置かれた場所)で`cask init`．  
+`~/.emacs.d`(設定ファイルが置かれた場所)で`cask init`．
 `Cask`というファイルができるため，今後このファイルでパッケージを管理する．
-本ファイルには，すでにCaskオススメのパッケージが依存関係として記述されているので，これを好みに記述し直していけば良い．  
+本ファイルには，すでにCaskオススメのパッケージが依存関係として記述されているので，これを好みに記述し直していけば良い．
 
-####4.2.3 Caskファイルの記述
+###4.2.3 Caskファイルの記述
 
-#####source
+####source
 
-パッケージリポジトリを指定する．  
+パッケージリポジトリを指定する．
 現状，gnu, melpa, marmalade, SC, orgが指定可能．
 
-```
+```lisp
 (source gnu)
 (source melpa)
 ```
 
-#####depends-on
+####depends-on
 
 インストールするパッケージをいろいろ書いていく．指定方法は以下が可能．
 
-```
+```lisp
 (depends-on "magit")
 (depends-on "magit" "0.8.1")
 (depends-on "magit" :git "https://github.com/magit/magit.git")
@@ -267,68 +248,65 @@ brew install cask
 (depends-on "magit" :git "https://github.com/magit/magit.git" :files ("*.el" (:exclude "magit-svn.el")))
 ```
 
-####4.2.4 ライブラリのインストール
+###4.2.4 ライブラリのインストール
 
 `Cask`に記述されたライブラリがインストールされる．
 
-```
-cask install
+```bash
+$ cask install
 ```
 
-####4.2.5 インストールされたパッケージにパスを通す
+###4.2.5 インストールされたパッケージにパスを通す
 
 cask.elをロードし，cask-initializeを呼ぶ．こうすることで，load-path，autoloadの設定を読み込んでくれる．
 `init.el`に以下を記述．
 
-```
-;; homebrewで導入したtool用のpathを追加                                     
+```lisp
+;; homebrewで導入したtool用のpathを追加
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
 
-;; ------------------------------------------------------------------------ 
-;; @ Cask設定                                                               
+;; ------------------------------------------------------------------------
+;; @ Cask設定
 (require 'cask "cask.el")
 (cask-initialize)
 ```
 
-####4.2.6 おまけ
+###4.2.6 おまけ
 
 とりあえず初期設定のままでパッケージをインストールした．暇なときに以下のサイトを見たりしておく．
 
 >[Cask init して入ってくるライブラリ一覧 - 亀岡的プログラマ日記](http://posaune.hatenablog.com/entry/2014/06/17/221041)
 
+>[Cask](https://github.com/cask/cask)
+>[Cask とは何であるのか、および init.el が非常にシンプルになった件](http://kiririmode.hatenablog.jp/entry/20141228/1419762171)
+>[Emacs Lispのテスト、依存性管理、CI](http://www.kaichan.info/blog/2014-02-23-emacs-cask.html)
+>[package.elから Caskに切り替えました](http://d.hatena.ne.jp/syohex/20140424/1398310931)
 
-##5. init-loaderによる設定ファイルの分割
+#5. init-loaderによる設定ファイルの分割
 
 `init-loader`は，指定したディレクトリ内のelファイルを読み込んでくれるelisp．それだけではなく，ファイル名を見て環境に合わせて読み込んでくれたり，エラーのあるファイルをスルーしてくれたりする．他にも，環境依存な設定を分離できたりするので便利．
 
->[.emacs分割のすゝめ](http://tech.kayac.com/archive/divide-dot-emacs.html)  
->[emacs-jp/init-loader](https://github.com/emacs-jp/init-loader)  
->[モダンなEmacsを求めて (3) init-loaderで設定ファイルを分割する](http://block-given.hatenablog.com/entry/2014/11/09/134725)  
->[init-loader.el と package.el を導入して快適 Emacs ライフ](http://qiita.com/catatsuy/items/5f1cd86e2522fd3384a0)  
->[自分流の .emacs管理](http://blog.shibayu36.org/entry/2013/12/03/213942)
+##5.1 init-loaderインストール
 
-###5.1 init-loaderインストール
+Caskを導入したので，利用してパッケージをいれる．Caskファイルにinit-loaderを追加．
 
-Caskを導入したので，利用してパッケージをいれる
-Caskファイルにinit-loaderを追加
-
-```
+```lisp
 (depends-on "init-loader")
 ```
 
 インストール
 
-```
-cask install
+```bash
+$ cask install
 ```
 
 アップデート
 
-```
-cask update
+```bash
+$ cask update
 ```
 
-###5.2 設定ファイル記述
+##5.2 設定ファイル記述
 
 `inits`フォルダの中に設定ファイルを書いていく．ファイルは以下の設定に従って作成していく．
 
@@ -348,13 +326,13 @@ cask update
 |Windows|windows|
 |Linux|linux|
 
-###5.3 設定の反映
+##5.3 設定の反映
 
 `inits.el`に設定追記
 
-```
-;;; init-loader 設定                                                         
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+```lisp
+;;; init-loader 設定
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'init-loader)
 (setq init-loader-show-lod-after-init "error-only")
 (init-loader-load "~/.emacs.d/inits")
@@ -379,8 +357,13 @@ loaded /Users/hogehoge/.emacs.d/inits/01_hoge. 0.00703
 ...
 ```
 
-エラーがなく，inits内のファイルが呼び出されていることが確認できる．
-設定ファイルの分け方はまた考える．
+エラーがなく，inits内のファイルが呼び出されていることが確認できる．設定ファイルの分け方はまた考える．
+
+>[.emacs分割のすゝめ](http://tech.kayac.com/archive/divide-dot-emacs.html)
+>[emacs-jp/init-loader](https://github.com/emacs-jp/init-loader)
+>[モダンなEmacsを求めて (3) init-loaderで設定ファイルを分割する](http://block-given.hatenablog.com/entry/2014/11/09/134725)
+>[init-loader.el と package.el を導入して快適 Emacs ライフ](http://qiita.com/catatsuy/items/5f1cd86e2522fd3384a0)
+>[自分流の .emacs管理](http://blog.shibayu36.org/entry/2013/12/03/213942)
 
 ##6. 最終的に
 
@@ -389,11 +372,11 @@ Caskとinit-loaderを導入した．
 
 設定については，どんなものがあるのかわからないし，いろんな人の.emacs.dを参考にする．
 
->[shibayu36/emacs](https://github.com/shibayu36/emacs/tree/master/emacs.d)  
->[shomah4a/.emacs.d](https://github.com/shomah4a/.emacs.d)  
+>[shibayu36/emacs](https://github.com/shibayu36/emacs/tree/master/emacs.d)
+>[shomah4a/.emacs.d](https://github.com/shomah4a/.emacs.d)
 >[catatsuy/dot.emacs.d](https://github.com/catatsuy/dot.emacs.d)
 
-###6.1 導入パッケージ
+##6.1 導入パッケージ
 
 下記サイトを参考にいくつか
 
@@ -401,53 +384,43 @@ Caskとinit-loaderを導入した．
 
 * init-loader
 	* いわずもがな
-	
 * auto-complete
 	* 字句保管機能
 	* バッファ内にある文字列を自動的に保管対象にする
 	* tabを押して選択
 * popup
-	* emacsでpopupメニューを使う．auto-completeで使われている．
-
-```
+	* emacsでpopupメニューを使う．auto-completeで使われている．  
+```lisp
 (require 'auto-complete)
 (require 'auto-complete-config)    ; 必須ではないですが一応
 (global-auto-complete-mode t)
 ```
-
 * smartparens
-	* 括弧やクォート等の自動挿入・管理
-
-```
+	* 括弧やクォート等の自動挿入・管理  
+```lisp
 (require 'smartparens-config)
 (smartparens-global-mode t)
 ```
-
 * rainbow-delimiters
-	* 括弧の対応を色付けする
-	* ~~そのうち邪魔になりそう~~
-
-```
+	* 括弧の対応を色付けする  
+```lisp
 (require 'rainbow-delimiters)
 
 ;(add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
 (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
 ;(global-rainbow-delimiters-mode)
 ```
-
 * helm
 	* 超絶便利らしいので勉強してみる
 * ace-jump-mode
 	* 特定語句にジャンプする
 	* 練習が必要そう
 
->[smartparens.el での括弧処理](http://kiririmode.hatenablog.jp/entry/20131231/p1)  
->[rainbow-delimiters.elの括弧色付けをデフォルトより強調する方法](http://d.hatena.ne.jp/murase_syuka/20140815/1408061850)  
+>[smartparens.el での括弧処理](http://kiririmode.hatenablog.jp/entry/20131231/p1)
+>[rainbow-delimiters.elの括弧色付けをデフォルトより強調する方法](http://d.hatena.ne.jp/murase_syuka/20140815/1408061850)
 >[「Emacsのトラノマキ」連載第09回「auto-completeを使おう」(松山智大)](http://dev.ariel-networks.com/wp/documents/aritcles/emacs/part9)
 
-##7. おわりに
+#7. おわりに
 
-設定は奥が深いようだ．使いながら欲しい機能を探すのがいいだろう．  
-あとは今回設定した中でも，気に入らない設定が出てくるかもしれない．  
-落ち着いたら，設定はgithubで公開したい．  
+設定は奥が深いようだ．使いながら欲しい機能を探すのがいいだろう．あとは今回設定した中でも，気に入らない設定が出てくるかもしれない．落ち着いたら，設定はgithubで公開したい．
 自作OSの方は8日目くらいまで進んでいるのだけど，まとめが終わっていない．明日はそちらをまとめることを目標にする．
