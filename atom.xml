@@ -4,7 +4,7 @@
   <title><![CDATA[tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2015-03-19T13:52:09+09:00</updated>
+  <updated>2015-03-19T13:56:56+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -12,15 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[Test]]></title>
-    <link href="http://tasuwo.github.io/blog/2015/03/19/test/"/>
-    <updated>2015-03-19T13:51:26+09:00</updated>
-    <id>http://tasuwo.github.io/blog/2015/03/19/test</id>
-    <content type="html"><![CDATA[<p>てすとです．</p>
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[自作OSの途中経過(8/30)]]></title>
