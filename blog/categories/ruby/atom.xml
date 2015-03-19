@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Ruby | tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/blog/categories/ruby/atom.xml" rel="self"/>
+  <link href="http://tasuwo.github.io/"/>
+  <updated>2015-03-19T13:33:39+09:00</updated>
+  <id>http://tasuwo.github.io/</id>
+  <author>
+    <name><![CDATA[tasuwo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Rubyの基礎知識についてのメモ]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/03/17/title2/"/>
+    <updated>2015-03-17T02:18:06+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/03/17/title2</id>
+    <content type="html"><![CDATA[<p>Rubyの基礎知識についてまとめたので，自分用のメモを残す．</p>
+
+<!-- more -->
+
+<h2>今回の目的</h2>
+
+<p>gemとかbundlerとかevmとかrbenvとか，言葉は聞いたことあるし利用したことあっても理解してなかったので，まとめる．</p>
+
+<h2>そもそもRubyとは</h2>
+
+<p>日本人発のスクリプト言語&#8230;?くらいの知識しかない．一言で言い表すなら，オブジェクト指向スクリプト言語，ということらしい．</p>
+
+<blockquote>
+<p><a href="https://www.ruby-lang.org/ja/">公式</a></p>
+</blockquote>
+
+<h1>1. 設計思想</h1>
+
+<p>Wikipediaもあるけど，インタビュー記事とかも見つけたのでざっと読んでみる．</p>
+
+<blockquote>
+<p><a href="http://doda.jp/engineer/guide/yosoku/07_1.html">三年予測 -トップリーダーと考えるエンジニアの未来- 第7回 Ruby言語設計者まつもとゆきひろ</a></p>
+</blockquote>
+
+<p>印象に残った文章をいくつか引用しておく．</p>
+
+<blockquote>
+<p>Ruby言語は純粋なオブジェクト指向言語なので、数値や文字列を含めすべてをオブジェクトとして扱う。&quot;Hello, World!&quot;の文字列を表示するだけの最も簡単なプログラムを動かすにも、まずオブジェクトを管理する枠組みを作り、最小限必要なクラス群を作り、さらにI/Oライブラリを作らなければならない。この段階に到達するまでに半年を要したのだ。</p>
+
+<p>まつもとゆきひろの有名な言葉の一つに「Rubyをキメると気持ちいい！」というものがある。「新しいものを作ろうとは思っていない。気分がよく開発できる言語を作りたい」のだ。</p>
+
+<p>特定分野に特化して設計された言語よりも、プログラミング言語として隅々まで配慮されている汎用言語が好みだという。「Rubyには目的はない。科学技術計算とかWeb開発とか、特定の目的に偏った言語ではない」</p>
+</blockquote>
+
+<p>まつもと氏の言語愛から生まれた言語なんだね．</p>
+
+<h1>2. 環境構築</h1>
+
+<p>公式サイトを見ると，インストール方法は以下のように示されている．</p>
+
+<ul>
+<li>Linux/Unix
+
+<ul>
+<li>システムのパッケージ管理ツール</li>
+<li>rbenv，RVM等のサードパーティ製のツール</li>
+</ul></li>
+<li>OS X
+
+<ul>
+<li>rbenv，RVM等のサードパーティ製のツール</li>
+</ul></li>
+<li>Windows
+
+<ul>
+<li>RubyInstaller</li>
+</ul></li>
+</ul>
+
+<p>わざわざ管理ツールを用いてインストールするのは，Rubyはバージョン更新が早く，バージョンによってはアプリケーションが動作しないことがよくあるから，だと思う．たぶん．<br>
+当方Macのため，今回はrbenvとRVMの概要についてまとめる．</p>
+
+<h2>2.1 rbenv</h2>
+
+<p>複数バージョンのRubyを管理できる．</p>
+
+<p>デフォルトでは，Rubyのインストール自体はサポートしていない．<br>
+しかし，<code>ruby-build</code>というプラグインによってインストール可能となる．</p>
+
+<blockquote>
+<p><a href="https://github.com/sstephenson/rbenv">rbenvドキュメント</a><br>
+<a href="http://takatoshiono.hatenablog.com/entry/2015/01/09/012040">rbenv + ruby-build はどうやって動いているのか</a><br>
+<a href="https://www.qoosky.net/references/128/">rbenvおよびbundlerの基本的な使用方法</a><br>
+<a href="http://mukaer.com/archives/2012/03/09/rubyrvmgemrbenv/">Rubyのrvmやgemってなんだ？て調べたらrbenvが出てきたの巻</a></p>
+</blockquote>
+
+<h2>2.2 RVM</h2>
+
+<p>略はそのまま，Ruby Version Manager．<br>
+複数のRubyのインストール及び管理をサポートする．</p>
+
+<blockquote>
+<p><a href="http://rvm.io">rvm.io</a></p>
+</blockquote>
+
+<h2>2.3 その他の方法</h2>
+
+<p>その他の方法として，システムのパッケージマネージャを用いる方法がある．</p>
+
+<ul>
+<li>Debian or Ubuntu
+
+<ul>
+<li>apt</li>
+</ul></li>
+<li>CentOS, Fedora, or RHEL
+
+<ul>
+<li>yum</li>
+</ul></li>
+<li>OS X
+
+<ul>
+<li>homebrew</li>
+</ul></li>
+</ul>
+
+<h2>2.4 MacにおけるRuby</h2>
+
+<p>Mac OS X には<code>ruby 2.2.0</code>，OS X Moutain Lion, Lion, Snow Leopardには<code>1.8.7</code>が含まれている．また，Homebrewを用いると簡単にインストールが可能．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>brew install ruby
+</code></pre></div>
+<blockquote>
+<p><a href="https://www.qoosky.net/references/128/">rbenvおよびbundlerの基本的な使用方法</a><br>
+<a href="http://mukaer.com/archives/2012/03/09/rubyrvmgemrbenv/">Rubyのrvmやgemってなんだ？て調べたらrbenvが出てきたの巻</a><br><br>
+<a href="http://takatoshiono.hatenablog.com/entry/2015/01/09/012040">rbenv + ruby-build はどうやって動いているのか</a></p>
+</blockquote>
+
+<h1>3. ライブラリ</h1>
+
+<h2>3.1 Gem</h2>
+
+<p>Rubyではサードパーティ製のライブラリやアプリケーションが多く提供されている．これらは<code>Gem</code>という形式でパッケージングされ，公開されている．有名なフレームワークである<code>Rails</code>も，Gem形式でパッケージ化されている．たまに，<code>.zip</code>や <code>.tar.gz</code>等のアーカイブ形式で配布されている場合もある．</p>
+
+<h2>3.2 RubyGems</h2>
+
+<p>gemのためのパッケージ管理ツール．コマンド名は<code>gem</code>．gem形式のパッケージの公開，インストールを助けるシステムで，Ruby のバージョン 1.9 以降では標準添付されている．<br>
+gem形式で公開されている様々なライブラリを使用できる窓口として動作するっぽい．</p>
+
+<ul>
+<li>Gemファイルの検索
+
+<ul>
+<li><a href="https://rubygems.org">RubyGems.org</a></li>
+</ul></li>
+<li> RubyGemsドキュメント
+
+<ul>
+<li><a href="http://guides.rubygems.org">RubyGems&#39; docs</a></li>
+</ul></li>
+<li>Gemコマンドリファレンス
+
+<ul>
+<li><a href="http://guides.rubygems.org/command-reference/">RubyGems Guide</a></li>
+</ul></li>
+<li>使用頻度の高いコマンド
+
+<ul>
+<li><code>gem search -r</code>：RubyGems のリポジトリを調べる</li>
+<li><code>gem search -l</code>：インストール済のgemを調べる</li>
+<li><code>gem list</code>：インストール済のgem一覧</li>
+<li><code>gem install [gem]</code>：gemのインストール</li>
+</ul></li>
+</ul>
+
+<blockquote>
+<p><a href="https://www.ruby-lang.org/ja/libraries/">ライブラリ - Ruby</a><br>
+<a href="http://qiita.com/muran001/items/14f34b735e0a6b4af98c">初心者は覚えておきたいRubygemsのコマンドまとめ</a><br><br>
+<a href="http://qiita.com/sumyapp/items/5ec58bf3567e557c24d7">Rubygemsのススメ | Rubyに慣れていない初心者さんへ</a></p>
+</blockquote>
+
+<h2>3.3 Bundler</h2>
+
+<p>アプリケーションが依存するgemを管理するツール．gem形式で公開されている．</p>
+
+<p>アプリケーション開発の際，いくつも<code>gem install</code>していると，どのアプリケーションがどの gem に依存しているのか？必要なバージョンは？等の依存関係がわからなくなる．bundlerはこれを解決するためのツール．</p>
+
+<h3>3.3.1 インストール</h3>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>gem install bundler
+</code></pre></div>
+<h3>3.3.2 Gemfile</h3>
+
+<p>アプリケーションのルートディレクトリ直下に，<code>Gemfile</code>というファイルを作成する．ここに，アプリケーションに依存する gem を記述しておく．</p>
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># 例</span>
+<span class="n">source</span> <span class="s1">&#39;https://rubygems.org&#39;</span>
+<span class="n">gem</span> <span class="s2">&quot;sinatra&quot;</span>
+<span class="n">gem</span> <span class="s2">&quot;mysql2&quot;</span>
+<span class="n">gem</span> <span class="s2">&quot;activerecord&quot;</span><span class="p">,</span> <span class="s2">&quot;3.1.1&quot;</span><span class="p">,</span> <span class="ss">:require</span> <span class="o">=&gt;</span> <span class="s1">&#39;active_record&#39;</span>
+
+<span class="n">group</span> <span class="ss">:development</span> <span class="k">do</span>
+  <span class="n">gem</span> <span class="s2">&quot;shotgun&quot;</span>
+  <span class="k">end</span>
+</code></pre></div>
+<h3>3.3.3 依存gemのインストール</h3>
+
+<p><code>Gemfile</code>に従って，依存する gem をインストールする．<code>--path</code>を指定すると，gemのインストール先ディレクトリを指定できる．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bundle install --path<span class="o">=</span>./vendor/bundler
+</code></pre></div>
+<blockquote>
+<p><a href="http://bundler.io">Bundler(公式)</a><br>
+<a href="http://www.rubylife.jp/rails/ini/index2.html">Bundlerを使ったGemパッケージの管理</a><br>
+<a href="http://tech.kayac.com/archive/ruby3rubygems.html">Rubyで開発するときに入れておきたい三種のRubyGems</a></p>
+</blockquote>
+
+<h1>4. まとめ</h1>
+
+<h2>Rubyとは？</h2>
+
+<p>Rubyは，<em>オブジェクト指向スクリプト言語</em>．<br>
+特定の目的のために作成されたわけではなく，プログラマが楽しくプログラミングできるように設計された汎用的な言語，とされている．<br>
+Webページを楽に制作できるフレームワーク<em>Rails</em>に採用されたことで広く認知されるようになった．</p>
+
+<h2>環境は？</h2>
+
+<p>Rubyはオープンソースであり，更新がめまぐるしい．<br>
+そのため，複数バージョンを切り替えるための<em>rbenv</em>や<em>RVM</em>等のサードパーティ製のパッケージ管理ツールによってインストール・管理するのが一般的．</p>
+
+<h2>ライブラリは？</h2>
+
+<p>また，ライブラリは<em>gem</em>という形式でパッケージングされている．<br>
+<em>RubyGems</em>を用いてこれらのライブラリを利用できる．<br>
+また，その依存関係を管理するのに<em>bundler</em>というgemパッケージが広く用いられている．<br>
+bundler は アプリケーション毎に Gemfile を用意する．<br>
+Gemfile にアプリケーションが依存する gem やそのバージョンを記述することで，アプリケーションとライブラリの依存関係を管理する．</p>
+]]></content>
+  </entry>
+  
+</feed>

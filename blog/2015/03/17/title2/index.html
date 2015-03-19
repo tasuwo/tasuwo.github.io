@@ -1,0 +1,492 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Rubyの基礎知識についてのメモ - tasuwo blog</title>
+  <meta name="author" content="tasuwo">
+
+  
+  <meta name="description" content="Rubyの基礎知識についてまとめたので，自分用のメモを残す． 今回の目的 gemとかbundlerとかevmとかrbenvとか，言葉は聞いたことあるし利用したことあっても理解してなかったので，まとめる． そもそもRubyとは 日本人発のスクリプト言語...?くらいの知識しかない．一言で言い表すなら &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tasuwo.github.io/blog/2015/03/17/title2">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="tasuwo blog" type="application/atom+xml">
+  <link href="/stylesheets/data-table.css" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-60860415-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">tasuwo blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:tasuwo.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Rubyの基礎知識についてのメモ</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-03-17T02:18:06+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:18 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tasuwo.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Rubyの基礎知識についてまとめたので，自分用のメモを残す．</p>
+
+<!-- more -->
+
+<h2>今回の目的</h2>
+
+<p>gemとかbundlerとかevmとかrbenvとか，言葉は聞いたことあるし利用したことあっても理解してなかったので，まとめる．</p>
+
+<h2>そもそもRubyとは</h2>
+
+<p>日本人発のスクリプト言語&#8230;?くらいの知識しかない．一言で言い表すなら，オブジェクト指向スクリプト言語，ということらしい．</p>
+
+<blockquote>
+<p><a href="https://www.ruby-lang.org/ja/">公式</a></p>
+</blockquote>
+
+<h1>1. 設計思想</h1>
+
+<p>Wikipediaもあるけど，インタビュー記事とかも見つけたのでざっと読んでみる．</p>
+
+<blockquote>
+<p><a href="http://doda.jp/engineer/guide/yosoku/07_1.html">三年予測 -トップリーダーと考えるエンジニアの未来- 第7回 Ruby言語設計者まつもとゆきひろ</a></p>
+</blockquote>
+
+<p>印象に残った文章をいくつか引用しておく．</p>
+
+<blockquote>
+<p>Ruby言語は純粋なオブジェクト指向言語なので、数値や文字列を含めすべてをオブジェクトとして扱う。&quot;Hello, World!&quot;の文字列を表示するだけの最も簡単なプログラムを動かすにも、まずオブジェクトを管理する枠組みを作り、最小限必要なクラス群を作り、さらにI/Oライブラリを作らなければならない。この段階に到達するまでに半年を要したのだ。</p>
+
+<p>まつもとゆきひろの有名な言葉の一つに「Rubyをキメると気持ちいい！」というものがある。「新しいものを作ろうとは思っていない。気分がよく開発できる言語を作りたい」のだ。</p>
+
+<p>特定分野に特化して設計された言語よりも、プログラミング言語として隅々まで配慮されている汎用言語が好みだという。「Rubyには目的はない。科学技術計算とかWeb開発とか、特定の目的に偏った言語ではない」</p>
+</blockquote>
+
+<p>まつもと氏の言語愛から生まれた言語なんだね．</p>
+
+<h1>2. 環境構築</h1>
+
+<p>公式サイトを見ると，インストール方法は以下のように示されている．</p>
+
+<ul>
+<li>Linux/Unix
+
+<ul>
+<li>システムのパッケージ管理ツール</li>
+<li>rbenv，RVM等のサードパーティ製のツール</li>
+</ul></li>
+<li>OS X
+
+<ul>
+<li>rbenv，RVM等のサードパーティ製のツール</li>
+</ul></li>
+<li>Windows
+
+<ul>
+<li>RubyInstaller</li>
+</ul></li>
+</ul>
+
+<p>わざわざ管理ツールを用いてインストールするのは，Rubyはバージョン更新が早く，バージョンによってはアプリケーションが動作しないことがよくあるから，だと思う．たぶん．<br>
+当方Macのため，今回はrbenvとRVMの概要についてまとめる．</p>
+
+<h2>2.1 rbenv</h2>
+
+<p>複数バージョンのRubyを管理できる．</p>
+
+<p>デフォルトでは，Rubyのインストール自体はサポートしていない．<br>
+しかし，<code>ruby-build</code>というプラグインによってインストール可能となる．</p>
+
+<blockquote>
+<p><a href="https://github.com/sstephenson/rbenv">rbenvドキュメント</a><br>
+<a href="http://takatoshiono.hatenablog.com/entry/2015/01/09/012040">rbenv + ruby-build はどうやって動いているのか</a><br>
+<a href="https://www.qoosky.net/references/128/">rbenvおよびbundlerの基本的な使用方法</a><br>
+<a href="http://mukaer.com/archives/2012/03/09/rubyrvmgemrbenv/">Rubyのrvmやgemってなんだ？て調べたらrbenvが出てきたの巻</a></p>
+</blockquote>
+
+<h2>2.2 RVM</h2>
+
+<p>略はそのまま，Ruby Version Manager．<br>
+複数のRubyのインストール及び管理をサポートする．</p>
+
+<blockquote>
+<p><a href="http://rvm.io">rvm.io</a></p>
+</blockquote>
+
+<h2>2.3 その他の方法</h2>
+
+<p>その他の方法として，システムのパッケージマネージャを用いる方法がある．</p>
+
+<ul>
+<li>Debian or Ubuntu
+
+<ul>
+<li>apt</li>
+</ul></li>
+<li>CentOS, Fedora, or RHEL
+
+<ul>
+<li>yum</li>
+</ul></li>
+<li>OS X
+
+<ul>
+<li>homebrew</li>
+</ul></li>
+</ul>
+
+<h2>2.4 MacにおけるRuby</h2>
+
+<p>Mac OS X には<code>ruby 2.2.0</code>，OS X Moutain Lion, Lion, Snow Leopardには<code>1.8.7</code>が含まれている．また，Homebrewを用いると簡単にインストールが可能．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew install ruby
+</span></code></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p><a href="https://www.qoosky.net/references/128/">rbenvおよびbundlerの基本的な使用方法</a><br>
+<a href="http://mukaer.com/archives/2012/03/09/rubyrvmgemrbenv/">Rubyのrvmやgemってなんだ？て調べたらrbenvが出てきたの巻</a><br><br>
+<a href="http://takatoshiono.hatenablog.com/entry/2015/01/09/012040">rbenv + ruby-build はどうやって動いているのか</a></p>
+</blockquote>
+
+<h1>3. ライブラリ</h1>
+
+<h2>3.1 Gem</h2>
+
+<p>Rubyではサードパーティ製のライブラリやアプリケーションが多く提供されている．これらは<code>Gem</code>という形式でパッケージングされ，公開されている．有名なフレームワークである<code>Rails</code>も，Gem形式でパッケージ化されている．たまに，<code>.zip</code>や <code>.tar.gz</code>等のアーカイブ形式で配布されている場合もある．</p>
+
+<h2>3.2 RubyGems</h2>
+
+<p>gemのためのパッケージ管理ツール．コマンド名は<code>gem</code>．gem形式のパッケージの公開，インストールを助けるシステムで，Ruby のバージョン 1.9 以降では標準添付されている．<br>
+gem形式で公開されている様々なライブラリを使用できる窓口として動作するっぽい．</p>
+
+<ul>
+<li>Gemファイルの検索
+
+<ul>
+<li><a href="https://rubygems.org">RubyGems.org</a></li>
+</ul></li>
+<li> RubyGemsドキュメント
+
+<ul>
+<li><a href="http://guides.rubygems.org">RubyGems&#39; docs</a></li>
+</ul></li>
+<li>Gemコマンドリファレンス
+
+<ul>
+<li><a href="http://guides.rubygems.org/command-reference/">RubyGems Guide</a></li>
+</ul></li>
+<li>使用頻度の高いコマンド
+
+<ul>
+<li><code>gem search -r</code>：RubyGems のリポジトリを調べる</li>
+<li><code>gem search -l</code>：インストール済のgemを調べる</li>
+<li><code>gem list</code>：インストール済のgem一覧</li>
+<li><code>gem install [gem]</code>：gemのインストール</li>
+</ul></li>
+</ul>
+
+<blockquote>
+<p><a href="https://www.ruby-lang.org/ja/libraries/">ライブラリ - Ruby</a><br>
+<a href="http://qiita.com/muran001/items/14f34b735e0a6b4af98c">初心者は覚えておきたいRubygemsのコマンドまとめ</a><br><br>
+<a href="http://qiita.com/sumyapp/items/5ec58bf3567e557c24d7">Rubygemsのススメ | Rubyに慣れていない初心者さんへ</a></p>
+</blockquote>
+
+<h2>3.3 Bundler</h2>
+
+<p>アプリケーションが依存するgemを管理するツール．gem形式で公開されている．</p>
+
+<p>アプリケーション開発の際，いくつも<code>gem install</code>していると，どのアプリケーションがどの gem に依存しているのか？必要なバージョンは？等の依存関係がわからなくなる．bundlerはこれを解決するためのツール．</p>
+
+<h3>3.3.1 インストール</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>gem install bundler
+</span></code></pre></td></tr></table></div></figure>
+
+<h3>3.3.2 Gemfile</h3>
+
+<p>アプリケーションのルートディレクトリ直下に，<code>Gemfile</code>というファイルを作成する．ここに，アプリケーションに依存する gem を記述しておく．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># 例</span>
+</span><span class='line'><span class="n">source</span> <span class="s1">&#39;https://rubygems.org&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;sinatra&quot;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;mysql2&quot;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;activerecord&quot;</span><span class="p">,</span> <span class="s2">&quot;3.1.1&quot;</span><span class="p">,</span> <span class="ss">:require</span> <span class="o">=&gt;</span> <span class="s1">&#39;active_record&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">group</span> <span class="ss">:development</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s2">&quot;shotgun&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h3>3.3.3 依存gemのインストール</h3>
+
+<p><code>Gemfile</code>に従って，依存する gem をインストールする．<code>--path</code>を指定すると，gemのインストール先ディレクトリを指定できる．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>bundle install --path<span class="o">=</span>./vendor/bundler
+</span></code></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p><a href="http://bundler.io">Bundler(公式)</a><br>
+<a href="http://www.rubylife.jp/rails/ini/index2.html">Bundlerを使ったGemパッケージの管理</a><br>
+<a href="http://tech.kayac.com/archive/ruby3rubygems.html">Rubyで開発するときに入れておきたい三種のRubyGems</a></p>
+</blockquote>
+
+<h1>4. まとめ</h1>
+
+<h2>Rubyとは？</h2>
+
+<p>Rubyは，<em>オブジェクト指向スクリプト言語</em>．<br>
+特定の目的のために作成されたわけではなく，プログラマが楽しくプログラミングできるように設計された汎用的な言語，とされている．<br>
+Webページを楽に制作できるフレームワーク<em>Rails</em>に採用されたことで広く認知されるようになった．</p>
+
+<h2>環境は？</h2>
+
+<p>Rubyはオープンソースであり，更新がめまぐるしい．<br>
+そのため，複数バージョンを切り替えるための<em>rbenv</em>や<em>RVM</em>等のサードパーティ製のパッケージ管理ツールによってインストール・管理するのが一般的．</p>
+
+<h2>ライブラリは？</h2>
+
+<p>また，ライブラリは<em>gem</em>という形式でパッケージングされている．<br>
+<em>RubyGems</em>を用いてこれらのライブラリを利用できる．<br>
+また，その依存関係を管理するのに<em>bundler</em>というgemパッケージが広く用いられている．<br>
+bundler は アプリケーション毎に Gemfile を用意する．<br>
+Gemfile にアプリケーションが依存する gem やそのバージョンを記述することで，アプリケーションとライブラリの依存関係を管理する．</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">tasuwo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-03-17T02:18:06+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:18 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/ruby/'>ruby</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2015/03/17/title2/" data-via="" data-counturl="http://tasuwo.github.io/blog/2015/03/17/title2/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <br />
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/03/17/title/" title="Previous Post: Emacsに色々設定したメモ">&laquo; Emacsに色々設定したメモ</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/03/17/title01/" title="Next Post: OctopressのCSSをいじる">OctopressのCSSをいじる &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h2 id="toc_0">Profile</h2>
+
+  <h3 id="toc_1">ME</h3>
+
+  <ul>
+  <li>情報系の学生</li>
+  <li>プログラミング初心者でMac初心者</li>
+  </ul>
+
+  <h3 id="toc_2">SNS</h3>
+
+  <ul>
+  <li>Twitter: <a href="https://twitter.com/tasuwo_">@tasuwo_</a></li>
+  <li>GiHub: <a href="https://github.com/tasuwo">tasuwo</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/19/harib-git/">自作OSの途中経過(8/30)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/19/about-git/">Gitの基礎知識をまとめたよ</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/18/biao-ji-gui-ze/">コマンド構文の表記規則についてメモ</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/17/title01/">OctopressのCSSをいじる</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/17/title2/">Rubyの基礎知識についてのメモ</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - tasuwo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'tasuwoblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tasuwo.github.io/blog/2015/03/17/title2/';
+        var disqus_url = 'http://tasuwo.github.io/blog/2015/03/17/title2/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

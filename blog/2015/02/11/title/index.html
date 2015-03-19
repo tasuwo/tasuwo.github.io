@@ -1,0 +1,431 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Yosemite + Lisp + Lispbuilder-SDL - tasuwo blog</title>
+  <meta name="author" content="tasuwo">
+
+  
+  <meta name="description" content="Motivation 以下の記事を読んだ． ＯＯエンジニアの輪！～ 第 21 回 川合史朗 さんの巻 ～
+これがプログラミングの神髄だ! ファイナルファンタジーのプログラマーが明かす秘密とLispトークバトル! なるほどね．なんだ，Lispでゲーム作れるんじゃん!
+差し当たって， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tasuwo.github.io/blog/2015/02/11/title">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="tasuwo blog" type="application/atom+xml">
+  <link href="/stylesheets/data-table.css" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-60860415-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">tasuwo blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:tasuwo.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Yosemite + Lisp + Lispbuilder-SDL</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-02-11T04:19:11+09:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>4:19 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tasuwo.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>Motivation</h2>
+
+<p>以下の記事を読んだ．</p>
+
+<blockquote>
+<p><a href="http://www.ogis-ri.co.jp/otc/hiroba/others/OORing/interview21.html">ＯＯエンジニアの輪！～ 第 21 回 川合史朗 さんの巻 ～</a><br>
+<a href="http://d.hatena.ne.jp/shi3z/20140123/1390429115">これがプログラミングの神髄だ! ファイナルファンタジーのプログラマーが明かす秘密とLispトークバトル!</a></p>
+</blockquote>
+
+<!-- more -->
+
+<p>なるほどね．なんだ，Lispでゲーム作れるんじゃん!<br>
+差し当たって，界隈では有名なpdfらしい以下を参考にして勉強している．</p>
+
+<blockquote>
+<p><a href="http://www.usamimi.info/%7Eide/programe/stg_doc/stg-commonlisp.pdf">Common LispでSTGを作りますが何か</a></p>
+</blockquote>
+
+<p>PDFでの学習内容には特に触れない．環境構築の際に色々つまづいたので，それについてメモしておく．</p>
+
+<h1>1. 環境構築</h1>
+
+<h2>1.1 ライブラリのインストール</h2>
+
+<p>前回の記事より，Lispの環境はできているので, ゲーム作成に必要な以下のライブラリをインストールする.</p>
+
+<ul>
+<li>Lispbuilder-SDL</li>
+</ul>
+
+<p>冊子によると, ライブラリ間の依存関係等もあり色々ダウンロードしなくてはならないらしい.試しに色々検索してみると以下のサイトがヒット．</p>
+
+<blockquote>
+<p><a href="http://d.hatena.ne.jp/Nos/20140824/1408869981">lispbuilder-sdl on mac</a><br>
+<a href="http://lambdasakura.hatenablog.com/entry/20110112/1294819728">lispbuilder-sdlのインストール(SBCL編)</a><br>
+<a href="http://stackoverflow.com/questions/6714714/unable-to-load-sdl-gfx-in-quicklisp">Unable to load sdl-gfx in quicklisp</a></p>
+</blockquote>
+
+<p>先人の苦しんだ後が伺える. とりあえず必要なlispbuilderは以下とされている.</p>
+
+<ul>
+<li>win32-lispbuilder-sdl-gfx-binaries-2.0.13.tgz</li>
+<li>win32-lispbuilder-sdl-ttf-binaries-2.0.9.tgz</li>
+<li>win32-lispbuilder-sdl-mixer-binaries-1.2.11.tgz</li>
+<li>win32-lispbuilder-sdl-image-binaries-1.2.10.tgz</li>
+<li>win32-lispbuilder-sdl-binaries-1.2.14.tgz</li>
+<li>lispbuilder-sdl-ttf-0.3.0.tgz</li>
+<li>lispbuilder-sdl-mixer-0.4.tgz</li>
+<li>lispbuilder-sdl-image-0.5.0.tgz</li>
+<li>lispbuilder-sdl-gfx-0.7.0.tgz</li>
+<li>lispbuilder-sdl-0.9.8.1.tgz</li>
+</ul>
+
+<p>OS指定のないファイルは, Quicklisp導入時点でダウンロードされているため必要ない. 自分の環境はMacOS X Yosemiteなので, 以下をダウンロード.</p>
+
+<ul>
+<li>max-lispbuilder-sdl-binaries-1.2.14.tar</li>
+<li>max-lispbuilder-sdl-gfx-binaries-2.0.16.tar</li>
+<li>max-lispbuilder-sdl-image-binaries-1.2.10.tar</li>
+<li>max-lispbuilder-sdl-mixer-binaries-1.2.11.tar</li>
+<li>max-lispbuilder-sdl-ttf-binaries-2.0.10.tar</li>
+</ul>
+
+<p>解凍後, READMEを読む．すると，<code>~.framework</code>を<code>Library/Frameworks</code>へ移動すれば良いと書かれているので従う．</p>
+
+<h3>補足</h3>
+
+<p>正直, 環境構築に失敗して色々やりすぎて, どれが本当は必要で, どれが必要ないのかわからない．SDLパッケージはhomebrewでもダウンロード可能だが，うまくいかずに上記の方法で落ち着いた．一から環境構築する機会があれば試すことにする．</p>
+
+<h2>1.2 インストール後の確認</h2>
+
+<p>きちんとインストールできているか確認する．以下を実行する．</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(ql:quickload "lispbuilder-sdl")
+</span><span class='line'>(ql:quickload "lispbuilder-sdl-examples")
+</span><span class='line'>
+</span><span class='line'>(sdl-examples:mandelbrot)</span></code></pre></td></tr></table></div></figure>
+
+<p>サンプルが動けば成功. ちなみに<code>(do-external-symbols (s :sdl-examples) (when (fboundp s) (print s)))</code>とするとデモ一覧が見られるので, 好きなモノを実行してみると良いかもしれない.</p>
+
+<p>あとは，PDFを参考にガシガシやっていけば良い．</p>
+
+<h2>1.3 トラブルシューティング</h2>
+
+<h3>トラブル01</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>* (ql:quickload "lispbuilder-sdl-image")
+</span><span class='line'>
+</span><span class='line'>...
+</span><span class='line'>
+</span><span class='line'>debugger invoked on a LOAD-FOREIGN-LIBRARY-ERROR in thread
+</span><span class='line'>#&lt;THREAD "main thread" RUNNING {1002C175F3}&gt;:
+</span><span class='line'>  Unable to find framework SDL_image</span></code></pre></td></tr></table></div></figure>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(ql:quickload "lispbuilder-sdl-gfx")
+</span><span class='line'>
+</span><span class='line'>...
+</span><span class='line'>
+</span><span class='line'>Unable to load any of the alternatives:
+</span><span class='line'>   ("libSDL_gfx.dylib" (:FRAMEWORK "SDL_gfx"))
+</span><span class='line'>   [Condition of type CFFI:LOAD-FOREIGN-LIBRARY-ERROR]</span></code></pre></td></tr></table></div></figure>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(ql:quickload "lispbuilder-sdl-gfx")
+</span><span class='line'>
+</span><span class='line'>...
+</span><span class='line'>
+</span><span class='line'>#&lt;THREAD "main thread" RUNNING {1002C175F3}&gt;:
+</span><span class='line'>  Unable to find framework SDL_image</span></code></pre></td></tr></table></div></figure>
+
+<p>以上のようなエラーの場合, SDL_gfxやSDL_imageがLibrary/Frameworkにインストールできていない.</p>
+
+<h3>トラブル02</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(ql:quickload "lispbuilder-sdl")
+</span><span class='line'>
+</span><span class='line'>Unable to load any of the alternatives:
+</span><span class='line'>   ((:FRAMEWORK "cocoahelper") (:DEFAULT "cocoahelper"))
+</span><span class='line'>   [Condition of type CFFI:LOAD-FOREIGN-LIBRARY-ERROR]</span></code></pre></td></tr></table></div></figure>
+
+<p>上記のような場合, cocoahelperがmakeされていない.<code>~quicklisp/dists/quicklisp/software/lispbuilder-20110619-svn/lispbuilder-sdl/cocoahelper</code>へ<code>cd</code>し, <code>make</code>を実行し, 再び以下を実行するとよい.</p>
+
+<blockquote>
+<p><a href="http://stackoverflow.com/questions/6714714/unable-to-load-sdl-gfx-in-quicklisp">Unable to load sdl-gfx in quicklisp</a></p>
+</blockquote>
+
+<h1>2. 今後の課題</h1>
+
+<p>前回から続けて記事を書いている．これもまとめていたものを公開する形になる．<br>
+前回の環境構築はうまくいったがこちらでなぜか二日ぐらい潰れた(特に画像が表示されなかった)ので，自分と同じような人の参考になればいいと思う．Lispに関しては，(そのうち)実際に作ったものを公開していく．</p>
+
+<h1>参考文献</h1>
+
+<blockquote>
+<p><a href="http://www.ogis-ri.co.jp/otc/hiroba/others/OORing/interview21.html">ＯＯエンジニアの輪！～ 第 21 回 川合史朗 さんの巻 ～</a><br>
+<a href="http://d.hatena.ne.jp/shi3z/20140123/1390429115">これがプログラミングの神髄だ! ファイナルファンタジーのプログラマーが明かす秘密とLispトークバトル!</a><br>
+<a href="http://www.usamimi.info/%7Eide/programe/stg_doc/stg-commonlisp.pdf">Common LispでSTGを作りますが何か</a><br>
+<a href="http://d.hatena.ne.jp/Nos/20140824/1408869981">lispbuilder-sdl on mac</a><br>
+<a href="http://lambdasakura.hatenablog.com/entry/20110112/1294819728">lispbuilder-sdlのインストール(SBCL編)</a><br>
+<a href="http://stackoverflow.com/questions/6714714/unable-to-load-sdl-gfx-in-quicklisp">Unable to load sdl-gfx in quicklisp</a><br>
+<a href="http://stackoverflow.com/questions/6714714/unable-to-load-sdl-gfx-in-quicklisp">Unable to load sdl-gfx in quicklisp</a><br>
+<a href="http://d.hatena.ne.jp/Nos/20141004/1412445272">windowsでsbcl + lispbuilder-sdl</a></p>
+</blockquote>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">tasuwo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-02-11T04:19:11+09:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>4:19 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/lisp/'>lisp</a>, <a class='category' href='/blog/categories/huan-jing-gou-zhu/'>環境構築</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2015/02/11/title/" data-via="" data-counturl="http://tasuwo.github.io/blog/2015/02/11/title/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <br />
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/02/10/title/" title="Previous Post: YosemiteでCommon Lispの環境構築">&laquo; YosemiteでCommon Lispの環境構築</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/02/17/title/" title="Next Post: 自作OS1日目">自作OS1日目 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h2 id="toc_0">Profile</h2>
+
+  <h3 id="toc_1">ME</h3>
+
+  <ul>
+  <li>情報系の学生</li>
+  <li>プログラミング初心者でMac初心者</li>
+  </ul>
+
+  <h3 id="toc_2">SNS</h3>
+
+  <ul>
+  <li>Twitter: <a href="https://twitter.com/tasuwo_">@tasuwo_</a></li>
+  <li>GiHub: <a href="https://github.com/tasuwo">tasuwo</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/19/harib-git/">自作OSの途中経過(8/30)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/19/about-git/">Gitの基礎知識をまとめたよ</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/18/biao-ji-gui-ze/">コマンド構文の表記規則についてメモ</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/17/title01/">OctopressのCSSをいじる</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/17/title2/">Rubyの基礎知識についてのメモ</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - tasuwo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'tasuwoblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tasuwo.github.io/blog/2015/02/11/title/';
+        var disqus_url = 'http://tasuwo.github.io/blog/2015/02/11/title/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: 自作os | tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/blog/categories/zi-zuo-os/atom.xml" rel="self"/>
+  <link href="http://tasuwo.github.io/"/>
+  <updated>2015-03-19T13:33:39+09:00</updated>
+  <id>http://tasuwo.github.io/</id>
+  <author>
+    <name><![CDATA[tasuwo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[自作OSの途中経過(8/30)]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/03/19/harib-git/"/>
+    <updated>2015-03-19T02:21:23+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/03/19/harib-git</id>
+    <content type="html"><![CDATA[<p>途中経過です．</p>
+
+<!-- more -->
+
+<h2>近況</h2>
+
+<p>GitHubに公開しました．</p>
+
+<blockquote>
+<p><a href="https://github.com/tasuwo/hariboteOS">tasuwo/hariboteOS</a></p>
+</blockquote>
+
+<p>進捗ダメです状態．学んだことのメモとかは<code>README.md</code>にまとめてあります．でも自分以外が読んでもわからないかもしれない．<br>
+今後は記事としての更新はやめて，こっちに色々メモしていくことにします．</p>
+
+<h2>雑記</h2>
+
+<p>最近プログラミングしてなさすぎてやばい．まつもとゆきひろさんのインタビュー記事読んでたらRubyに興味が出てきた．でもLand of Lispもあるしやばい．自作OSも理解が遅いせいで進捗がやばい．うおー．<br>
+それと<a href="https://qiita.com">Qiita</a>に興味が出てきた．でもポストできるだけの知識がない．いつか自分がお世話になったコミュニティーには何らかの形で貢献できるようにしたい．</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[自作OS3日目]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/02/26/title/"/>
+    <updated>2015-02-26T00:13:10+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/02/26/title</id>
+    <content type="html"><![CDATA[<p>3日目です．</p>
+
+<!-- more -->
+
+<p>余計なことをしていたら，結構時間がかかってしまった．現在進めている本は2006年の本なので，実はかなり情報が古い．でも，OSの根本の部分ってそんな簡単に変わらないと思うので，無駄になることはないはずだ．多分．また，組み込みOSの方はたぶんCPUとかの組み立てからやるのだけど，レジスタとかメモリとか利用していると実際にそれらを見てみたくなるのはわかる．余裕があればいつかやってみたいな．そっちは2010年でまだ新しいしね．<br>
+前回同様やったことの整理をする．</p>
+
+<h1>2日目</h1>
+
+<h3>今まで</h3>
+
+<ol>
+<li>naskでアセンブリコードからディスクイメージ全体を生成する</li>
+<li>qemuでエミュレートする</li>
+</ol>
+
+<h3>これから</h3>
+
+<ol>
+<li>naskにはアセンブリコードからブートセクタを生成してもらう</li>
+<li>ディスクイメージは，edimg(筆者作のディスクイメージ管理ツール) を使用して生成する</li>
+<li>qemuでエミュレートする</li>
+</ol>
+
+<h3>つまり</h3>
+
+<p>Makefileが以下のように書きかわるというワケ．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">run :
+    ../../z_tools/nask helloos.nas helloos.img
+    cp helloos.img ../../z_tools/qemu/fdimage0.bin
+    make -C ../../z_tools/qemu
+</code></pre></div>
+<p>↓</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">ipl.bin : ipl.nas Makefile
+    ../../z_tools/nask ipl.nas ipl.bin ipl.lst
+helloos.img : ipl.bin Makefile
+    ../../z_tools/edimg   imgin:../../z_tools/fdimg0at.tek \
+    wbinimg src:ipl.bin len:512 from:0 to:0   imgout:helloos.img
+img :
+    make -r helloos.img
+run :
+    make img
+    cp helloos.img ../../z_tools/qemu/fdimage0.bin
+    make -C ../../z_tools/qemu
+</code></pre></div>
+<h1>3日目</h1>
+
+<p>アセンブラの命令とかレジスタの略称とかをまとめた用紙を作った．すぐわからなくなる．<br>
+今まで作っていたのはIPL(初期プログラムローダ)というらしい．今回はOS本体のプログラムをロードするまでが目的(即ち，IPLの完成)．<br>
+IPLにはフロッピーディスクの全情報を読み込ませる(実際にはシリンダー10まで)．OS本体はC言語とアセンブリ言語を組み合わせて記述し，ロードする．</p>
+
+<p>コンパイル時に様々な中間言語が登場する．かなり回りくどい．でも，こういう中身を知っておくのは大事だと思う(だからこそ自作OSに手を出してる部分もある)．</p>
+
+<p>とりあえず，真っ黒な画面を生成しただけだけど今回はおしまい．</p>
+
+<h1>雑記</h1>
+
+<p>書籍の古さもあって，出来上がりのGUIが一昔前のOSになりそう．フロッピーディスクも今時使えないし．</p>
+
+<ul>
+<li>GUIを今風にする</li>
+<li>USBからブートする</li>
+</ul>
+
+<p>の2点がこの本から発展した個人的な課題になりそう．とりあえず，見れるものを作っておきたい．</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[自作OS2日目]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/02/24/title/"/>
+    <updated>2015-02-24T16:48:16+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/02/24/title</id>
+    <content type="html"><![CDATA[<p>間が空いて2日目です．</p>
+
+<!-- more -->
+
+<p>わからないことについて調べながらだと，膨大な時間がかかるなぁと気づいてしまった．4月までに終わるといいな，くらいの認識．また，こういう風に本を使った学習だと，たまに，自分は今一体何をしようとしているのか？見失ってしまうことがある．整理の意味も込めて，前回と今回でやったことを簡単にまとめておく．</p>
+
+<h1>1日目</h1>
+
+<ul>
+<li>目標：ブートセクタを作る
+
+<ul>
+<li>ブートセクタって？
+
+<ul>
+<li>OSを呼び出すためのプログラムが格納された，ハードディスク上の一部分(セクタ)のこと</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<ol>
+<li><p>まずは，バイナリエディタでディスクイメージファイルを書く</p>
+
+<ul>
+<li>バイナリエディタって？
+
+<ul>
+<li>2進数をかくやつ</li>
+</ul></li>
+<li>ディスクイメージファイルって？
+
+<ul>
+<li>仮想イメージファイルとも</li>
+<li>ファイルシステムの完全な内容と構造を1つのファイルに格納したデータのこと</li>
+</ul></li>
+<li>なぜバイナリエディタで？
+
+<ul>
+<li>コンピュータの心臓はCPU</li>
+<li>CPUは機械語の通りに電気信号を他の回路とやりとりする</li>
+<li>電気信号はON/OFFの2通りしかない</li>
+<li>なので，機械語も1/0の2通りしかない</li>
+<li>つまり，バイナリエディタで書ける</li>
+</ul></li>
+</ul></li>
+<li><p>バイナリエディタで開発は無理があったので，アセンブリ言語で書く</p>
+
+<ul>
+<li>DB命令，RESB命令等ですっきりしたコードがかける</li>
+<li>アセンブラは<code>nask</code>を使う</li>
+<li><code>nasm(netwide assembler)</code>というフリーのアセンブラの派生？</li>
+</ul></li>
+</ol>
+
+<h1>2日目</h1>
+
+<ol>
+<li>アセンブリ言語のコードをもう少し見やすくした(アセンブリ言語の勉強)</li>
+<li>Makefileについて勉強した</li>
+</ol>
+
+<h1>わからないこと</h1>
+
+<p><code>tolsetOSX</code>と<code>Q.app</code>が何をしているのか．</p>
+
+<h1>雑記</h1>
+
+<p>やることがつまっているのにうまくやる気が出せない．根性が必要．生活を豊かにするために，とりあえず積極的に自炊することにした．やりたいことがでてくるとお金に困りそうなので，アルバイトについても少し考えておく．</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[自作OS1日目]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/02/17/title/"/>
+    <updated>2015-02-17T00:28:46+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/02/17/title</id>
+    <content type="html"><![CDATA[<h2>Motivation</h2>
+
+<p>前々から勉強しようと思っていた<a href="">この本</a>にやっと手をつけました．</p>
+
+<!-- more -->
+
+<p>以下，自分の環境です．</p>
+
+<ul>
+<li>Mac OS X Yosemite</li>
+</ul>
+
+<h2>やったこと</h2>
+
+<p>Windows用に書かれている本なので，Macで実行するためには工夫が必要になる．以下のサイトを参考にしました．先人に感謝します．</p>
+
+<blockquote>
+<p><a href="https://github.com/sandai/30nichideosjisaku">『30日でできる！ OS自作入門』川合 秀実氏(著)のMacOSX開発環境を整えることができます</a></p>
+</blockquote>
+
+<p>エディタは<a href="http://www.suavetech.com/0xed/">0xED</a>を使用．1日目は，とりあえず恒例のHello, Worldをやった．仮想環境での実行なので，あまり実感はないけど&#8230;</p>
+
+<h1>感想</h1>
+
+<p>馬鹿正直にバイナリエディタで手書きした後にアセンブラで手書きした．何もわかってないけど，とりあえずできた!って感じ．明日からわくわくである．<br>
+<a href="http://www.amazon.co.jp/12%E3%82%B9%E3%83%86%E3%83%83%E3%83%97%E3%81%A7%E4%BD%9C%E3%82%8B%E7%B5%84%E8%BE%BC%E3%81%BFOS%E8%87%AA%E4%BD%9C%E5%85%A5%E9%96%80-%E5%9D%82%E4%BA%95-%E5%BC%98%E4%BA%AE/dp/4877832394/ref=sr_1_2?ie=UTF8&amp;qid=1424273418&amp;sr=8-2&amp;keywords=OS%E8%87%AA%E4%BD%9C%E5%85%A5%E9%96%80">組み込み0S自作入門</a>も購入してある．こっちを進める予定はしばらくないけど，気が向いたらちょこちょこ読んでみようかなぁ．</p>
+
+<h1>雑記</h1>
+
+<p><a href="http://www.amazon.co.jp/Land-Lisp-M-D-Conrad-Barski/dp/4873115876/ref=sr_1_1?ie=UTF8&amp;qid=1424274333&amp;sr=8-1&amp;keywords=land+on+lisp">Land of Lisp</a>を買いました．読みきれるだろうか．読み切りたい．積み本が増える&#8230;</p>
+
+<h1>参考サイト</h1>
+
+<blockquote>
+<p><a href="http://d.hatena.ne.jp/sandai/20120728/p2">初めてのC言語で『30日でできる！OS自作入門』の通りに初めてのOSを作ってみた</a></p>
+</blockquote>
+]]></content>
+  </entry>
+  
+</feed>

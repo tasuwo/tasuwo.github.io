@@ -1,0 +1,352 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>コマンド構文の表記規則についてメモ - tasuwo blog</title>
+  <meta name="author" content="tasuwo">
+
+  
+  <meta name="description" content="ちょっとしたメモ コマンドの説明の例． 1
+2
+3
+4
+5
+# これとか
+$ git remote add [shortname] [url] # これとか
+$ git add &lt;file&gt;... 括弧が「[]」と「&lt;&gt;」で異なっている． &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tasuwo.github.io/blog/2015/03/18/biao-ji-gui-ze">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="tasuwo blog" type="application/atom+xml">
+  <link href="/stylesheets/data-table.css" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-60860415-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">tasuwo blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:tasuwo.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">コマンド構文の表記規則についてメモ</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-03-18T16:57:24+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>4:57 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tasuwo.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>ちょっとしたメモ</p>
+
+<!-- more -->
+
+<p>コマンドの説明の例．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># これとか</span>
+</span><span class='line'><span class="nv">$ </span>git remote add <span class="o">[</span>shortname<span class="o">]</span> <span class="o">[</span>url<span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># これとか</span>
+</span><span class='line'><span class="nv">$ </span>git add &lt;file&gt;...
+</span></code></pre></td></tr></table></div></figure>
+
+<p>括弧が「[]」と「&lt;&gt;」で異なっている．<br>
+今までイマイチ気にしていなかったので，少し調べてみる．</p>
+
+<p>調べればごろごろ出てくる．</p>
+
+<blockquote>
+<p><a href="http://publib.boulder.ibm.com/tividd/td/TRM/GC32-1320-00/ja_JA/HTML/cmdref18.htm">コマンド構文規則 - IBM</a><br>
+<a href="https://docs.oracle.com/cd/E37520_01/b69426/vmutl-preface-syntax.html">4. コマンド構文</a><br>
+<a href="http://itdoc.hitachi.co.jp/manuals/3020/30203R3331/PCRE0058.HTM">コマンドの記載形式</a><br>
+<a href="http://support.ca.com/cadocs/0/CA%20ARCserve%20%20Backup%20r16-JPN/Bookshelf_Files/HTML/cmndline/index.htm?toc.htm?cl_cmd_line_syntax_char.htm">コマンド ライン構文の文字 - CA ARCserve® Backup for &#8230;</a><br>
+<a href="http://otndnld.oracle.co.jp/document/products/oracleVM/220/generic/B57076-01/preface.htm">表記規則 - 日本オラクル</a></p>
+</blockquote>
+
+<p>ここら辺を見れば意味はわかるんだけど，何が元になってるのか気になってもうちょっとうろうろしてみた．すると以下のような記載を発見．</p>
+
+<blockquote>
+<p>ってかこれって統一文法みたいなのがあるのか？UNIXのmanコマンド表記がベースになってるのかな？<br>
+<a href="http://yakinikunotare.boo.jp/orebase/index.php?%A5%B3%A5%DE%A5%F3%A5%C9%C9%BD%B5%AD%CB%A1">コマンド表記法 - 俺の基地</a></p>
+</blockquote>
+
+<p>UNIXの<code>man</code>コマンドを知らなかったので調べてみる．</p>
+
+<blockquote>
+<p><a href="http://www.cc.kyoto-su.ac.jp/%7Ehirai/text/unixcommand.html">基本的なUNIXコマンド</a><br>
+<a href="http://www.k-tanaka.net/unix/man.php">UNIXコマンド - man (Linux/FreeBSD/Solaris) - k-tanaka.net</a><br>
+<a href="http://ja.wikipedia.org/wiki/Man%E3%83%9A%E3%83%BC%E3%82%B8">manページ - Wikipedia</a></p>
+</blockquote>
+
+<p><code>man</code>コマンドは，UNIXコマンドのマニュアルを表示するコマンドのようだ．その前身ともいえる UNIX Programmer&#39;s Manual は1971年に出版され，その後オンラインのmanページが1971年に執筆された．そのレイアウトは以下のような構成になっている．</p>
+
+<ul>
+<li>NAME(名前)</li>
+<li>SYNOPSIS(書式)</li>
+<li>DESCRIPTION(説明)</li>
+<li>EXAMPLES(使用例)</li>
+<li>SEE ALSO(関連項目)</li>
+</ul>
+
+<p>このうち，<strong>SYNOPSIS</strong>に構文規則を用いた表記法が用いられているので，これが元なのではないかということ．実際にこれが元かはわからないけど，とりあえず<del>無駄</del>知識を増やすことができたので満足した．暇があったらまた調べてみよう．</p>
+
+<p>とりあえず，代表的なものをまとめておく．</p>
+
+<table><thead>
+<tr>
+<th>表記法</th>
+<th>概要</th>
+<th>例</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>[]</td>
+<td>なくてもよい</td>
+<td>hoge [-h]：<code>-h</code>はなくてもよい</td>
+</tr>
+<tr>
+<td>{}, &lt;&gt;</td>
+<td>必須</td>
+<td>hoge &lt;<em>filename</em>&gt;：<code>filename</code>は必ず記載</td>
+</tr>
+<tr>
+<td>斜体</td>
+<td>変数</td>
+<td>hoge &lt;<em>filename</em>&gt;：<code>filename</code>は変数．適切な値を記述する</td>
+</tr>
+<tr>
+<td>&#124;</td>
+<td>エレメントの選択</td>
+<td>hote [-a&#124;-b]：<code>-a</code>か<code>-b</code>を選択</td>
+</tr>
+<tr>
+<td>&#8230;</td>
+<td>繰り返し</td>
+<td>hoge &lt;<em>file</em>&gt;&#8230; ：<code>hoge file1 file2 file3</code>と使用できる</td>
+</tr>
+</tbody></table>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">tasuwo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-03-18T16:57:24+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>4:57 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2015/03/18/biao-ji-gui-ze/" data-via="" data-counturl="http://tasuwo.github.io/blog/2015/03/18/biao-ji-gui-ze/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <br />
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/03/17/title01/" title="Previous Post: OctopressのCSSをいじる">&laquo; OctopressのCSSをいじる</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/03/19/about-git/" title="Next Post: Gitの基礎知識をまとめたよ">Gitの基礎知識をまとめたよ &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h2 id="toc_0">Profile</h2>
+
+  <h3 id="toc_1">ME</h3>
+
+  <ul>
+  <li>情報系の学生</li>
+  <li>プログラミング初心者でMac初心者</li>
+  </ul>
+
+  <h3 id="toc_2">SNS</h3>
+
+  <ul>
+  <li>Twitter: <a href="https://twitter.com/tasuwo_">@tasuwo_</a></li>
+  <li>GiHub: <a href="https://github.com/tasuwo">tasuwo</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/19/harib-git/">自作OSの途中経過(8/30)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/19/about-git/">Gitの基礎知識をまとめたよ</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/18/biao-ji-gui-ze/">コマンド構文の表記規則についてメモ</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/17/title01/">OctopressのCSSをいじる</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/17/title2/">Rubyの基礎知識についてのメモ</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - tasuwo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'tasuwoblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tasuwo.github.io/blog/2015/03/18/biao-ji-gui-ze/';
+        var disqus_url = 'http://tasuwo.github.io/blog/2015/03/18/biao-ji-gui-ze/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
