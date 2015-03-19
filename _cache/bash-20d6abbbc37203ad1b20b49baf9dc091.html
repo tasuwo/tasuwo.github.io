@@ -1,8 +1,0 @@
-<div class="highlight"><pre><span class="nv">$ </span>which grip
-<span class="nv">$ </span>emacs /usr/local/bin/markdown
-
-<span class="c">#!/bin/sh</span>
-<span class="nv">filename</span><span class="o">=</span><span class="nv">$1</span>
-/usr/local/bin/grip --export --gfm <span class="k">${</span><span class="nv">filename</span><span class="k">}</span> &gt; /dev/null
-cat <span class="k">${</span><span class="nv">filename</span><span class="p">%.*</span><span class="k">}</span>.html
-</pre></div>
