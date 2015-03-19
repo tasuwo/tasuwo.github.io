@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Octopress | tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/blog/categories/octopress/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2015-03-19T13:48:53+09:00</updated>
+  <updated>2015-03-19T13:52:09+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -107,7 +107,7 @@
     <span class="p">}</span>
 </code></pre></div>
 <p><code>source/_includes/head.html</code>に以下を追記して反映させる．</p>
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;link</span> <span class="na">href=</span><span class="s">&quot;{{ root_url }}/stylesheets/data-table.css&quot;</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">type=</span><span class="s">&quot;text/css&quot;</span><span class="nt">&gt;</span>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;link</span> <span class="na">href=</span><span class="s">&quot;/stylesheets/data-table.css&quot;</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">type=</span><span class="s">&quot;text/css&quot;</span><span class="nt">&gt;</span>
 </code></pre></div>
 <blockquote>
 <p><a href="http://whiskers.nukos.kitchen/2014/08/02/markdown.html">Redcarpetを使ったmarkdown記法サンプル</a><br>
