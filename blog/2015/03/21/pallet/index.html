@@ -1,0 +1,343 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Palletを導入した - tasuwo blog</title>
+  <meta name="author" content="tasuwo">
+
+  
+  <meta name="description" content="EmacsにPalletを導入しました． Cask + Pallet に移行した，みたいな話はよく聞いていたけど，cask はわかるが Pallet のうまみがわからなかったのでインストールしていなかった． rdallasgray/pallet 1. Pallet の目的と利点 Pallet &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tasuwo.github.io/blog/2015/03/21/pallet">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="tasuwo blog" type="application/atom+xml">
+  <link href="/stylesheets/data-table.css" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-60860415-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">tasuwo blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:tasuwo.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Palletを導入した</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-03-21T22:37:06+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>10:37 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tasuwo.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>EmacsにPalletを導入しました．</p>
+
+<!-- more -->
+
+<p>Cask + Pallet に移行した，みたいな話はよく聞いていたけど，cask はわかるが Pallet のうまみがわからなかったのでインストールしていなかった．</p>
+
+<blockquote>
+<p><a href="https://github.com/rdallasgray/pallet">rdallasgray/pallet</a></p>
+</blockquote>
+
+<h2>1. Pallet の目的と利点</h2>
+
+<p>Pallet の主目的は，Emacs備え付けのパッケージ管理システムを用いたパッケージのインストール，アンインストールにあわせて，Cask ファイルの記述を追加・削除すること．<br>
+すなわち，<code>M-x package-install</code>などを用いても自動で同期をとってくれるので，パッケージのインストール/アンインストールと Cask ファイルの記述内容との生合成について気を使わなくてよくなる．</p>
+
+<h2>2. 導入</h2>
+
+<p>Cask ファイルに以下を記述</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nv">source</span> <span class="nv">melpa</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;cask&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>インストール</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>cask
+</span></code></pre></td></tr></table></div></figure>
+
+<p>設定ファイル内に<code>(pallet-mode t)</code>を記述，もしくは<code>pallet-mode</code>を呼び出す(<code>M-x pallet-mode</code>)ことにより使用できる．<br>
+例えば，<code>init.el</code>に以下のように記述する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;pallet</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">pallet-mode</span> <span class="no">t</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>3. 使い方</h2>
+
+<ul>
+<li><p><code>M-x pallet-init</code></p>
+
+<ul>
+<li><code>package.el</code>によってインストールされたパッケージを元に Cask ファイル生成</li>
+</ul></li>
+<li><p><code>M-x pallet-install</code></p>
+
+<ul>
+<li>Cask ファイルに記述されたパッケージをインストール</li>
+</ul></li>
+<li><p><code>M-x pallet-update</code></p>
+
+<ul>
+<li>インストールされたパッケージの更新</li>
+</ul></li>
+</ul>
+
+<h2>4. おまけ</h2>
+
+<p>Cask の記述を Pallet に無視させたい場合は以下のように記述する</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nv">source</span> <span class="nv">melpa</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;s&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;;;pallet-ignore</span>
+</span><span class='line'><span class="c1">;;;これ以降が無視される</span>
+</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;newlisp&quot;</span> <span class="ss">:git</span>
+</span><span class='line'><span class="s">&quot;https://github.com/coldnew/newlisp-mode.git&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>5. 参考</h2>
+
+<blockquote>
+<p><a href="http://gongo.hatenablog.com/entry/2014/05/09/230836">Emacs のパッケージ管理を package.el + el-get から Cask + pallet に乗り換えました</a></p>
+</blockquote>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">tasuwo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-03-21T22:37:06+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>10:37 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/emacs/'>emacs</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2015/03/21/pallet/" data-via="" data-counturl="http://tasuwo.github.io/blog/2015/03/21/pallet/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <br />
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/03/19/harib-git/" title="Previous Post: 自作OSの途中経過(8/30)">&laquo; 自作OSの途中経過(8/30)</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h2 id="toc_0">Profile</h2>
+
+  <h3 id="toc_1">ME</h3>
+
+  <ul>
+  <li>情報系の学生</li>
+  <li>プログラミング初心者でMac初心者</li>
+  </ul>
+
+  <h3 id="toc_2">SNS</h3>
+
+  <ul>
+  <li>Twitter: <a href="https://twitter.com/tasuwo_">@tasuwo_</a></li>
+  <li>GiHub: <a href="https://github.com/tasuwo">tasuwo</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/21/pallet/">Palletを導入した</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/19/harib-git/">自作OSの途中経過(8/30)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/19/about-git/">Gitの基礎知識をまとめたよ</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/18/biao-ji-gui-ze/">コマンド構文の表記規則についてメモ</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/17/title01/">OctopressのCSSをいじる</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - tasuwo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'tasuwoblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tasuwo.github.io/blog/2015/03/21/pallet/';
+        var disqus_url = 'http://tasuwo.github.io/blog/2015/03/21/pallet/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

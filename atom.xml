@@ -4,7 +4,7 @@
   <title><![CDATA[tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2015-03-21T22:01:32+09:00</updated>
+  <updated>2015-03-21T23:01:00+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -12,6 +12,101 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Palletを導入した]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/03/21/pallet/"/>
+    <updated>2015-03-21T22:37:06+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/03/21/pallet</id>
+    <content type="html"><![CDATA[<p>EmacsにPalletを導入しました．</p>
+
+<!-- more -->
+
+<p>Cask + Pallet に移行した，みたいな話はよく聞いていたけど，cask はわかるが Pallet のうまみがわからなかったのでインストールしていなかった．</p>
+
+<blockquote>
+<p><a href="https://github.com/rdallasgray/pallet">rdallasgray/pallet</a></p>
+</blockquote>
+
+<h2>1. Pallet の目的と利点</h2>
+
+<p>Pallet の主目的は，Emacs備え付けのパッケージ管理システムを用いたパッケージのインストール，アンインストールにあわせて，Cask ファイルの記述を追加・削除すること．<br>
+すなわち，<code>M-x package-install</code>などを用いても自動で同期をとってくれるので，パッケージのインストール/アンインストールと Cask ファイルの記述内容との生合成について気を使わなくてよくなる．</p>
+
+<h2>2. 導入</h2>
+
+<p>Cask ファイルに以下を記述</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nv">source</span> <span class="nv">melpa</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;cask&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>インストール</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>cask
+</span></code></pre></td></tr></table></div></figure>
+
+<p>設定ファイル内に<code>(pallet-mode t)</code>を記述，もしくは<code>pallet-mode</code>を呼び出す(<code>M-x pallet-mode</code>)ことにより使用できる．<br>
+例えば，<code>init.el</code>に以下のように記述する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;pallet</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">pallet-mode</span> <span class="no">t</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>3. 使い方</h2>
+
+<ul>
+<li><p><code>M-x pallet-init</code></p>
+
+<ul>
+<li><code>package.el</code>によってインストールされたパッケージを元に Cask ファイル生成</li>
+</ul></li>
+<li><p><code>M-x pallet-install</code></p>
+
+<ul>
+<li>Cask ファイルに記述されたパッケージをインストール</li>
+</ul></li>
+<li><p><code>M-x pallet-update</code></p>
+
+<ul>
+<li>インストールされたパッケージの更新</li>
+</ul></li>
+</ul>
+
+<h2>4. おまけ</h2>
+
+<p>Cask の記述を Pallet に無視させたい場合は以下のように記述する</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nv">source</span> <span class="nv">melpa</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;s&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;;;pallet-ignore</span>
+</span><span class='line'><span class="c1">;;;これ以降が無視される</span>
+</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;newlisp&quot;</span> <span class="ss">:git</span>
+</span><span class='line'><span class="s">&quot;https://github.com/coldnew/newlisp-mode.git&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>5. 参考</h2>
+
+<blockquote>
+<p><a href="http://gongo.hatenablog.com/entry/2014/05/09/230836">Emacs のパッケージ管理を package.el + el-get から Cask + pallet に乗り換えました</a></p>
+</blockquote>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[自作OSの途中経過(8/30)]]></title>
