@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Emacs | tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/blog/categories/emacs/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2015-03-19T13:56:56+09:00</updated>
+  <updated>2015-03-21T22:01:32+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -620,7 +620,8 @@ loaded /Users/hogehoge/.emacs.d/inits/01_hoge. 0.00703
 <blockquote>
 <p><a href="https://github.com/shibayu36/emacs/tree/master/emacs.d">shibayu36/emacs</a><br>
 <a href="https://github.com/shomah4a/.emacs.d">shomah4a/.emacs.d</a><br>
-<a href="https://github.com/catatsuy/dot.emacs.d">catatsuy/dot.emacs.d</a></p>
+<a href="https://github.com/catatsuy/dot.emacs.d">catatsuy/dot.emacs.d</a><br>
+<a href="https://github.com/gongo/elfactory">gongo/elfactory</a></p>
 </blockquote>
 
 <h2>6.1 導入パッケージ</h2>
