@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 読書 | tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/blog/categories/du-shu/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2015-03-26T10:11:44+09:00</updated>
+  <updated>2015-03-26T11:30:13+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -74,122 +74,6 @@
 <li>おもしろい問題を解決するには、まず自分にとっておもしろい問題を見つけることから始めよう。</li>
 </ul>
 </blockquote>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[読書：コーディングを支える技術 1〜3章]]></title>
-    <link href="http://tasuwo.github.io/blog/2015/02/18/title/"/>
-    <updated>2015-02-18T01:16:55+09:00</updated>
-    <id>http://tasuwo.github.io/blog/2015/02/18/title</id>
-    <content type="html"><![CDATA[<p>読書して，感想や得た知識をメモします．今読んでいるのは<a href="http://www.amazon.co.jp/%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%82%92%E6%94%AF%E3%81%88%E3%82%8B%E6%8A%80%E8%A1%93-%7E%E6%88%90%E3%82%8A%E7%AB%8B%E3%81%A1%E3%81%8B%E3%82%89%E5%AD%A6%E3%81%B6%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0%E4%BD%9C%E6%B3%95-WEB-PRESS-plus/dp/477415654X">この本</a>です．</p>
-
-<!-- more -->
-
-<h1>はじめに</h1>
-
-<p>大学の講義で，とんでもなく実装能力の高い後輩に刺激されて，とにかく勉強しなきゃと思って購入した本．特に，言語間の違いっていうのがよくわかっていなかった．各言語の設計思想ってどう違うの，とか，そもそもプログラミング言語ってどういう風に発達してきたの，とか，そういう部分を学びたいと思っていたら目に付いた．</p>
-
-<p>本著書で学んだポイントをメモしておく．</p>
-
-<h2>言語の学び方</h2>
-
-<ul>
-<li>何が言語間で共通しているのか？</li>
-<li>何が特定言語におけるローカルルールなのか？</li>
-</ul>
-
-<p>(例)<br>
-C言語では<strong>0が偽</strong>でその他が真<br>
-Rubyでは<strong>false，nilが偽</strong>でその他が真</p>
-
-<ul>
-<li>言語設計者が何を解決したかったのか？</li>
-<li>その言語がどのような背景から生まれたのか？</li>
-</ul>
-
-<p>多くの言語の比較，言語の歴史・理由を調べることで，言語が変わっても通用する理解力を養うべき．</p>
-
-<h2>プログラミング言語の存在意義</h2>
-
-<p>プログラミング言語は人間が楽をするために存在する．しかし，何を「楽」だと考えるかは人により異なる．</p>
-
-<ul>
-<li>プログラマの三大美徳
-
-<ul>
-<li>無精：将来も含めて一番楽な方法を選ぶ</li>
-<li>短気</li>
-<li>傲慢</li>
-</ul></li>
-</ul>
-
-<h2>各言語の設計思想や方針まとめ</h2>
-
-<h3>FORTH，Lisp，FORTLAN</h3>
-
-<ul>
-<li><p>FORTH，Lisp</p>
-
-<ul>
-<li>ルールの少なさ，シンプルさを求めた</li>
-<li>しかし，括弧が多かったり前置・後置記法だったりで扱いづらい</li>
-</ul></li>
-<li><p>FORTLAN(Formula Translating System)</p>
-
-<ul>
-<li>中置記法で数式を記述できる</li>
-<li>プログラマが慣れた方法で数式を記述できるように</li>
-<li>FORTH，Lispよりもつっつきやすい</li>
-</ul></li>
-</ul>
-
-<h3>C++，Scheme，Python</h3>
-
-<ul>
-<li><p>C++</p>
-
-<ul>
-<li>コードの高速さを重視</li>
-<li>しかし，言語仕様は複雑</li>
-</ul></li>
-<li><p>Scheme</p>
-
-<ul>
-<li>言語仕様を把握する楽さを重視</li>
-<li>しかし，構文が括弧だらけで抵抗がある</li>
-</ul></li>
-<li><p>Python</p>
-
-<ul>
-<li>他人の書いたコードの可読性を重視</li>
-<li>しかし，早くもないし，言語仕様も特にコンパクトではない</li>
-</ul></li>
-</ul>
-
-<h3>その他</h3>
-
-<ul>
-<li><p>Perl(practical extraction and report language)</p>
-
-<ul>
-<li>レポート作成を楽にできるように設計された</li>
-</ul></li>
-<li><p>PHP</p>
-
-<ul>
-<li>Webサービスを書くことが楽</li>
-</ul></li>
-<li><p>Haskell，OCaml (ML系言語)</p>
-
-<ul>
-<li>言語処理系を書くことが楽</li>
-</ul></li>
-</ul>
-
-<h1>感想</h1>
-
-<p>できる人からすれば当たり前のことかもしれないが，勉強になる．ずっと積んでいたし，他に読みたい本もあるので，一週間程度で読み切ることを目標にする．</p>
 ]]></content>
   </entry>
   
