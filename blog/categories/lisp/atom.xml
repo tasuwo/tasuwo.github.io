@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Lisp | tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/blog/categories/lisp/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2015-03-21T23:01:00+09:00</updated>
+  <updated>2015-03-26T10:11:44+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -12,6 +12,85 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Lispメモ]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/03/24/land-of-lisp/"/>
+    <updated>2015-03-24T12:49:43+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/03/24/land-of-lisp</id>
+    <content type="html"><![CDATA[<p>Land of Lisp を読んでいるのでメモ．<br>
+本ブログは自己啓発の意味合いもあるため，定期的に何かしらはブログにアップすることを目標にする．<br>
+そのうち綺麗にまとめます．</p>
+
+<!-- more -->
+
+<ul>
+<li><p>関数型プログラミング</p>
+
+<ul>
+<li>関数は，引数か関数内で宣言された変数しか参照せず，また値を返す以外の動作をしない．</li>
+</ul></li>
+<li><p>比較についてのルール</p>
+
+<ul>
+<li>シンボル同士は<strong>EQ</strong>で比較する</li>
+<li>それ以外は<strong>EQUAL</strong>で比較する</li>
+</ul></li>
+<li><p>Common Lispでは，空リスト( &#39;(),(),&#39;nil,nil )が<strong>唯一の</strong>偽値</p></li>
+<li><p>リストはコンスセルがつながってできている</p></li>
+<li><p>コンスセルは<code>cons</code>コマンドで作られる</p></li>
+<li><p><code>car</code>と<code>cdr</code>でリストの中身を調べることができる</p></li>
+<li><p>Lispには<strong>コードモード</strong>と<strong>データモード</strong>がある</p>
+
+<ul>
+<li>デフォルトではコードモード</li>
+<li>REPLへの入力は<strong>フォーム</strong>の形式でなくてはならない
+
+<ul>
+<li><code>(command bla bla bla bla ...)</code></li>
+</ul></li>
+<li><code>&#39;</code>(シングルクオート)を式に付加すると，データモードで扱われる(<strong>クオートする</strong>)</li>
+<li>準クオート
+
+<ul>
+<li><strong>`</strong>(バッククオート)を付加した式の中で<code>,</code>(コンマ)を使用すると，一部分だけコードモードに戻すことができる(<strong>アンクオートする</strong>)</li>
+</ul></li>
+</ul></li>
+<li><p>関数</p>
+
+<ul>
+<li><code>assoc</code>：キーをもとに要素を抜き出す</li>
+<li><code>mapcar</code>：関数とリストを引数とする．リストの要素1つ1つに対し，関数を実行する</li>
+<li><code>append</code>：リストをつなげて1つのリストにする</li>
+<li><code>apply</code>：関数とリストを引数とする．リストの各要素を引数として関数を呼び出したかのように動作する</li>
+<li><code>remove-if-not</code>：関数とリストを受け取る．リストの各要素に関数を適用し，真でなかったものを除いたリストを返す</li>
+</ul></li>
+<li><p>高階関数：他の関数を引数として受け取る関数</p>
+
+<ul>
+<li><code>#&#39;</code>：functionオペレータの略記．関数を値として扱う場合にそれを明示する必要がある(Common Lispでは)</li>
+</ul></li>
+<li><p>典型的なLispコードスタイル</p>
+
+<ul>
+<li><code>(apply #&#39;append (mapcar #&#39;describe-path (cdr (assoc location edges))))</code></li>
+<li>複雑なデータの塊を幾つかのステップで受け渡しながら処理を進める</li>
+<li>高階関数も頻繁に使われる</li>
+</ul></li>
+<li><p>関数末尾のp</p>
+
+<ul>
+<li>nilか真を返す場合，Common Lisp では関数名の最後に<strong>p</strong>をつける</li>
+<li>真偽値を確かめる関数は<strong>述語(predicate)</strong>と呼ばれるため</li>
+</ul></li>
+</ul>
+
+<h3>雑記</h3>
+
+<p>一週間ほど海外なので，更新はないです．<br>
+自作OSは飛行機の中やホテルでの夜にも進める予定だけど，リモートにpushするのは帰国してからかも．</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Yosemite + Lisp + Lispbuilder-SDL]]></title>
