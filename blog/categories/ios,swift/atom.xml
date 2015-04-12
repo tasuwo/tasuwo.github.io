@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Ios，swift | tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/blog/categories/ios,swift/atom.xml" rel="self"/>
+  <link href="http://tasuwo.github.io/"/>
+  <updated>2015-04-12T23:28:51+09:00</updated>
+  <id>http://tasuwo.github.io/</id>
+  <author>
+    <name><![CDATA[tasuwo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[iOSアプリ開発初心者がTwitterクライアントを作成する その1]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/04/12/title/"/>
+    <updated>2015-04-12T21:55:11+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/04/12/title</id>
+    <content type="html"><![CDATA[<p>久しぶりの更新です．iOSアプリ作ってました．</p>
+
+<!-- more -->
+
+<h1>これはなに</h1>
+
+<p>Twitterクライアントを使っていて，欲しい機能がなかったので安易な気持ちで手を出した．とりあえずの叩き台として，簡単なTwitterクライアントを作成した．<br>
+知識ゼロからのスタートだったので，やったことを簡単にまとめておく．</p>
+
+<h1>つくったもの</h1>
+
+<p>とりあえず1週間くらいでつくった拙作が以下になります．</p>
+
+<p><img src="/images/tasuwotter.png" alt="tasuwotter"></p>
+
+<blockquote>
+<p><a href="https://github.com/tasuwo/tasuwotter">tasuwo/tasuwotter</a></p>
+</blockquote>
+
+<ul>
+<li>できること
+
+<ul>
+<li>ホームタイムラインの表示と更新</li>
+<li>メンションの表示と更新</li>
+<li>ツイートする</li>
+</ul></li>
+<li>できないこと
+
+<ul>
+<li>その他全部</li>
+</ul></li>
+</ul>
+
+<h1>前提知識</h1>
+
+<ul>
+<li>Xcode使用経験
+
+<ul>
+<li>なし</li>
+</ul></li>
+<li>iOS/Android アプリ開発経験
+
+<ul>
+<li>なし</li>
+</ul></li>
+<li>Twitter クライアント開発経験
+
+<ul>
+<li>なし</li>
+</ul></li>
+<li>Swift 使用経験
+
+<ul>
+<li>なし</li>
+</ul></li>
+<li>使用経験のある言語
+
+<ul>
+<li>C，C++，Java，<del>Common Lisp</del></li>
+</ul></li>
+</ul>
+
+<h1>やったこと</h1>
+
+<h2>はじまりからつまづくまで(悪い例)</h2>
+
+<p>最初に見たサイト</p>
+
+<blockquote>
+<p><a href="http://qiita.com/mokumoku/items/bf0460f420acac3c04fc">(iOS)FabricでTwitterクライアントを作った</a></p>
+</blockquote>
+
+<p>Twitter産の SNS Framework である <a href="https://get.fabric.io">Fabric</a> を用いてTwitterクライアントを作成する，という内容．詳しいことは割愛．上記サイトの内容に従って以下を実行した．</p>
+
+<ol>
+<li>Fabric.app のダウンロード</li>
+<li>Xcode プロジェクトの作成</li>
+<li>Xcode プロジェクトに，Fabric SDK および Twitter Kit をダウンロード</li>
+<li>サンプルコードをためす</li>
+</ol>
+
+<p>サンプルコードを動かしたところで，これ以上どう動けばいいかわからない．つまづく．</p>
+
+<ol>
+<li><a href="http://qiita.com/mokumoku/items/bf0460f420acac3c04fc">参考サイト</a>の著者様のソースコードを拝見する</li>
+</ol>
+
+<p>コードが読めない(swiftがわからない &amp; iOSアプリのアーキテクチャがわからない)．つまづく．</p>
+
+<h2>やったほうがいいこと(良い例)</h2>
+
+<h3>Apple のドキュメントを読む</h3>
+
+<p>iOSアプリの開発経験がない場合は，まず公式のチュートリアルを一通りやると良い．</p>
+
+<ul>
+<li><a href="https://developer.apple.com/library/ios/referencelibrary/GettingStarted/RoadMapiOS/index.html#//apple_ref/doc/uid/TP40011343-CH2-SW1">Start Developing iOS Apps Today</a>
+
+<ul>
+<li>Apple 公式の初心者向け iOS アプリ作成ガイド</li>
+<li>簡単な To-do list アプリを作成しながら，iOSアプリの仕組みと特徴について学べる</li>
+<li>英語です</li>
+</ul></li>
+</ul>
+
+<p>チュートリアルだけでは iOS アプリについて理解しきれないので，適宜公式のドキュメントを参照すると良い．</p>
+
+<ul>
+<li><a href="https://developer.apple.com">Apple Developer</a></li>
+<li><a href="https://developer.apple.com/jp/">Apple Developer(日本語)</a>
+
+<ul>
+<li>Apple 公式の開発者用サイト</li>
+<li><code>Resources(リソース) &gt; iOS Developer Library(日本語ドキュメントを見る)</code> でiOSのドキュメントを閲覧できる</li>
+<li>日本語サイトよりも英語サイトのほうが情報量が多い上に最新</li>
+</ul></li>
+</ul>
+
+<p>特に，自分が参考にしたドキュメントは以下．</p>
+
+<ul>
+<li><p><a href="https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIKit_Framework/index.html#//apple_ref/doc/uid/TP40006955">UIKit Framework Reference</a></p>
+
+<ul>
+<li>UIKit のリファレンス．クラスやメソッド等について調べたい時に</li>
+<li>自分は特に以下のクラスについては目を通しておいた
+
+<ul>
+<li>UIApplication，UIApplicationDelegate，UIResponder，UIViewController</li>
+</ul></li>
+<li>英語です</li>
+</ul></li>
+<li><p><a href="https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/index.html#//apple_ref/doc/uid/TP40014097-CH3-ID0">The Swift Programming Language</a></p>
+
+<ul>
+<li>Swift のドキュメント</li>
+<li>とりあえず Swift Tour を通してやるべき</li>
+<li>英語です</li>
+</ul></li>
+<li><p><a href="https://developer.apple.com/jp/documentation/ViewPG_iPhoneOS.pdf">iOS View プログラミングガイド</a></p></li>
+<li><p><a href="https://developer.apple.com/jp/documentation/ViewControllerPGforiOS.pdf">iOS View Controller プログラミングガイド</a></p>
+
+<ul>
+<li>View と View Controller に関するガイド</li>
+<li>画面遷移とからへんについて学びたい時に読むと良い</li>
+<li>日本語です</li>
+</ul></li>
+<li><p><a href="https://developer.apple.com/jp/documentation/EventHandlingiPhoneOS.pdf">イベント処理カイド (iOS用)</a></p>
+
+<ul>
+<li>イベント処理について学ぶなら</li>
+<li>日本語の方は少し古いけど，概要を学ぶだけならいいかもしれない</li>
+</ul></li>
+</ul>
+
+<p>自分も各々隅々まで読んでいないので理解は大分あやしい．View Controller の役割についてはもう少しよく読む必要がある気がする．</p>
+
+<h3>Twitter のドキュメントを読む</h3>
+
+<p>iOS アプリについて大雑把に理解したら，Twitter のドキュメントを読んで利用の仕方を学ぶ．</p>
+
+<ul>
+<li><p><a href="https://dev.twitter.com/twitter-kit/ios">Twitter Kit for iOS | Twitter Developers</a></p>
+
+<ul>
+<li>Fabric の公式ドキュメント</li>
+<li>「ログインの仕方」，「タイムラインの表示の仕方」，「ツイートの仕方」等，使用方法とサンプルコードがいくつか紹介されている</li>
+</ul></li>
+<li><p><a href="https://dev.twitter.com/twitter-kit/ios-reference">iOS Reference | Twitter Developers</a></p>
+
+<ul>
+<li>Twitter Kit に含まれるクラスのリファレンス</li>
+<li>上記を一通り眺めた後に，より詳細に知りたい場合には参考にする</li>
+</ul></li>
+<li><p><a href="https://dev.twitter.com/twitter-kit/ios/api">Access Twitter&#39;s REST API | Twitter developers</a></p>
+
+<ul>
+<li>上記の公式ドキュメントのうちの一つ</li>
+<li>Twitterクライアントは REST API を叩いて様々な情報を取得する．本ドキュメントに叩き方が書かれているので，あとは好きにやれば良い</li>
+</ul></li>
+<li><p><a href="https://dev.twitter.com/rest/public">REST APIs | Twitter Developers</a></p></li>
+<li><p><a href="http://dx.24-7.co.jp/twitterapi1-1-rest-api/">【保存版】TwitterAPI1.1 REST API 全項目解説</a></p>
+
+<ul>
+<li>REST API の一覧</li>
+<li>公式とその日本語訳がある</li>
+</ul></li>
+<li><p><a href="https://dev.twitter.com/rest/public/timelines">working with timeline | twiter developers</a></p>
+
+<ul>
+<li>タイムライン更新処理を適切に行うために必要な技術について記述されている</li>
+<li>要約すると，<code>since_id</code> と <code>max_id</code> を，リクエスト発行の際にパラメータとして指定してやれば良い，ということ</li>
+</ul></li>
+</ul>
+
+<h3>その他の参考サイト</h3>
+
+<blockquote>
+<p><a href="http://dev.classmethod.jp/smartphone/ios-fabric-sign-in-with-twitter/"><iOS> Fabric 入門 #1 アカウント登録 &amp; Twitter Kit を使ってログインする</a><br>
+<a href="http://nonbiri-tereka.hatenablog.com/entry/2014/03/06/220015">Twitter API Timeline解説 | のんびりしているエンジニアの日記</a></p>
+</blockquote>
+
+<h1>総括</h1>
+
+<ul>
+<li>ドキュメントをいろいろ参考にして，簡単なTwitterクライアントを作成した</li>
+<li>参考サイトにならって Storyboard を使用していないが，使用した場合の開発もしてみたい</li>
+<li>これを叩き台として個性溢れるTwitterクライアントを作成していきたい</li>
+</ul>
+
+<p>途中つまった部分(Swift で Objective-C のライブラリを使うところとか)や得られた知識等，そのうちちょくちょくまとめていく予定．</p>
+
+<h1>雑記</h1>
+
+<p>ずっと iOS アプリの勉強をしていたら，他のことが進んでいない．組み込みの知識をつけたいので，自作OSの方も頑張っていこう．</p>
+]]></content>
+  </entry>
+  
+</feed>
