@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Matlab | tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/blog/categories/matlab/atom.xml" rel="self"/>
+  <link href="http://tasuwo.github.io/"/>
+  <updated>2015-04-28T12:29:33+09:00</updated>
+  <id>http://tasuwo.github.io/</id>
+  <author>
+    <name><![CDATA[tasuwo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[MATLAB のコーディングガイドラインについてメモ]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/04/28/matlab-guideline/"/>
+    <updated>2015-04-28T12:13:30+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/04/28/matlab-guideline</id>
+    <content type="html"><![CDATA[<p>研究で MATLAB を利用しているので，コードを綺麗にかくためのメモ．</p>
+
+<!-- more -->
+
+<h2>コーディング作法</h2>
+
+<p>MATLAB のコードを書く際のコーディング作法を記述しているドキュメントを発見した．</p>
+
+<blockquote>
+<p><a href="http://www.mathworks.com/matlabcentral/fileexchange/46056-matlab-style-guidelines-2-0">MATLAB Programming Style Guidelines 2.0 | MATLAB CENTRAL</a></p>
+</blockquote>
+
+<p>日本語訳をしていらっしゃる方もいて素晴らしい．</p>
+
+<blockquote>
+<p><a href="http://myenigma.hatenablog.com/entry/20120103/1325575787#fn-a7d7d54e">MATLAB Programming Style Guidelines 1 - はてなダイアリー</a></p>
+</blockquote>
+
+<p>自分はプログラミング経験が浅いので，とても参考になる．コードがぐっと見やすくなった．</p>
+
+<h2>単体テスト</h2>
+
+<p>作成しているツールの規模が大きくなってきたので，しっかりテストしたいと思うようになってきた．MATLAB には単体テスト用のフレームワークが用意されているようだ．</p>
+
+<blockquote>
+<p><a href="http://jp.mathworks.com/help/matlab/write-unit-tests-1.html">単体テストの作成 - MATLAB &amp; Simulink - MathWorks 日本</a><br>
+<a href="http://blog.smooth-works.net/archives/2183">スムーズワークス日想 » Blog Archive » m-fileに品質を！（2）</a><br>
+<a href="http://d.hatena.ne.jp/hkob/20131226">Jenkins 導入と MATLAB の自動テスト (教員のための Mac Tips:9)</a></p>
+</blockquote>
+
+<p>Jenkins による継続的インテグレーションにも興味があるので，気が向けば触れてみたいと思う．具体的なやり方については，そのうちまとめる．たぶん．</p>
+
+<h2>その他の参考文献</h2>
+
+<blockquote>
+<p><a href="http://blog.smooth-works.net/archives/2901">MATLABプログラミングスタイル | スムーズワークス日想 シミュレーション業界関連情報</a></p>
+</blockquote>
+]]></content>
+  </entry>
+  
+</feed>
