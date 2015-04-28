@@ -1,0 +1,73 @@
+---
+layout: post
+title: "Palletを導入した"
+date: 2015-03-21 22:37:06 +0900
+comments: true
+categories: emacs
+---
+
+EmacsにPalletを導入しました．
+
+<!-- more -->
+
+Cask + Pallet に移行した，みたいな話はよく聞いていたけど，cask はわかるが Pallet のうまみがわからなかったのでインストールしていなかった．
+
+>[rdallasgray/pallet](https://github.com/rdallasgray/pallet)
+
+##1. Pallet の目的と利点
+
+Pallet の主目的は，Emacs備え付けのパッケージ管理システムを用いたパッケージのインストール，アンインストールにあわせて，Cask ファイルの記述を追加・削除すること．
+すなわち，`M-x package-install`などを用いても自動で同期をとってくれるので，パッケージのインストール/アンインストールと Cask ファイルの記述内容との生合成について気を使わなくてよくなる．
+
+##2. 導入
+
+Cask ファイルに以下を記述
+
+```lisp
+(source melpa)
+
+(depends-on "cask")
+```
+
+インストール
+
+```bash
+$ cask
+```
+
+設定ファイル内に`(pallet-mode t)`を記述，もしくは`pallet-mode`を呼び出す(`M-x pallet-mode`)ことにより使用できる．
+例えば，`init.el`に以下のように記述する．
+
+```lisp
+(require 'pallet)
+(pallet-mode t)
+```
+
+##3. 使い方
+
+* `M-x pallet-init`
+    * `package.el`によってインストールされたパッケージを元に Cask ファイル生成
+
+* `M-x pallet-install`
+    * Cask ファイルに記述されたパッケージをインストール
+
+* `M-x pallet-update`
+    * インストールされたパッケージの更新
+
+##4. おまけ
+
+Cask の記述を Pallet に無視させたい場合は以下のように記述する
+
+```lisp
+(source melpa)
+(depends-on "s")
+
+;;;pallet-ignore
+;;;これ以降が無視される
+(depends-on "newlisp" :git
+"https://github.com/coldnew/newlisp-mode.git")
+```
+
+##5. 参考
+
+>[Emacs のパッケージ管理を package.el + el-get から Cask + pallet に乗り換えました](http://gongo.hatenablog.com/entry/2014/05/09/230836)

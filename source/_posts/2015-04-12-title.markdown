@@ -1,0 +1,152 @@
+---
+layout: post
+title: "iOSアプリ開発初心者がTwitterクライアントを作成する その1"
+date: 2015-04-12 21:55:11 +0900
+comments: true
+categories: [iOS，swift]
+---
+
+久しぶりの更新です．iOSアプリ作ってました．
+
+<!-- more -->
+
+#これはなに
+
+Twitterクライアントを使っていて，欲しい機能がなかったので安易な気持ちで手を出した．とりあえずの叩き台として，簡単なTwitterクライアントを作成した．
+知識ゼロからのスタートだったので，やったことを簡単にまとめておく．
+
+#つくったもの
+
+とりあえず1週間くらいでつくった拙作が以下になります．
+
+![tasuwotter](/images/tasuwotter.png)
+
+>[tasuwo/tasuwotter](https://github.com/tasuwo/tasuwotter)
+
+* できること
+    * ホームタイムラインの表示と更新
+    * メンションの表示と更新
+    * ツイートする
+* できないこと
+    * その他全部
+
+#前提知識
+
+* Xcode使用経験
+    * なし
+* iOS/Android アプリ開発経験
+    * なし
+* Twitter クライアント開発経験
+    * なし
+* Swift 使用経験
+    * なし
+* 使用経験のある言語
+    * C，C++，Java，~~Common Lisp~~
+
+#やったこと
+
+##はじまりからつまづくまで(悪い例)
+
+最初に見たサイト
+
+>[(iOS)FabricでTwitterクライアントを作った](http://qiita.com/mokumoku/items/bf0460f420acac3c04fc)
+
+Twitter産の SNS Framework である [Fabric](https://get.fabric.io) を用いてTwitterクライアントを作成する，という内容．詳しいことは割愛．上記サイトの内容に従って以下を実行した．
+
+1. Fabric.app のダウンロード
+2. Xcode プロジェクトの作成
+3. Xcode プロジェクトに，Fabric SDK および Twitter Kit をダウンロード
+4. サンプルコードをためす
+
+サンプルコードを動かしたところで，これ以上どう動けばいいかわからない．つまづく．
+
+1. [参考サイト](http://qiita.com/mokumoku/items/bf0460f420acac3c04fc)の著者様のソースコードを拝見する
+
+コードが読めない(swiftがわからない & iOSアプリのアーキテクチャがわからない)．つまづく．
+
+##やったほうがいいこと(良い例)
+
+###Apple のドキュメントを読む
+
+iOSアプリの開発経験がない場合は，まず公式のチュートリアルを一通りやると良い．
+
+* [Start Developing iOS Apps Today](https://developer.apple.com/library/ios/referencelibrary/GettingStarted/RoadMapiOS/index.html#//apple_ref/doc/uid/TP40011343-CH2-SW1)
+    * Apple 公式の初心者向け iOS アプリ作成ガイド
+    * 簡単な To-do list アプリを作成しながら，iOSアプリの仕組みと特徴について学べる
+    * 英語です
+
+チュートリアルだけでは iOS アプリについて理解しきれないので，適宜公式のドキュメントを参照すると良い．
+
+* [Apple Developer](https://developer.apple.com)
+* [Apple Developer(日本語)](https://developer.apple.com/jp/)
+    * Apple 公式の開発者用サイト
+    * `Resources(リソース) > iOS Developer Library(日本語ドキュメントを見る)` でiOSのドキュメントを閲覧できる
+    * 日本語サイトよりも英語サイトのほうが情報量が多い上に最新
+
+特に，自分が参考にしたドキュメントは以下．
+
+* [UIKit Framework Reference](https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIKit_Framework/index.html#//apple_ref/doc/uid/TP40006955)
+    * UIKit のリファレンス．クラスやメソッド等について調べたい時に
+    * 自分は特に以下のクラスについては目を通しておいた
+        * UIApplication，UIApplicationDelegate，UIResponder，UIViewController
+    * 英語です
+
+* [The Swift Programming Language](https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/index.html#//apple_ref/doc/uid/TP40014097-CH3-ID0)
+    * Swift のドキュメント
+    * とりあえず Swift Tour を通してやるべき
+    * 英語です
+
+* [iOS View プログラミングガイド](https://developer.apple.com/jp/documentation/ViewPG_iPhoneOS.pdf)
+* [iOS View Controller プログラミングガイド](https://developer.apple.com/jp/documentation/ViewControllerPGforiOS.pdf)
+    * View と View Controller に関するガイド
+    * 画面遷移とからへんについて学びたい時に読むと良い
+    * 日本語です
+
+* [イベント処理カイド (iOS用)](https://developer.apple.com/jp/documentation/EventHandlingiPhoneOS.pdf)
+    * イベント処理について学ぶなら
+    * 日本語の方は少し古いけど，概要を学ぶだけならいいかもしれない
+
+自分も各々隅々まで読んでいないので理解は大分あやしい．View Controller の役割についてはもう少しよく読む必要がある気がする．
+
+
+###Twitter のドキュメントを読む
+
+iOS アプリについて大雑把に理解したら，Twitter のドキュメントを読んで利用の仕方を学ぶ．
+
+* [Twitter Kit for iOS | Twitter Developers](https://dev.twitter.com/twitter-kit/ios)
+    * Fabric の公式ドキュメント
+    * 「ログインの仕方」，「タイムラインの表示の仕方」，「ツイートの仕方」等，使用方法とサンプルコードがいくつか紹介されている
+
+* [iOS Reference | Twitter Developers](https://dev.twitter.com/twitter-kit/ios-reference)
+    * Twitter Kit に含まれるクラスのリファレンス
+    * 上記を一通り眺めた後に，より詳細に知りたい場合には参考にする
+
+* [Access Twitter's REST API | Twitter developers](https://dev.twitter.com/twitter-kit/ios/api)
+    * 上記の公式ドキュメントのうちの一つ
+    * Twitterクライアントは REST API を叩いて様々な情報を取得する．本ドキュメントに叩き方が書かれているので，あとは好きにやれば良い
+
+* [REST APIs | Twitter Developers](https://dev.twitter.com/rest/public)
+* [【保存版】TwitterAPI1.1 REST API 全項目解説](http://dx.24-7.co.jp/twitterapi1-1-rest-api/)
+    * REST API の一覧
+    * 公式とその日本語訳がある
+
+* [working with timeline | twiter developers](https://dev.twitter.com/rest/public/timelines)
+    * タイムライン更新処理を適切に行うために必要な技術について記述されている
+    * 要約すると，`since_id` と `max_id` を，リクエスト発行の際にパラメータとして指定してやれば良い，ということ
+
+###その他の参考サイト
+
+>[<iOS> Fabric 入門 #1 アカウント登録 & Twitter Kit を使ってログインする](http://dev.classmethod.jp/smartphone/ios-fabric-sign-in-with-twitter/)
+>[Twitter API Timeline解説 | のんびりしているエンジニアの日記](http://nonbiri-tereka.hatenablog.com/entry/2014/03/06/220015)
+
+#総括
+
+* ドキュメントをいろいろ参考にして，簡単なTwitterクライアントを作成した
+* 参考サイトにならって Storyboard を使用していないが，使用した場合の開発もしてみたい
+* これを叩き台として個性溢れるTwitterクライアントを作成していきたい
+
+途中つまった部分(Swift で Objective-C のライブラリを使うところとか)や得られた知識等，そのうちちょくちょくまとめていく予定．
+
+#雑記
+
+ずっと iOS アプリの勉強をしていたら，他のことが進んでいない．組み込みの知識をつけたいので，自作OSの方も頑張っていこう．

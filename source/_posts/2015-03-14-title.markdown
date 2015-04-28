@@ -375,6 +375,7 @@ Caskとinit-loaderを導入した．
 >[shibayu36/emacs](https://github.com/shibayu36/emacs/tree/master/emacs.d)
 >[shomah4a/.emacs.d](https://github.com/shomah4a/.emacs.d)
 >[catatsuy/dot.emacs.d](https://github.com/catatsuy/dot.emacs.d)
+>[gongo/elfactory](https://github.com/gongo/elfactory)
 
 ##6.1 導入パッケージ
 
