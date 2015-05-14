@@ -4,7 +4,7 @@
   <title><![CDATA[tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2015-05-07T09:53:25+09:00</updated>
+  <updated>2015-05-14T11:10:11+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -12,6 +12,113 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[論文の管理に Mendeley を導入した話]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/05/14/mendeley/"/>
+    <updated>2015-05-14T10:59:35+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/05/14/mendeley</id>
+    <content type="html"><![CDATA[<p>何も大したことはしてないので雑記みたいな感じです．<br>
+いつものことだけど，Mac OS X Yosemite での話です．</p>
+
+<!-- more -->
+
+<h2><a href="https://www.mendeley.com/dashboard/">Mendeley</a> を導入した</h2>
+
+<p>フリーの文献管理アプリケーション．<br>
+Win/Mac/Linux で使用可能．<br>
+使ってみた感じを書いておく．</p>
+
+<h3>悪い部分</h3>
+
+<ul>
+<li>論文情報の自動抽出はあまりあてにならない
+
+<ul>
+<li>海外製なので，日本語論文より英語論文の方が精度が良い(気がする)</li>
+<li>というか，日本語論文でも英語タイトルの方が抽出されたりする</li>
+</ul></li>
+<li>「Google Scholar を参照して補完する」と聞いてすごいって思ったけどあまりあてにならない</li>
+<li>たまにうまく表示されない PDF がある
+
+<ul>
+<li>保護されているものとか(しょうがない)</li>
+<li>それ以外でも表示されない場合がある</li>
+</ul></li>
+<li>タグ付けは有用かとおもいきやそうでもなかった
+
+<ul>
+<li>いちいちつけるのが面倒になる</li>
+</ul></li>
+<li>日本語でキーワード検索できない
+
+<ul>
+<li><del>Spotlight使え</del></li>
+</ul></li>
+</ul>
+
+<h3>良い部分</h3>
+
+<ul>
+<li>論文に Note をつけられるところ
+
+<ul>
+<li>今のところ一番うれしい</li>
+<li>ダウンロードした時，なぜ有用だと思ったのかをメモっておくと，後から見返すときに便利</li>
+</ul></li>
+<li>他のデバイスとの同期が簡単
+
+<ul>
+<li>ストレージが2GB与えられる</li>
+<li>足りなくなりそう</li>
+</ul></li>
+<li>iPhone/iPad からも利用できる
+
+<ul>
+<li>まだあまり活用してない</li>
+<li>結構大きいと思う</li>
+</ul></li>
+</ul>
+
+<h2>やったこと</h2>
+
+<ol>
+<li>論文PDF をダウンロード</li>
+<li>ダウンロードしたPDF を Mendeley に追加</li>
+</ol>
+
+<p>という作業がだるい．</p>
+
+<p>Mendeley には Watch Folder という機能がある．<br>
+フォルダを指定すると，そのフォルダにPDFが追加された時に自動で取得できる．<br>
+でも&#8230;</p>
+
+<ul>
+<li>ダウンロードフォルダを Watch Folder にしたくない
+
+<ul>
+<li>具体的には，PDF だけダウンロードするフォルダを別にして，そのフォルダを Watch Folder にしたい</li>
+<li>別にダウンロードフォルダを Watch Folder にしても大丈夫(だと思う)だけど，気持ちの問題</li>
+</ul></li>
+</ul>
+
+<p>なので，以下のようにした</p>
+
+<ol>
+<li>ダウンロードフォルダに PDF が追加されたら，専用フォルダに移動させる</li>
+<li>専用フォルダを Watch Folder に指定する</li>
+</ol>
+
+<p>Automator を使ったら簡単に出来た．<br>
+以下のサイトのソースをほぼコピペ．</p>
+
+<blockquote>
+<p><a href="http://www.virment.com/automator-tips/">Automatorのフォルダアクションを使った小技.ファイル自動振り分けとファイルの自動アップロード</a></p>
+</blockquote>
+
+<p>ありがとうございました．</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[開発モデルの話]]></title>
@@ -3764,494 +3871,6 @@ octopressの設定で簡単に連携もできるらしいので調べておく�
 <li><a name="sankou_01"></a><a href="http://www.miukoba.net/blog/2013/01/05/start-octopress/">Octopressはじめました</a></li>
 <li><a name="sankou_03"></a><a href="http://moonstruckdrops.github.io/blog/2013/03/21/start-octpress/">Octpress始めました</a></li>
 <li><a name="sankou_04"></a><a href="http://blog.shiroyama.us/blog/2014/02/26/octopress/">エンジニアのブログは Octopress が最適</a></li>
-</ol>
-</blockquote>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Emacsについて 01]]></title>
-    <link href="http://tasuwo.github.io/blog/2015/02/08/title/"/>
-    <updated>2015-02-08T19:36:18+09:00</updated>
-    <id>http://tasuwo.github.io/blog/2015/02/08/title</id>
-    <content type="html"><![CDATA[<p>Emacsを使おうと思うので，調べたこととやったことをメモする．</p>
-
-<!-- more -->
-
-<h1>1. 環境</h1>
-
-<p>使用環境は以下．</p>
-
-<ul>
-<li>Mac OS X Yosemite 10.10.1</li>
-</ul>
-
-<h1>2. 関連知識</h1>
-
-<h2>2.1 基本コマンド</h2>
-
-<p>使いそうなコマンドをメモしておく<a href="#emacs_keybind_01">1</a> <a href="#emacs_keybind_02">2</a>．何か不便に感じた時はそれを実現するコマンドがないかその都度調べる．</p>
-
-<ul>
-<li>C-：コントロールキー(Ctrl)</li>
-<li>M-：メタキー(Alt，Esc．Altは長押し．Escは1回押し．)</li>
-</ul>
-
-<h3>2.1.1 とりあえず</h3>
-
-<table><thead>
-<tr>
-<th>key</th>
-<th>desc</th>
-<th>notes</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>C-g</td>
-<td>コマンド中断</td>
-<td>困った時に</td>
-</tr>
-</tbody></table>
-
-<h3>2.1.2 移動</h3>
-
-<table><thead>
-<tr>
-<th>key</th>
-<th>desc</th>
-<th>notes</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>C-u</td>
-<td>上</td>
-<td></td>
-</tr>
-<tr>
-<td>C-n</td>
-<td>下</td>
-<td></td>
-</tr>
-<tr>
-<td>C-u</td>
-<td>上</td>
-<td></td>
-</tr>
-<tr>
-<td>C-f</td>
-<td>次</td>
-<td>Forward</td>
-</tr>
-<tr>
-<td>C-b</td>
-<td>前</td>
-<td>Back</td>
-</tr>
-<tr>
-<td>M-f</td>
-<td>1単語次</td>
-<td></td>
-</tr>
-<tr>
-<td>M-b</td>
-<td>1単語前</td>
-<td></td>
-</tr>
-<tr>
-<td>C-e</td>
-<td>行末</td>
-<td>Endのe</td>
-</tr>
-<tr>
-<td>C-a</td>
-<td>行頭</td>
-<td>ABC&#8230;のa</td>
-</tr>
-<tr>
-<td>C-v</td>
-<td>次ページ</td>
-<td></td>
-</tr>
-<tr>
-<td>M-v</td>
-<td>前ページ</td>
-<td></td>
-</tr>
-<tr>
-<td>M-&lt;</td>
-<td>ファイル先頭</td>
-<td></td>
-</tr>
-<tr>
-<td>M-&gt;</td>
-<td>ファイル末尾</td>
-<td></td>
-</tr>
-<tr>
-<td>M-g g</td>
-<td>任意の行へ移動</td>
-<td></td>
-</tr>
-</tbody></table>
-
-<h3>2.1.3 操作</h3>
-
-<table><thead>
-<tr>
-<th>key</th>
-<th>desc</th>
-<th>notes</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>C-d</td>
-<td>delete</td>
-<td></td>
-</tr>
-<tr>
-<td>C-h</td>
-<td>back space</td>
-<td></td>
-</tr>
-<tr>
-<td>M-d</td>
-<td>1単語delete</td>
-<td></td>
-</tr>
-<tr>
-<td>M-BS</td>
-<td>1単語back space</td>
-<td></td>
-</tr>
-<tr>
-<td>C-k</td>
-<td>行末まで削除</td>
-<td></td>
-</tr>
-<tr>
-<td>C-d</td>
-<td>カーソル位置の文字を削除</td>
-<td></td>
-</tr>
-<tr>
-<td>C-space</td>
-<td>領域始点</td>
-<td></td>
-</tr>
-<tr>
-<td>M-w</td>
-<td>領域コピー</td>
-<td></td>
-</tr>
-<tr>
-<td>C-w</td>
-<td>領域カット</td>
-<td></td>
-</tr>
-<tr>
-<td>C-y</td>
-<td>貼り付け</td>
-<td></td>
-</tr>
-</tbody></table>
-
-<h3>2.1.4 その他</h3>
-
-<table><thead>
-<tr>
-<th>key</th>
-<th>desc</th>
-<th>notes</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>C-s</td>
-<td>前方検索</td>
-<td></td>
-</tr>
-<tr>
-<td>C-r</td>
-<td>後方検索</td>
-<td></td>
-</tr>
-<tr>
-<td>C-x num</td>
-<td>ウインドウ分割</td>
-<td></td>
-</tr>
-<tr>
-<td>C-x o</td>
-<td>ウインドウ移動</td>
-<td></td>
-</tr>
-</tbody></table>
-
-<h2>2.2 初期化</h2>
-
-<p>初期化について．<br>
-Emacsの起動時に設定等の初期化が行われるはずなので，どういう仕組みで行われているのかを調べてメモしておく．とりあえず，Emacsの公式ドキュメント<a href="#emacs_doc">3</a>を読む．</p>
-
-<h3>初期化に用いられるファイル</h3>
-
-<p>Emacsは，最初にLispプログラムを読み込んで初期化する<a href="#init_01">4</a> <a href="#init_02">5</a>．</p>
-
-<ul>
-<li>個人用
-
-<ul>
-<li>~/.emacs( ~/.emacs.el )</li>
-<li>~/.emacs.d/init.el</li>
-</ul></li>
-<li>サイト用(PC毎，全ユーザ共通)
-
-<ul>
-<li>default.el</li>
-<li>site-start.el</li>
-</ul></li>
-</ul>
-
-<h3>初期化の順序</h3>
-
-<ol>
-<li>サイト設定(<code>site-start.el</code>)</li>
-<li>個人設定(<code>.emacs</code>等)
-
-<ol>
-<li><code>$HOME</code>から<code>~/.emacs(~/.emacs.el)</code>を探索
-
-<ol>
-<li>見つけた場合，読み込む</li>
-<li>見つからなかった場合，<code>~/.emacs.d/init.el</code>を探索し，読み込む</li>
-</ol></li>
-</ol></li>
-<li>デフォルト設定(<code>default.el</code>)</li>
-</ol>
-
-<p>読みこみたくない場合は<code>-p</code>，他のユーザの初期化ファイルを読み込みたい場合は<code>-u</code>をオプションとして指定する．また，個人設定で<code>inhibit-default-init nil</code>と指定すると，<code>default.el</code>は読み込まれない．<code>-no-site-file</code>オプションを指定すると，<code>site-start.el</code>は読み込まれない．<br>
-サイト設定とデフォルト設定は，Emacsがライブラリを読み込みに行くパス内(<code>load-path</code>)に存在すれば読み込まれる．</p>
-
-<h3>各初期化ファイルの記述目的</h3>
-
-<p>参考サイト<a href="init_how_to_use">6</a>より．</p>
-
-<table><thead>
-<tr>
-<th>設定</th>
-<th>記述目的</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>サイト設定</td>
-<td>Emacs環境を用意した担当者が，標準的なものを設定</td>
-</tr>
-<tr>
-<td>個人設定</td>
-<td>個人用の設定</td>
-</tr>
-<tr>
-<td>デフォルト設定</td>
-<td>個人設定がない場合，あるいは使うとしたらコレ，という設定</td>
-</tr>
-</tbody></table>
-
-<p>設定の記述方法は別項で説明する．</p>
-
-<blockquote>
-<p><a href="http://www.gfd-dennou.org/member/uwabami/cc-env/EmacsBasic.html#fn.1">Emacs の基本設定</a></p>
-</blockquote>
-
-<h2>2.3 ライブラリ</h2>
-
-<p>Emacsが読み込むライブラリについて触れる<a href="#emacs_library_01">7</a> <a href="#emacs_library_02">8</a>．Lispコードを含むファイルをライブラリ(Library)と呼ぶ．基本的にEmacs Lispで書く(拡張子は<code>.el</code>)．<br>
-Emacs Lispファイルはバイトコード(拡張子は<code>.elc</code>)にコンパイルされる．バイトコードはEmacs Lispファイルと比較してロードも実行も早く，容量も小さい．</p>
-
-<h3>ライブラリのロード</h3>
-
-<p>ロードを行うと，対象ファイル内の全ての式が評価され，設定が反映される．ロードはEmacs起動後に以下のコマンドで実行可能．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='emacs'><span class='line'><span class="nv">M-x</span> <span class="nv">load-file</span> <span class="nv">filename</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<h3>ライブラリの探索</h3>
-
-<ol>
-<li><em>filename.elc</em>を探す．</li>
-<li><em>filename.el</em>を探す．</li>
-<li><em>filename</em>を探す．</li>
-</ol>
-
-<p>対象ファイルを見つけた時点でロードし，見つからなかった場合はエラーとなる．</p>
-
-<h2>2.4 load path</h2>
-
-<h3>load path を用いたライブラリのロード</h3>
-
-<p><code>load path</code>が定義されており，以下のコマンドを実行すれば<code>load path</code>内のディレクトリが全て探索される．同名の<code>.el</code>と<code>.elc</code>があった場合，<code>.elc</code>が実行される．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='emacs'><span class='line'><span class="nv">M-x</span> <span class="nv">load-library</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<h3>load path のデフォルト値</h3>
-
-<p><code>load path</code>は変数<code>load-path</code>として定義されている．探索対象のディレクトリがリスト構造で格納されている．<br>
-環境変数<code>EMACSLOADPATH</code>が設定されていれば，その値で初期化される．もしくは，<code>emacs/src/paths.h</code>に指定されたデフォルト値になる．</p>
-
-<h3>load path へのパスの追加</h3>
-
-<p>自作ライブラリ等が別のフォルダにある場合は，<code>load path</code>に追加する．パスを追加する方法をいくつかあげる．</p>
-
-<ol>
-<li>cshの場合，<code>.login</code>ファイルに設定する</li>
-</ol>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='emacs'><span class='line'><span class="nv">setenv</span> <span class="nv">EMACSLOADPATH</span> <span class="o">.</span><span class="ss">:/user/bil/emacs:/usr/lib/emacs/lisp</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<ol>
-<li>shの場合</li>
-</ol>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='emacs'><span class='line'><span class="nb">export</span> <span class="nv">EMACSLOADPATH</span>
-</span><span class='line'><span class="nv">EMACSLOADPATH=.:/user/bil/emacs:/usr/local/lib/emacs/lisp</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<ol>
-<li><code>.emacs</code>ファイルに設定する</li>
-</ol>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='emacs'><span class='line'><span class="c1">;; これとか</span>
-</span><span class='line'><span class="p">(</span><span class="k">setq</span> <span class="nv">load-path</span>
-</span><span class='line'>      <span class="p">(</span><span class="nb">append</span> <span class="p">(</span><span class="nb">list</span> <span class="no">nil</span> <span class="s">&quot;/user/bil/emacs&quot;</span>
-</span><span class='line'>                    <span class="s">&quot;/usr/local/lisplib&quot;</span>
-</span><span class='line'>                    <span class="s">&quot;~/emacs&quot;</span><span class="p">)</span>
-</span><span class='line'>              <span class="nv">load-path</span><span class="p">))</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; これとか</span>
-</span><span class='line'><span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;load-path</span> <span class="s">&quot;/path/to/my/lisp/library&quot;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<h2>2.5 scratchバッファ</h2>
-
-<p>scratchバッファは，Emacs Lisp の実行環境であり，Emacs の設定を試し書きできる場所．以下で起動できる<a href="#emacs_scratch">9</a>．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='emacs'><span class='line'><span class="nv">C-x</span> <span class="nv">b</span> <span class="vg">*scratch*</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<p><code>C-j</code>で式を評価できる．<br>
-<code>C-h f</code>で関数のヘルプが見れる．<br>
-<code>C-h v</code>で変数の値が見れる．</p>
-
-<h1>3. やったこと</h1>
-
-<p>満を持して，色々やっていく．<br>
-まずは，とりあえずやりたいことをまとめる．</p>
-
-<ul>
-<li>Markdownをかけるようにして，さくっとブログを更新したい．</li>
-<li>カラースキームの設定をしたい．</li>
-</ul>
-
-<p>満を持してといいつつ，今回は何もしていない．<br>
-次回に持ち越し．</p>
-
-<h3>3.1 最新版インストール</h3>
-
-<p>MacにはEmacsがデフォルトで入っている．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>emacs version
-</span><span class='line'>GNU Emacs 22.1.1
-</span><span class='line'>Copyright <span class="o">(</span>C<span class="o">)</span> <span class="m">2007</span> Free Software Foundation, Inc.
-</span><span class='line'>GNU Emacs comes with ABSOLUTELY NO WARRANTY.
-</span><span class='line'>You may redistribute copies of Emacs
-</span><span class='line'>under the terms of the GNU General Public License.
-</span><span class='line'>For more information about these matters, see the file named COPYING.
-</span></code></pre></td></tr></table></div></figure>
-
-<p>最新ではないので，最新版をいれる<a href="#emacs_inst_01">10</a> <a href="#emacs_inst_02">11</a> <a href="#emacs_inst_03">12</a>．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew install emacs --cocoa
-</span></code></pre></td></tr></table></div></figure>
-
-<p><code>/Applications/</code>にシンボリックリンクを貼る．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew linkapps
-</span></code></pre></td></tr></table></div></figure>
-
-<p>確認．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>emacs version
-</span><span class='line'>GNU Emacs 24.4.1
-</span><span class='line'>Copyright <span class="o">(</span>C<span class="o">)</span> <span class="m">2014</span> Free Software Foundation, Inc.
-</span><span class='line'>GNU Emacs comes with ABSOLUTELY NO WARRANTY.
-</span><span class='line'>You may redistribute copies of Emacs
-</span><span class='line'>under the terms of the GNU General Public License.
-</span><span class='line'>For more information about these matters, see the file named COPYING.
-</span></code></pre></td></tr></table></div></figure>
-
-<p>インストールできた．</p>
-
-<h2>4. 次回やること</h2>
-
-<p>感想．Lispの勉強になりそう．エディターは使いこなすまでやってなんぼだと思っているので積極的に使っていく．<br>
-今回はほぼ何もしてないので，次回はパッケージ管理辺りを調べながら，具体的に色々設定していきたいと思う．</p>
-
-<!--
-次回の参考
-http://totem3.hatenablog.jp/entry/2014/11/13/090715
-http://e-arrows.sakura.ne.jp/2010/02/vim-to-emacs.html
-http://gongo.hatenablog.com/entry/2014/05/09/230836
-http://d.hatena.ne.jp/rubikitch/20100201/elispsyntax
-http://totem3.hatenablog.jp/entry/2014/11/12/083115
-http://moonstruckdrops.github.io/blog/2013/03/24/markdown-mode/
--->
-
-<h2>参考文献</h2>
-
-<blockquote>
-<ol>
-<li><a name="emacs_keybint_01"></a><a href="http://www.hpcs.cs.tsukuba.ac.jp/%7Eyonemoto/pukiwiki/index.php?Emacs%2F%A5%B7%A5%E7%A1%BC%A5%C8%A5%AB%A5%C3%A5%C8">Emacsのキーボードショートカット一覧</a></li>
-<li><a name="emacs_keybind_02"></a><a href="http://www.geocities.co.jp/SiliconValley-Bay/1553/linux/emacs.html">GNUEmacs の学習</a></li>
-<li><a name="emacs_doc"></a><a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/">The Emacs Editor</a></li>
-<li><a name="init_01"></a><a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Find-Init.html#Find-Init">49.4.4 How Emacs Finds Your Init File</a></li>
-<li><a name="init_02"></a><a href="http://www.math.s.chiba-u.ac.jp/%7Ematsu/lisp/emacs-lisp-intro-jp_17.html">16. `.emacs&#39; ファイル</a></li>
-<li><a name="init_how_to_use"></a><a href="http://www.ki.nu/%7Emakoto/diary/2009/10/05/1.html">Ubuntu の site-start.el</a></li>
-<li><a name="emacs_library_01"></a><a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Lisp-Libraries.html#Lisp-Libraries">27.8 Libraries of Lisp Code for Emacs</a></li>
-<li><a name="emacs_library_02"></a><a href="http://www.fan.gr.jp/%7Ering/doc/elisp_19/elisp-jp_15.html">13.1 プログラムでロードする方法</a></li>
-<li><a name="emacs_scratch"></a><a href="http://d.hatena.ne.jp/sandai/20120304/p2">うわっ&#8230;私のEmacs、使いにくすぎ？だったら&#8230;ｶｽﾀﾏｲｽﾞｼﾔｯｾｰ!!ﾀﾞｧﾀﾞｧｼｴﾘｲｪｯｽｯｼｪｰｼｮｰﾍｲﾍｲ!!!</a></li>
-<li><a name="emacs_inst_01"></a><a href="http://blog.yug1224.com/2013/10/29/emacs/">HomebrewでEmacsをインストール。</a></li>
-<li><a name="emacs_inst_02"></a><a href="http://tb-lab.hatenablog.jp/entry/2013/10/22/225853">Macでemacsを設定しよう</a></li>
-<li><a name="emacs_inst_03"></a><a href="http://www.sevencredit.com/2014/07/02/580/">Macで本家EmacsとHomebrew IMEパッチ版とEmacs Mac PortとAquamacsを比べてみる。</a></li>
 </ol>
 </blockquote>
 ]]></content>
