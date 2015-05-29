@@ -1,0 +1,115 @@
+---
+layout: post
+title: "[Swift] Optional型まとめ"
+date: 2015-05-29 14:22:24 +0900
+comments: true
+categories: swift
+---
+
+Optional型がよくわからなかったのでまとめておく．
+定義のメモだけなので，使い方とかもそのうち追記していきたい．
+
+<!-- more -->
+
+##Optional型とは？
+
+**nil を許す型**のこと．
+
+##宣言
+
+型に`?`を付加すると，Optional型を宣言できる．
+ちなみに`T?`は`Optional<T>`のシンタックスシュガー．
+
+```swift
+var optionalSuger: Int?           // Optional型の宣言．初期値はnil．
+var optional:      Optional<Int>  // Int? と同じ意味
+var notOptional:   Int            // 非Optional型．初期値は空(nilですらない)
+```
+
+##wrap と unwrap
+
+`T`と`T?`は違う型．
+同様に扱うためには**unwrap**する必要がある．
+
+* **unwrap**とは？
+    * Optional<T>型から`T`型の変数を取り出すこと．
+
+**unwrap**の方法には以下の4種類がある．
+
+1. Forced unwrapping
+2. Optional Chaining
+3. Optional Binding
+4. 比較演算子
+
+```swift
+////////////////////////////////////////////
+// Optional型の宣言
+class Dog {
+    func bark() -> String {
+        return "BowWow!"
+    }
+}
+var wrappedDog: Dog? = Dog()
+
+////////////////////////////////////////////
+// 1. Forced Unwrapping
+//    「!」を付加する．
+//    値が nil だった場合はランタイムエラー．
+println(wrappedDog!.bark)           // "BowWow!"
+
+////////////////////////////////////////////
+// 2. Optional Chaining
+//    「?」を付加する
+//    値が nil だった場合は nil を返す．
+//    最終的な戻り値は Optional型 となる．
+println(wrappedDog?.bark())         // Optional("BowWow!")
+
+////////////////////////////////////////////
+// 3. Optional Binding
+//    if，while 等の条件式内で宣言，代入されると unwrap される．
+//    値が nil の場合は条件式が false となる．
+if var unwrappedDog = wrappedDog {
+    println(unwrappedDog.bark())    // "BowWow!"
+}
+
+////////////////////////////////////////////
+// 4. 比較演算子
+//    比較演算子を使うと unwrap される．
+var wrappedInt: Int? = 1
+println(wrappedInt == 1)            // "true"
+```
+
+## Implicitly Unwrapped Optional型とは？
+
+型に`!`を付加すると，Implicitly Unwrapped Optional型を宣言できる．
+ちなみに`T!`は`ImplicitlyUnwrappedOptional<T>`のシンタックスシュガー．
+
+```swift
+var iuOptionalSuger: Int!                              // Implicitly Unwrapped Optional型の宣言．初期値はnil．
+var iuOptional:      ImplicitlyUnwrappedOptional<Int>  // Int! と同じ意味
+var Optional:        Int?                              // Optional型
+
+iuOptional = 1
+Optional   = 1
+
+// 自動的に unwrap される．
+println(iuOptional)    // "1"
+println(Optional)      // "Optional(1)"
+```
+
+##比較演算子：??
+
+nil かどうか判定する比較演算子．
+`a ?? b`は`a != nil ? a! : b`のシンタックスシュガー．
+
+```
+var wrappedInt: Int?
+ptinrln(wrappedInt ?? 2)    // "2"
+wrappedInt = 1
+println(wrappedInt ?? 2)    // "1"
+```
+
+#参考サイト
+
+>[Swift Optional 型についてのまとめ Ver2](http://qiita.com/cotrpepe/items/518c4476ca957a42f5f1)
+>[SwiftのOptional型を極める](http://qiita.com/koher/items/c6f446bad54442a28bf4)
