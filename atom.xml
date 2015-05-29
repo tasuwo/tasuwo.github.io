@@ -4,7 +4,7 @@
   <title><![CDATA[tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2015-05-14T11:10:11+09:00</updated>
+  <updated>2015-05-29T17:01:36+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -12,6 +12,462 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[[Swift] 関数とクロージャについて]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/05/29/swift-func/"/>
+    <updated>2015-05-29T15:46:10+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/05/29/swift-func</id>
+    <content type="html"><![CDATA[<p>クロージャって何？？？と思ったので．</p>
+
+<!-- more -->
+
+<h2>関数</h2>
+
+<p>クロージャについてまとめる前に，まず関数について理解する．</p>
+
+<h3>定義</h3>
+
+<p><code>func</code>で宣言し，返り値は<code>-&gt;</code>を用いる．<br>
+返り値は複数指定可能．<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+<span class='line-number'>2</span><br>
+<span class='line-number'>3</span><br>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">func</span> <span class="nf">testFunc</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nl">first</span><span class="p">:</span><span class="n">Int</span><span class="p">,</span> <span class="nl">second</span><span class="p">:</span><span class="n">Int</span><span class="p">)</span> <span class="p">{</span><br>
+</span><span class='line'>    <span class="k">return</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span><br>
+</span><span class='line'><span class="p">}</span><br>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h3>特徴</h3>
+
+<p>Swiftの関数には以下の特徴がある．</p>
+
+<ol>
+<li>可変数の引数を指定可能</li>
+<li>ネストして宣言可能</li>
+<li>引数に指定可能</li>
+<li>返り値に指定可能</li>
+</ol>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="c1">///////////////////////////</span>
+</span><span class='line'><span class="c1">// 1. 可変数の引数を指定可能</span>
+</span><span class='line'><span class="c1">//    引数を配列で指定できる．</span>
+</span><span class='line'><span class="k">func</span> <span class="nf">sumOf</span><span class="p">(</span><span class="nl">numbers</span><span class="p">:</span> <span class="n">Int</span><span class="p">...)</span> <span class="o">-&gt;</span> <span class="n">Int</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">var</span> <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>    <span class="k">for</span> <span class="n">number</span> <span class="k">in</span> <span class="n">numbers</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">sum</span> <span class="o">+=</span> <span class="n">number</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">sum</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="n">sumOf</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>        <span class="c1">// 21</span>
+</span><span class='line'><span class="n">sumOf</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="mi">597</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>   <span class="c1">// 651</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">///////////////////////////</span>
+</span><span class='line'><span class="c1">// 2. ネストして宣言可能</span>
+</span><span class='line'><span class="c1">//    ネストした関数は，外の関数の変数にアクセス可能</span>
+</span><span class='line'><span class="k">func</span> <span class="n">returnFifteen</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Int</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">var</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">10</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">func</span> <span class="n">add</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">y</span> <span class="o">+=</span> <span class="mi">5</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">add</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="n">y</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="n">returnFifteen</span><span class="p">()</span>     <span class="c1">// 15</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">///////////////////////////</span>
+</span><span class='line'><span class="c1">// 3. 引数に指定可能</span>
+</span><span class='line'><span class="c1">// 数値のリストと条件となる関数を与えると，</span>
+</span><span class='line'><span class="c1">// 条件にマッチした数値がリスト内に存在するか調べる関数．</span>
+</span><span class='line'><span class="k">func</span> <span class="n">hasAnyMatches</span><span class="p">(</span><span class="nl">list</span><span class="p">:</span> <span class="p">[</span><span class="n">Int</span><span class="p">],</span> <span class="nl">condition</span><span class="p">:</span> <span class="n">Int</span> <span class="o">-&gt;</span> <span class="n">Bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bool</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">for</span> <span class="n">item</span> <span class="k">in</span> <span class="n">list</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="n">conition</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nb">true</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nb">false</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">// 10より小さい値ならば true</span>
+</span><span class='line'><span class="k">func</span> <span class="n">lessThanTen</span><span class="p">(</span><span class="nl">number</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bool</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">number</span> <span class="o">&lt;</span> <span class="mi">10</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">var</span> <span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">12</span><span class="p">]</span>
+</span><span class='line'><span class="n">hasAnyMathces</span><span class="p">(</span><span class="n">numbers</span><span class="p">,</span> <span class="n">lessThanTen</span><span class="p">)</span>    <span class="c1">// true</span>
+</span><span class='line'><span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">12</span><span class="p">]</span>
+</span><span class='line'><span class="n">hasAnyMathces</span><span class="p">(</span><span class="n">numbers</span><span class="p">,</span> <span class="n">lessThanTen</span><span class="p">)</span>    <span class="c1">// false</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">///////////////////////////</span>
+</span><span class='line'><span class="c1">// 4. 返り値に指定可能</span>
+</span><span class='line'><span class="k">func</span> <span class="n">makeIncrementer</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">Int</span> <span class="o">-&gt;</span> <span class="n">Int</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// ネストした関数</span>
+</span><span class='line'>    <span class="k">func</span> <span class="n">addOne</span><span class="p">(</span><span class="nl">number</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Int</span><span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">number</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">// ネストして宣言された関数をそのまま返す</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">addOne</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>クロージャとは？</h2>
+
+<p>実行可能なコードブロックのこと&#8230;?<br>
+一言で言い表そうとすると難しい．公式では，<code>関数は再利用が可能な特別なクロージャである．</code>と言われている．</p>
+
+<h3>宣言</h3>
+
+<p>とりあえず，書き方を見てみる．<br>
+名前が省略可能で，<code>{}</code>で囲んで記述する．引数と返り値の後に<code>in</code>を記述してから本体を記述する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="c1">// クロージャ</span>
+</span><span class='line'><span class="k">var</span> <span class="nl">greetClosure</span><span class="p">:</span> <span class="p">(</span><span class="n">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">String</span>
+</span><span class='line'><span class="n">paramClosure</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">name</span> <span class="o">-&gt;</span> <span class="n">String</span> <span class="k">in</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s">&quot;Hello &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">// 関数でも同様の振る舞いを定義をしてみる</span>
+</span><span class='line'><span class="k">func</span> <span class="n">greetFunc</span><span class="p">(</span><span class="nl">name</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">String</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s">&quot;Hello &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 実行結果はどちらも変わらない．</span>
+</span><span class='line'><span class="n">println</span><span class="p">(</span><span class="n">greetClosure</span><span class="p">(</span><span class="s">&quot;tasuwo&quot;</span><span class="p">))</span>
+</span><span class='line'><span class="n">println</span><span class="p">(</span><span class="n">greetFunc</span><span class="p">(</span><span class="s">&quot;tasuwo&quot;</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>これだけだと，クロージャの意味がイマイチわからない．つまり，なぜ関数じゃダメなのか？<br>
+自分なりの解釈だが，クロージャの良い点は<strong>複数の処理の記述をコンパクトにまとめられること</strong>なのではと思う．<br>
+例えば，<code>map</code>を例にとって考える．<br>
+<code>map</code>はクロージャを引数にとり(つまり，関数を与えても問題はない)，配列の各値にその関数を適用・変換する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">var</span> <span class="n">numArray</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+</span><span class='line'><span class="c1">// 配列の各値を三倍にする</span>
+</span><span class='line'><span class="n">numArray</span><span class="p">.</span><span class="n">map</span><span class="p">({</span>
+</span><span class='line'>    <span class="p">(</span><span class="nl">number</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Int</span> <span class="k">in</span>
+</span><span class='line'>    <span class="k">let</span> <span class="n">result</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">number</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">result</span>
+</span><span class='line'><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>クロージャは，引数や返り値の型が自明である時，その指定を省略可能である．また，返り値が1つに減退されている場合には，<code>return</code>も記述しなくて良い．<br>
+よって，以下のように記述を省略できる</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="n">numArray</span><span class="p">.</span><span class="n">map</span><span class="p">({</span>
+</span><span class='line'>    <span class="n">number</span> <span class="k">in</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">number</span>
+</span><span class='line'><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>記述がかなりコンパクトになったし，何をしているのかも一目見れば大体わかる．<br>
+また，第二引数を以下のように外に出す書き方もできるそうだ．自分はこれを知らなくて，以下のような記述を見るたびに(なんだこれは&#8230;?)と頭をひねっていた．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="n">numArray</span><span class="p">.</span><span class="n">map</span><span class="p">(){</span>
+</span><span class='line'>    <span class="n">number</span> <span class="k">in</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">number</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>もう一つの例を見てみる．<br>
+<code>sorted</code>は，与えられた配列を並び替える．クロージャを引数にとると，その内容に従って並び替える．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">var</span> <span class="n">numArray</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+</span><span class='line'><span class="k">let</span> <span class="n">sortedNum</span> <span class="o">=</span> <span class="n">sorted</span><span class="p">(</span><span class="n">numArray</span><span class="p">){</span>
+</span><span class='line'>    <span class="p">(</span><span class="nl">str1</span><span class="p">:</span> <span class="n">Int</span><span class="p">,</span> <span class="nl">str2</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bool</span> <span class="k">in</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">str1</span> <span class="o">&gt;</span> <span class="n">str2</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>引数，返り値の型と，<code>return</code>を省略する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">let</span> <span class="n">sortedNum</span> <span class="o">=</span> <span class="n">sorted</span><span class="p">(</span><span class="n">numArray</span><span class="p">){</span>
+</span><span class='line'>    <span class="n">str1</span><span class="p">,</span> <span class="n">str2</span> <span class="k">in</span> <span class="n">str1</span> <span class="o">&gt;</span> <span class="n">str2</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>さらに，自分自身が引数となっている時，自身の引数を<code>$0,$1...</code>で記述可能．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">let</span> <span class="n">sortedNum</span> <span class="o">=</span> <span class="n">sorted</span><span class="p">(</span><span class="n">numArray</span><span class="p">){</span><span class="err">$</span><span class="mi">0</span> <span class="o">&gt;</span> <span class="err">$</span><span class="mi">1</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>これでかなり省略できる．</p>
+
+<h1>参考文献</h1>
+
+<blockquote>
+<p><a href="http://qiita.com/yuinchirn/items/2ebb6fed6de0c9c1c3c9">Swift さくっと確認したい基礎文法 クロージャ(closure)<br>
+</a><br>
+<a href="http://qiita.com/mst/items/b18e9531ac0cbdf2f3c3">swift Sort関数とClosure</a><br>
+<a href="https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/GuidedTour.html">A Swift Tour</a><br>
+<a href="http://chicketen.blog.jp/archives/14886216.html">iOS Swiftのクロージャを使う</a></p>
+</blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[Swift] Optional型まとめ]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/05/29/swift/"/>
+    <updated>2015-05-29T14:22:24+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/05/29/swift</id>
+    <content type="html"><![CDATA[<p>Optional型がよくわからなかったのでまとめておく．<br>
+定義のメモだけなので，使い方とかもそのうち追記していきたい．</p>
+
+<!-- more -->
+
+<h2>Optional型とは？</h2>
+
+<p><strong>nil を許す型</strong>のこと．</p>
+
+<h2>宣言</h2>
+
+<p>型に<code>?</code>を付加すると，Optional型を宣言できる．<br>
+ちなみに<code>T?</code>は<code>Optional&lt;T&gt;</code>のシンタックスシュガー．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">var</span> <span class="nl">optionalSuger</span><span class="p">:</span> <span class="n">Int</span><span class="o">?</span>           <span class="c1">// Optional型の宣言．初期値はnil．</span>
+</span><span class='line'><span class="k">var</span> <span class="nl">optional</span><span class="p">:</span>      <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Int</span><span class="o">&gt;</span>  <span class="c1">// Int? と同じ意味</span>
+</span><span class='line'><span class="k">var</span> <span class="nl">notOptional</span><span class="p">:</span>   <span class="n">Int</span>            <span class="c1">// 非Optional型．初期値は空(nilですらない)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>wrap と unwrap</h2>
+
+<p><code>T</code>と<code>T?</code>は違う型．<br>
+同様に扱うためには<strong>unwrap</strong>する必要がある．</p>
+
+<ul>
+<li><strong>unwrap</strong>とは？
+
+<ul>
+<li>Optional<T>型から<code>T</code>型の変数を取り出すこと．</li>
+</ul></li>
+</ul>
+
+<p><strong>unwrap</strong>の方法には以下の4種類がある．</p>
+
+<ol>
+<li>Forced unwrapping</li>
+<li>Optional Chaining</li>
+<li>Optional Binding</li>
+<li>比較演算子</li>
+</ol>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="c1">////////////////////////////////////////////</span>
+</span><span class='line'><span class="c1">// Optional型の宣言</span>
+</span><span class='line'><span class="k">class</span> <span class="n">Dog</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">func</span> <span class="n">bark</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">String</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s">&quot;BowWow!&quot;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">var</span> <span class="nl">wrappedDog</span><span class="p">:</span> <span class="n">Dog</span><span class="o">?</span> <span class="o">=</span> <span class="n">Dog</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">////////////////////////////////////////////</span>
+</span><span class='line'><span class="c1">// 1. Forced Unwrapping</span>
+</span><span class='line'><span class="c1">//    「!」を付加する．</span>
+</span><span class='line'><span class="c1">//    値が nil だった場合はランタイムエラー．</span>
+</span><span class='line'><span class="n">println</span><span class="p">(</span><span class="n">wrappedDog</span><span class="o">!</span><span class="p">.</span><span class="n">bark</span><span class="p">)</span>           <span class="c1">// &quot;BowWow!&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">////////////////////////////////////////////</span>
+</span><span class='line'><span class="c1">// 2. Optional Chaining</span>
+</span><span class='line'><span class="c1">//    「?」を付加する</span>
+</span><span class='line'><span class="c1">//    値が nil だった場合は nil を返す．</span>
+</span><span class='line'><span class="c1">//    最終的な戻り値は Optional型 となる．</span>
+</span><span class='line'><span class="n">println</span><span class="p">(</span><span class="n">wrappedDog</span><span class="o">?</span><span class="p">.</span><span class="n">bark</span><span class="p">())</span>         <span class="c1">// Optional(&quot;BowWow!&quot;)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">////////////////////////////////////////////</span>
+</span><span class='line'><span class="c1">// 3. Optional Binding</span>
+</span><span class='line'><span class="c1">//    if，while 等の条件式内で宣言，代入されると unwrap される．</span>
+</span><span class='line'><span class="c1">//    値が nil の場合は条件式が false となる．</span>
+</span><span class='line'><span class="k">if</span> <span class="k">var</span> <span class="n">unwrappedDog</span> <span class="o">=</span> <span class="n">wrappedDog</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">println</span><span class="p">(</span><span class="n">unwrappedDog</span><span class="p">.</span><span class="n">bark</span><span class="p">())</span>    <span class="c1">// &quot;BowWow!&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">////////////////////////////////////////////</span>
+</span><span class='line'><span class="c1">// 4. 比較演算子</span>
+</span><span class='line'><span class="c1">//    比較演算子を使うと unwrap される．</span>
+</span><span class='line'><span class="k">var</span> <span class="nl">wrappedInt</span><span class="p">:</span> <span class="n">Int</span><span class="o">?</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'><span class="n">println</span><span class="p">(</span><span class="n">wrappedInt</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>            <span class="c1">// &quot;true&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>Implicitly Unwrapped Optional型とは？</h2>
+
+<p>型に<code>!</code>を付加すると，Implicitly Unwrapped Optional型を宣言できる．<br>
+ちなみに<code>T!</code>は<code>ImplicitlyUnwrappedOptional&lt;T&gt;</code>のシンタックスシュガー．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">var</span> <span class="nl">iuOptionalSuger</span><span class="p">:</span> <span class="n">Int</span><span class="o">!</span>                              <span class="c1">// Implicitly Unwrapped Optional型の宣言．初期値はnil．</span>
+</span><span class='line'><span class="k">var</span> <span class="nl">iuOptional</span><span class="p">:</span>      <span class="n">ImplicitlyUnwrappedOptional</span><span class="o">&lt;</span><span class="n">Int</span><span class="o">&gt;</span>  <span class="c1">// Int! と同じ意味</span>
+</span><span class='line'><span class="k">var</span> <span class="nl">Optional</span><span class="p">:</span>        <span class="n">Int</span><span class="o">?</span>                              <span class="c1">// Optional型</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">iuOptional</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'><span class="n">Optional</span>   <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 自動的に unwrap される．</span>
+</span><span class='line'><span class="n">println</span><span class="p">(</span><span class="n">iuOptional</span><span class="p">)</span>    <span class="c1">// &quot;1&quot;</span>
+</span><span class='line'><span class="n">println</span><span class="p">(</span><span class="n">Optional</span><span class="p">)</span>      <span class="c1">// &quot;Optional(1)&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>比較演算子：??</h2>
+
+<p>nil かどうか判定する比較演算子．<br>
+<code>a ?? b</code>は<code>a != nil ? a! : b</code>のシンタックスシュガー．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">var</span> <span class="nl">wrappedInt</span><span class="p">:</span> <span class="n">Int</span><span class="o">?</span>
+</span><span class='line'><span class="n">ptinrln</span><span class="p">(</span><span class="n">wrappedInt</span> <span class="o">??</span> <span class="mi">2</span><span class="p">)</span>    <span class="c1">// &quot;2&quot;</span>
+</span><span class='line'><span class="n">wrappedInt</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'><span class="n">println</span><span class="p">(</span><span class="n">wrappedInt</span> <span class="o">??</span> <span class="mi">2</span><span class="p">)</span>    <span class="c1">// &quot;1&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h1>参考サイト</h1>
+
+<blockquote>
+<p><a href="http://qiita.com/cotrpepe/items/518c4476ca957a42f5f1">Swift Optional 型についてのまとめ Ver2</a><br>
+<a href="http://qiita.com/koher/items/c6f446bad54442a28bf4">SwiftのOptional型を極める</a></p>
+</blockquote>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[論文の管理に Mendeley を導入した話]]></title>
@@ -3405,473 +3861,6 @@ IPLにはフロッピーディスクの全情報を読み込ませる(実際に�
 <a href="http://stackoverflow.com/questions/6714714/unable-to-load-sdl-gfx-in-quicklisp">Unable to load sdl-gfx in quicklisp</a><br>
 <a href="http://stackoverflow.com/questions/6714714/unable-to-load-sdl-gfx-in-quicklisp">Unable to load sdl-gfx in quicklisp</a><br>
 <a href="http://d.hatena.ne.jp/Nos/20141004/1412445272">windowsでsbcl + lispbuilder-sdl</a></p>
-</blockquote>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[YosemiteでCommon Lispの環境構築]]></title>
-    <link href="http://tasuwo.github.io/blog/2015/02/10/title/"/>
-    <updated>2015-02-10T13:57:56+09:00</updated>
-    <id>http://tasuwo.github.io/blog/2015/02/10/title</id>
-    <content type="html"><![CDATA[<h2>Motivation</h2>
-
-<p>以前<a href="http://www.amazon.co.jp/%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%82%92%E6%94%AF%E3%81%88%E3%82%8B%E6%8A%80%E8%A1%93-%7E%E6%88%90%E3%82%8A%E7%AB%8B%E3%81%A1%E3%81%8B%E3%82%89%E5%AD%A6%E3%81%B6%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0%E4%BD%9C%E6%B3%95-WEB-PRESS-plus/dp/477415654X/ref=sr_1_1?ie=UTF8&amp;qid=1423594846&amp;sr=8-1&amp;keywords=%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%82%92%E6%94%AF%E3%81%88%E3%82%8B%E6%8A%80%E8%A1%93">この本</a>を読んでLispを知った．どんなもんかなと触ってみたくて&#8230;という軽い気持ちで触れることに．結構奥が深いようで楽しみという初心者並みの感想．自分用に環境構築時のメモしておく．</p>
-
-<!-- more -->
-
-<p>以下，自分のPC環境．</p>
-
-<ul>
-<li>Mac OS X Yosemite 10.10.1</li>
-</ul>
-
-<h1>1. Common Lisp</h1>
-
-<h2>1.1 基礎知識</h2>
-
-<p>そもそもどんなものが必要なのか？ざっくり言うと以下．</p>
-
-<ul>
-<li>Lisp処理系
-
-<ul>
-<li>つまりコンパイラ(インタプリタ)．</li>
-</ul></li>
-<li>ライブラリ管理ツール
-
-<ul>
-<li>名前の通り</li>
-</ul></li>
-</ul>
-
-<h2>1.2 実際にインストール</h2>
-
-<p>それぞれ種類があるけど，今回は情報をよく見かけた以下を選んだ．</p>
-
-<ul>
-<li>Lisp処理系
-
-<ul>
-<li>SBCL Compiler</li>
-</ul></li>
-<li>ライブラリ管理ツール
-
-<ul>
-<li>Quicklisp</li>
-</ul></li>
-</ul>
-
-<p>前提として，Homebrewが導入されている必要がある．手順は以下．</p>
-
-<ol>
-<li>Homebrewを用いてSBCLをダウンロード<br>
-<code>brew install sblc</code></li>
-<li>QuickLispを<a href="http://www.quicklisp.org/beta/#installation">公式サイト</a>からダウンロード. <code>quicklisp.lisp</code>をDLすれば良い.</li>
-<li>SBCLから<code>quicklisp.lisp</code>を実行する. Terminalで <code>sbcl --load quicklisp.lisp</code> を入力. SBCLが起動する.</li>
-<li><code>(quicklisp-quickstart:install)</code>とタイプし, Returnを押下. Quicklispのインストールルーチンが開始される.</li>
-<li>インストール終了後, <code>(ql:add-to-init-file)</code>とタイプする. これにより, SBCL起動時, 自動的にQuicklispがロードされる.</li>
-</ol>
-
-<p>これでSBCLとQuicklispのインストールは終了．lispファイルを実行したい場合は <code>sbcl --load &lt;file&gt;</code> とすれば良い.ライブラリを追加したい場合は<code>(ql:quickload &quot;libraryname&quot;)</code> とすれば良い.</p>
-
-<h1>3. Sublime Text3 + Common Lisp</h1>
-
-<p>ST3をよく使うので，連携させて使ってみたいと思った．<br>
-必要なものは1つ．</p>
-
-<ul>
-<li>SublimeREPL
-
-<ul>
-<li>REPL = Read-eval-print loop</li>
-<li>評価/表示の繰り返し = 対話型評価環境のこと(インタプリタとは違うらしい&#8230;)</li>
-<li>利用可能な言語は多数ある
-
-<ul>
-<li>Emacs lisp</li>
-<li>Ruby</li>
-<li>Python</li>
-<li>Scheme処理系</li>
-<li>Haskell</li>
-<li>OCaml</li>
-</ul></li>
-</ul></li>
-</ul>
-
-<h2>3.1 インストール</h2>
-
-<p>パッケージコントロールからインストールしておしまい．Sublime Textにおいて<code>Preferences &gt; Package Control</code>でInstall Packageを選択し, インストールする．これにより, SBCLのREPLにsublimeを介してアクセスできるようになる. アクセス方法は, <code>Tools &gt; SublimeREPL &gt; Common Lisp &gt; SBCL</code> ．<br>
-また，複数のCommon Lisp処理系に対応させるために最新版にしたほうがいいらしい． <code>Preferences &gt; Package Control</code>から，Add Repositoryを選択し， URL<code>https://github.com/wuub/SublimeREPL</code> を入力．これにより，最新版をインストール可能．</p>
-
-<h2>3.2 キーバインディングの設定</h2>
-
-<p>いちいちメニューから選択してREPLを起動するのは面倒なので， キーバインディングを設定する. <code>Sublime Text &gt; Preferences &gt; Key Bindings - User</code>を開き，以下を入力 &amp; 保存.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[
-</span><span class='line'>    {
-</span><span class='line'>        "keys": ["super+ctrl+h"],
-</span><span class='line'>        "command": "repl_open",
-</span><span class='line'>        "args": {
-</span><span class='line'>            "type": "subprocess",
-</span><span class='line'>            "encoding": "utf8",
-</span><span class='line'>            "cmd": ["sbcl", "-i"],
-</span><span class='line'>            "cwd": "$file_path",
-</span><span class='line'>            "external_id": "lisp",
-</span><span class='line'>            "syntax": "Packages/Lisp/Lisp.tmLanguage"
-</span><span class='line'>        }
-</span><span class='line'>    }
-</span><span class='line'>]</span></code></pre></td></tr></table></div></figure>
-
-<p>これで, <code>⌘ Command + ^ Control + H</code>からSBCL REPLを開くことができる. ちなみに, ファイルパスはSublimeでどこのファイルを開いたか? に依存する. <code>/path/to/main.lisp</code>をSublimeで開き, <code>⌘ Command + ^ Control + H</code> を押下しSBCLを起動したなら, パスは<code>/path/to/</code>に通っているので, そこに存在するlispファイルをloadできる.</p>
-
-<h2>3.3 ビルドシステムの設定</h2>
-
-<p>Sublime上で記述したCLファイルがあった時, コマンド一つでビルドできたら便利だ.ということで, ビルドシステムの設定を行う. <code>Tools &gt; Build System &gt; New Build System...</code>とし, 次のような記述を行う.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>{
-</span><span class='line'>    "shell_cmd": "/usr/local/bin/sbcl --disable-debugger --load $file",
-</span><span class='line'>    "working_dir": "$file_path"
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-<p>ファイル名を<code>SBCL.sublime-build</code>として保存する. これにより, ビルドシステムから<code>SBCL</code>を選ぶことが可能になる.<br>
-CLファイルを記述中に<code>⌘ Command + B</code>を押下すれば, 即座にコンパイル &amp; 実行できるようになった.</p>
-
-<h1>4. 次回</h1>
-
-<p>今回は手元にまとめていたものを公開する形だった．なので新しいことをしたわけじゃない．学業の方がひと段落つきそうなので，そしたら残っているやりたいことや新しいことに挑戦していきたいなぁ．<br>
-Lispについては勉強の仕方と，簡単なゲームを作った記録を公開していく予定．まだまだ勉強したてなので精進したい．</p>
-
-<h1>参考文献</h1>
-
-<blockquote>
-<p><a href="http://blog.8arrow.org/entry/2013/12/19/183508">Sublime Text 2でCommon Lispを書くための環境設定</a><br>
-<a href="https://github.com/wuub/SublimeREPL">SublimeREPL</a><br>
-<a href="http://marktrapp.com/blog/2014/01/20/lisp-with-os-x-sublime-text/">Setting up a Common Lisp environment on OS X with Sublime Text 3</a><br>
-<a href="http://ja.common-lisp.wikia.com/wiki/QuickLisp">QuickLisp - Common Lisp Wiki</a><br>
-<a href="http://cl.cddddr.org/index.cgi?ASDF">ASDF</a><br>
-<a href="http://dev.ariel-networks.com/wp/archives/365">モダンCommon Lisp: Quicklispによるライブラリ環境</a><br>
-<a href="https://sites.google.com/site/shidoinfo/Home/programing-lang/%E9%96%A2%E6%95%B0%E5%9E%8B%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0%E8%A8%80%E8%AA%9E/lisp/common-lisp/common-lisp-%E5%87%A6%E7%90%86%E7%B3%BB/sbclsteel-bank-common-lisp">SBCL(Steel Bank Common Lisp) - 紫藤のWiki</a><br>
-<a href="http://lispuser.net/commonlisp/sbcl.html">SBCL - Steel Bank Common Lisp - LispUser.net</a><br>
-<a href="http://en.wikipedia.org/wiki/Steel_Bank_Common_Lisp">Steel Bank Common Lisp - Wikipedia</a></p>
-</blockquote>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[GitHub + Octopress でブログ作成]]></title>
-    <link href="http://tasuwo.github.io/blog/2015/02/09/title/"/>
-    <updated>2015-02-09T03:19:59+09:00</updated>
-    <id>http://tasuwo.github.io/blog/2015/02/09/title</id>
-    <content type="html"><![CDATA[<p>octopress + GitHubでのブログの立ち上げ方法をまとめました．</p>
-
-<!-- more -->
-
-<h1>1. はじめに</h1>
-
-<h2>1.1 今日の目的</h2>
-
-<ul>
-<li>octopress + github の基礎知識</li>
-<li>記事をdeployした際に自動的にツイート</li>
-</ul>
-
-<h2>1.2 あとまわし</h2>
-
-<ul>
-<li>emacsについて その2</li>
-</ul>
-
-<h1>2. GitHub + Octopressでブログを立ち上げる</h1>
-
-<p>調べれば簡単にできるけど，自分用にまとめる．<br>
-ページ見つつ思い出しつつ書くので，記述が足りない部分があるかもしれない．</p>
-
-<p>自分の環境</p>
-
-<ul>
-<li>PC：MacBook Air, Core i5 1.8GHz, Mem 4GB</li>
-<li>OS：OS X Yosemite 10.10.1</li>
-</ul>
-
-<p>必要なもの</p>
-
-<ul>
-<li>Ruby</li>
-<li>Octopress</li>
-<li>Github</li>
-</ul>
-
-<h2>2.1 Octopressの導入と準備(2015/2/12追記：Rubyについて)</h2>
-
-<p>記事の投稿ができるまで．<br>
-以下，簡略手順<a href="#oct_tejun">2</a>．</p>
-
-<ol>
-<li>Rubyとbundleのインストール(<a href="http://salinger.github.io/blog/2013/01/14/1/">Mac + Ruby + Octopress + Github でブログの作成</a>)</li>
-<li>GitHubに登録する(メールアドレスの認証も済ませておく<a href="#github_account">3</a>)．</li>
-<li>GitHubリポジトリを作成する(リポジトリ名は「<em>username</em>.github.io」)．</li>
-<li><a href="http://octopress.org/docs/setup/">公式サイト</a>を参考にセットアップを行う．
-
-<ol>
-<li>octopressをGitHubからクローン<br>
-<code>git clone git://github.com/imathis/octopress.git octopress</code></li>
-<li><code>cd octopress</code></li>
-<li><code>gem install bundler</code></li>
-<li><code>bundle install</code></li>
-<li>デフォルトのテーマインストール<br>
-<code>rake install</code></li>
-</ol></li>
-<li>動作確認．<code>http://localhost:4000/</code>にアクセスして，ブログのプレビューが表示されればOK．<br>
-<code>rake preview</code></li>
-<li><code>rake setup_github_pages</code>(<a href="http://octopress.org/docs/deploying/github/">公式サイト</a>)</li>
-<li>ブログのタイトルなどの初期設定(<code>_config.yml</code>)</li>
-</ol>
-
-<h3>2.1.1 手順4の補足</h3>
-
-<p>GitHubにデプロイするファイルを生成する．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>rake setup_github_pages
-</span><span class='line'>
-</span><span class='line'>Enter the <span class="nb">read</span>/write url <span class="k">for</span> your repository
-</span><span class='line'><span class="o">(</span>For example, <span class="s1">&#39;git@github.com:your_username/your_username.github.io.git)</span>
-</span><span class='line'><span class="s1">           or &#39;</span>https://github.com/your_username/your_username.github.io<span class="s1">&#39;)</span>
-</span><span class='line'><span class="s1">Repository url: git@github.com:srym/srym.github.io.git</span>
-</span><span class='line'><span class="s1">Added remote git@github.com:srym/srym.github.io.git as origin</span>
-</span><span class='line'><span class="s1">Set origin as default remote</span>
-</span><span class='line'><span class="s1">Master branch renamed to &#39;</span><span class="nb">source</span><span class="err">&#39;</span> <span class="k">for</span> committing your blog <span class="nb">source </span>files
-</span><span class='line'>rm -rf _deploy
-</span><span class='line'>mkdir _deploy
-</span><span class='line'><span class="nb">cd </span>_deploy
-</span><span class='line'>Initialized empty Git repository in /Users/shiroyama/playGround/octopress/_deploy/.git/
-</span><span class='line'><span class="o">[</span>master <span class="o">(</span>root-commit<span class="o">)</span> dacfaa2<span class="o">]</span> Octopress init
-</span><span class='line'> <span class="m">1</span> file changed, <span class="m">1</span> insertion<span class="o">(</span>+<span class="o">)</span>
-</span><span class='line'> create mode <span class="m">100644</span> index.html
-</span><span class='line'><span class="nb">cd</span> -
-</span></code></pre></td></tr></table></div></figure>
-
-<p>GitHub Pagesのリポジトリが自動的にoriginに指定される．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git remote -v
-</span><span class='line'>octopress       git://github.com/imathis/octopress.git <span class="o">(</span>fetch<span class="o">)</span>
-</span><span class='line'>octopress       git://github.com/imathis/octopress.git <span class="o">(</span>push<span class="o">)</span>
-</span><span class='line'>origin          git@github.com:srym/srym.github.io.git <span class="o">(</span>fetch<span class="o">)</span>
-</span><span class='line'>origin          git@github.com:srym/srym.github.io.git <span class="o">(</span>push<span class="o">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<h3>2.1.2 手順5の補足</h3>
-
-<p><a href="http://octopress.org/docs/configuring/">公式サイト</a>を参考に．<br>
-config.ymlの記述は以下のようになっている．<br>
-好みに編集する．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># _config.yml</span>
-</span><span class='line'>
-</span><span class='line'>url: http://blog.shiroyama.us
-</span><span class='line'>title: 白山軟件有限公司
-</span><span class='line'>subtitle: 東洋太平洋ブログ三日坊主チャンピオンのブログ
-</span><span class='line'>author: Fumihiko Shiroyama
-</span><span class='line'>simple_search: http://google.com/search
-</span><span class='line'>description:
-</span></code></pre></td></tr></table></div></figure>
-
-<h2>2.2 記事の作成/投稿</h2>
-
-<p><a href="http://octopress.org/docs/blogging/">公式サイト</a>を参考に手順をまとめる．</p>
-
-<ol>
-<li>記事のテンプレートを作成(<code>title</code>は任意のタイトルで)<br>
-<code>rake new_post\[title\]</code></li>
-<li>生成された<code>source/_posts/20XX-XX-XX-title.markdown</code>を編集して保存．</li>
-<li>静的ページの生成<br>
-<code>rake generate</code></li>
-<li>記事の確認．<code>localhost:4000</code>にアクセスしてみる．<br>
-<code>rake preview</code></li>
-<li>投稿する．デプロイ一発．楽．<br>
-<code>rake deploy</code></li>
-<li>ソースもpush<br>
-<code>git add .</code><br>
-<code>git commit -m &#39;comment&#39;</code><br>
-<code>git push origin source</code><br></li>
-</ol>
-
-<p>_config.ymlに記述されていたurlにアクセスすれば確認できる．<br>
-投稿の反映に10分ほどかかる場合があるので，あせらないで待つ．</p>
-
-<h2>2.3 その他</h2>
-
-<h3>2.3.1 ブログテーマ</h3>
-
-<p><a href="https://github.com/imathis/octopress/wiki/3rd-Party-Octopress-Themes">ここ</a>から選ぶと良い．</p>
-
-<h3>2.3.2 「つづきをよむ」ボタンを追加</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;!-- more --&gt;
-</span></code></pre></td></tr></table></div></figure>
-
-<h3>2.3.3 タグ</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># One category</span>
-</span><span class='line'>categories: Sass
-</span><span class='line'>
-</span><span class='line'><span class="c"># Multiple categories example 1</span>
-</span><span class='line'>categories: <span class="o">[</span>CSS3, Sass, Media Queries<span class="o">]</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># Multiple categories example 2</span>
-</span><span class='line'>categories:
-</span><span class='line'>- CSS3
-</span><span class='line'>- Sass
-</span><span class='line'>- Media Queries
-</span></code></pre></td></tr></table></div></figure>
-
-<h3>2.3.4 コメント欄の追加(2015/2/12追記)</h3>
-
-<p>Disqusに登録する必要がある．<br>
-登録時，サイトの登録を行うはず．<br>
-ここでshortnameを設定するので，これを設定ファイル(<code>_config.yml</code>)に追記する．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Disqus Comments</span>
-</span><span class='line'>disqus_short_name: your_short_name
-</span><span class='line'>disqus_show_comment_count: <span class="nb">true</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<p>shortnameを後から確認したい場合．<br>
-サイトにログインし，右上の歯車をクリックし，<code>Admin &gt; Settings</code>の，<code>Site Identity</code>にある．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>Your website<span class="err">&#39;</span>s shortname is *******.
-</span><span class='line'>This is used to uniquely identify your website on Disqus. It cannot be changed.
-</span></code></pre></td></tr></table></div></figure>
-
-<blockquote>
-<p><a href="http://blog.morizotter.com/2012/07/01/octopress%E3%81%AB%E3%82%B3%E3%83%A1%E3%83%B3%E3%83%88%E3%82%92%E8%BF%BD%E5%8A%A0%E3%81%99%E3%82%8B/">Octopressにコメントを追加する</a><br>
-<a href="http://salinger.github.io/blog/2013/01/14/1/">Mac + Ruby + Octopress + Github でブログの作成</a></p>
-</blockquote>
-
-<h3>2.4.5 プロフィールをサイドバーに表示(2015/2/12追記)</h3>
-
-<ol>
-<li><code>source/_includes/custom/asides/about.html</code>を編集する．</li>
-<li><code>_config.yml</code>において，サイドバーに<code>custom/asides/about.html</code>を追加する．</li>
-</ol>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># list each of the sidebar modules you want to include, in the order you want them to appear.</span>
-</span><span class='line'><span class="c"># To add custom asides, create files in /source/_includes/custom/asides/ and add them to the list like &#39;custom/asides/custom_aside_name.html&#39;</span>
-</span><span class='line'><span class="c"># ↓ここにパスを追加</span>
-</span><span class='line'>default_asides: <span class="o">[</span>custom/asides/about.html, asides/recent_posts.html, custom/asides/category_list.html, custom/asides/tag_cloud.html, asides/github.html, asides/twitter.html, asides/delicious.html, asides/pinboard.html, asides/googleplus.html<span class="o">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<blockquote>
-<p><a href="http://www.mk-mode.com/octopress/2012/12/17/octopress-add-profile/">Octopress - プロフィール表示を追加！</a></p>
-</blockquote>
-
-<h1>3. 記事をdeployした際に自動的にツイート</h1>
-
-<p>ありました<a href="#auto_tweet">1</a>．<br>
-octopressの設定で簡単に連携もできるらしいので調べておく．<br>
-夜が遅いので今日はここまで．</p>
-
-<h1>4. 次回への持ち越し</h1>
-
-<ul>
-<li>各コマンドがやっていること
-
-<ul>
-<li>少し理解が足りない部分がある</li>
-<li>この記事に説明を追記するかもしれない</li>
-</ul></li>
-<li>自動ツイート
-
-<ul>
-<li>調べてみる</li>
-</ul></li>
-<li>emacsのパッケージ管理について
-
-<ul>
-<li>上記が終わったら</li>
-</ul></li>
-</ul>
-
-<h1>参考文献</h1>
-
-<blockquote>
-<ol>
-<li><a name="auto_tweet"></a><a href="https://github.com/kawaken/kawaken.github.io/blob/master/_posts/2013-09-17-drone.io%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6github-pages%E3%81%AE%E6%9B%B4%E6%96%B0%E6%83%85%E5%A0%B1%E3%82%92twitter%E3%81%AB%E8%87%AA%E5%8B%95%E6%8A%95%E7%A8%BF%E3%81%99%E3%82%8B.md">最新記事があるか判別する</a></li>
-<li><a name="oct_tejun"></a><a href="http://qiita.com/syui/items/07365ed24eef63602233">GitHub Pages + Octopress カスタマイズ</a></li>
-<li><a name="github_account"></a><a href="http://ounziw.com/2012/08/10/github-create/">github アカウント作成方法</a></li>
-<li><a name="sankou_01"></a><a href="http://www.miukoba.net/blog/2013/01/05/start-octopress/">Octopressはじめました</a></li>
-<li><a name="sankou_03"></a><a href="http://moonstruckdrops.github.io/blog/2013/03/21/start-octpress/">Octpress始めました</a></li>
-<li><a name="sankou_04"></a><a href="http://blog.shiroyama.us/blog/2014/02/26/octopress/">エンジニアのブログは Octopress が最適</a></li>
-</ol>
 </blockquote>
 ]]></content>
   </entry>
