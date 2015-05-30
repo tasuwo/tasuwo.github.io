@@ -1,0 +1,149 @@
+---
+layout: post
+title: "iOSアプリケーションの実行時の振る舞いについて"
+date: 2015-05-30 11:18:52 +0900
+comments: true
+categories:
+- iOS
+- Swift
+- Objective-C
+---
+
+iOSアプリケーションの構造がよくわからなかったので，とりあえず実行時の振る舞いから理解していくためのまとめ．
+
+<!-- more -->
+
+以下の初心者用ガイドを一通りやった．
+
+>[Start Developing iOS Apps Today: Setup - Apple Developer](https://developer.apple.com/library/ios/referencelibrary/GettingStarted/RoadMapiOS/)
+
+ちなみに，上記サイトの使用言語は Swift ではなく Objective-C．
+
+##1. アプリケーション実行時の振る舞い
+
+アプリケーション起動時にはどのようなことが起きるのだろうか？Swift でも Objective-C でも，記述方法が違うだけでやってることは同じはずなので，結局何をしているのか？を公式ドキュメントから抽出してみる．
+
+###やっていること
+
+`UIApplicationMain`関数が呼び出され，以下の2つのインスタンスが生成される．
+
+* `UIApplication`クラスのインスタンス生成(**application object**)
+    * イベントループを開始する
+    * アプリケーションの基盤となる
+* `AppDelegate`クラスのインスタンス生成(**app delegate**)
+    * コンテンツ描画のためのウインドウを管理する
+    * 状態遷移を管理する
+
+*application object* が *app delegate* 上に定義されたメソッドを呼び出し，記述されたコードを実行する．コードを見てみると，`UIApplicationMain`関数に`AppDelegate`クラスが渡され，紐づけられているようだ．
+
+##2. App Delegate について
+
+アプリケーションを開発する上で関わりが深いのは`AppDelegate`だろう．初心者用ガイドに書かれていたことをメモしておく．
+
+###window 属性
+
+コンテンツが描画されるウインドウが格納される
+
+###重要メソッドのスケルトン
+
+アプリケーションが特殊な状態に陥った場合...アプリケーションの実行時，メモリ不足時，アプリケーション終了時など...には，*application object* が *app delegate* 内の対応したメソッドが呼び出す．デフォルトでは，対応した各メソッドのスケルトンが定義されている．これらの中身が空，もしくは削除されている場合には，デフォルトの振る舞いが呼び出される．必要に応じて記述すれば良い．
+
+##3. Objective-C と Swift での違いについて
+
+開発言語は Swift を使用する予定だけど，気になったのでメモしておく．実行時の振る舞いに関係する各ソースコードを示したのちに，その違いについて考えてみる．各ソースコードは，Xcode で Single View Application を作成した時のテンプレ．中略の部分は，スケルトンコードが書かれていた部分．
+
+###Objective-C
+
+`AppDelegate`が定義されたファイルの他に，`main.m`がある．
+
+```Objective-C
+//////////
+// main.m
+#import <UIKit/UIKit.h>
+#import "AppDelegate.h"
+
+int main(int argc, char * argv[]) {
+    @autoreleasepool {
+        // UIApplicationMain関数に，AppDelegateクラスを渡している．
+        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+    }
+}
+
+/////////////////
+// AppDelegate.h
+#import <UIKit/UIKit.h>
+
+@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@property (strong, nonatomic) UIWindow *window;
+@end
+
+/////////////////
+// AppDelegate.m
+#import "AppDelegate.h"
+
+@interface AppDelegate ()
+@end
+
+@implementation AppDelegate
+// 中略
+@end
+```
+
+###Swift
+
+```Swift
+/////////////////////
+// AppDelegate.swift
+import UIKit
+
+// Main関数の自動実装？
+@UIApplicationMain
+class AppDelegate: UIResponder, UIApplicationDelegate {
+
+    var window: UIWindow?
+
+    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+        // Override point for customization after application launch.
+        return true
+    }
+
+    // 中略
+}
+```
+
+Objective-C では，単純に`UIApplicationMain`関数に`AppDelegate`クラスを渡しているが，Swift の`@UIApplicationMain`とはなんなのか？
+探してみると，同じ疑問を抱いている人がいた．
+
+>[swift - What does "@UIApplicationMain" mean? - Stackoverflow](http://stackoverflow.com/questions/24516250/what-does-uiapplicationmain-mean)
+
+そもそも，iOSアプリケーションにおける`main`関数の主な役割は以下の2つである．
+
+* C プログラムの入り口になる
+* `UIApplicationMain`関数の呼び出し
+
+
+要は，`UIApplicationMain`関数と`AppDelegate`クラスをひもづけられれば良いようだ．これを実現するために，Swift では **Attributes** が用いられている．
+
+Attributes とは定義や型に関して情報を補足するもので，先頭に`@`を付加して記述する．
+
+>[Attributes - iOS Developer Library](https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Attributes.html)
+
+公式ドキュメントでは，`UIApplicationMain` attirbute について以下のように記述されている．
+
+>UIApplicationMain
+>Apply this attribute to a class to indicate that it is the application delegate. Using this attribute is equivalent to calling the UIApplicationMain function and passing this class’s name as the name of the delegate class.
+
+まとめると...
+
+* `UIApplicationMain` attributes は`AppDelegate`クラスに付加する
+* `UIApplicationMain` 関数を呼び出せる
+* 付加されたクラスのクラス名を，`delegate class` のクラス名として登録する
+
+つまり，Objective-C における Main 関数と同等に振る舞うということらしい．ちなみに，この attributes を利用する代わりに`main.swift`を作成することもできるそうだ．
+
+同じことをやっていることはわかっていたけど，やっぱり公式ドキュメントに記述を発見できたり，明確な理由付けができると，落ち着く．
+
+##参考
+
+>[Objective-C で書いたアプリを Swift で書き換える5ステップ - Qiita](http://qiita.com/shu223/items/437d9a9a3502800a891b)
+>[SwiftのAttributesをまとめた。 - tomoyaonishiのブログ](http://tomoyaonishi.hatenablog.jp/entry/2015/03/22/144246)
