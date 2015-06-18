@@ -1,0 +1,3901 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/atom.xml" rel="self"/>
+  <link href="http://tasuwo.github.io/"/>
+  <updated>2015-05-30T13:10:11+09:00</updated>
+  <id>http://tasuwo.github.io/</id>
+  <author>
+    <name><![CDATA[tasuwo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[iOSアプリケーションの実行時の振る舞いについて]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/05/30/ios-02/"/>
+    <updated>2015-05-30T11:18:52+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/05/30/ios-02</id>
+    <content type="html"><![CDATA[<p>iOSアプリケーションの構造がよくわからなかったので，とりあえず実行時の振る舞いから理解していくためのまとめ．</p>
+
+<!-- more -->
+
+<p>以下の初心者用ガイドを一通りやった．</p>
+
+<blockquote>
+<p><a href="https://developer.apple.com/library/ios/referencelibrary/GettingStarted/RoadMapiOS/">Start Developing iOS Apps Today: Setup - Apple Developer</a></p>
+</blockquote>
+
+<p>ちなみに，上記サイトの使用言語は Swift ではなく Objective-C．</p>
+
+<h2>1. アプリケーション実行時の振る舞い</h2>
+
+<p>アプリケーション起動時にはどのようなことが起きるのだろうか？Swift でも Objective-C でも，記述方法が違うだけでやってることは同じはずなので，結局何をしているのか？を公式ドキュメントから抽出してみる．</p>
+
+<h3>やっていること</h3>
+
+<p><code>UIApplicationMain</code>関数が呼び出され，以下の2つのインスタンスが生成される．</p>
+
+<ul>
+<li><code>UIApplication</code>クラスのインスタンス生成(<strong>application object</strong>)
+
+<ul>
+<li>イベントループを開始する</li>
+<li>アプリケーションの基盤となる</li>
+</ul></li>
+<li><code>AppDelegate</code>クラスのインスタンス生成(<strong>app delegate</strong>)
+
+<ul>
+<li>コンテンツ描画のためのウインドウを管理する</li>
+<li>状態遷移を管理する</li>
+</ul></li>
+</ul>
+
+<p><em>application object</em> が <em>app delegate</em> 上に定義されたメソッドを呼び出し，記述されたコードを実行する．コードを見てみると，<code>UIApplicationMain</code>関数に<code>AppDelegate</code>クラスが渡され，紐づけられているようだ．</p>
+
+<h2>2. App Delegate について</h2>
+
+<p>アプリケーションを開発する上で関わりが深いのは<code>AppDelegate</code>だろう．初心者用ガイドに書かれていたことをメモしておく．</p>
+
+<h3>window 属性</h3>
+
+<p>コンテンツが描画されるウインドウが格納される</p>
+
+<h3>重要メソッドのスケルトン</h3>
+
+<p>アプリケーションが特殊な状態に陥った場合&#8230;アプリケーションの実行時，メモリ不足時，アプリケーション終了時など&#8230;には，<em>application object</em> が <em>app delegate</em> 内の対応したメソッドが呼び出す．デフォルトでは，対応した各メソッドのスケルトンが定義されている．これらの中身が空，もしくは削除されている場合には，デフォルトの振る舞いが呼び出される．必要に応じて記述すれば良い．</p>
+
+<h2>3. Objective-C と Swift での違いについて</h2>
+
+<p>開発言語は Swift を使用する予定だけど，気になったのでメモしておく．実行時の振る舞いに関係する各ソースコードを示したのちに，その違いについて考えてみる．各ソースコードは，Xcode で Single View Application を作成した時のテンプレ．中略の部分は，スケルトンコードが書かれていた部分．</p>
+
+<h3>Objective-C</h3>
+
+<p><code>AppDelegate</code>が定義されたファイルの他に，<code>main.m</code>がある．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='Objective-C'><span class='line'><span class="c1">//////////</span>
+</span><span class='line'><span class="c1">// main.m</span>
+</span><span class='line'><span class="cp">#import &lt;UIKit/UIKit.h&gt;</span>
+</span><span class='line'><span class="cp">#import &quot;AppDelegate.h&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">@autoreleasepool</span> <span class="p">{</span>
+</span><span class='line'>        <span class="c1">// UIApplicationMain関数に，AppDelegateクラスを渡している．</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">UIApplicationMain</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="nb">nil</span><span class="p">,</span> <span class="n">NSStringFromClass</span><span class="p">([</span><span class="n">AppDelegate</span> <span class="k">class</span><span class="p">]));</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">/////////////////</span>
+</span><span class='line'><span class="c1">// AppDelegate.h</span>
+</span><span class='line'><span class="cp">#import &lt;UIKit/UIKit.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@interface</span> <span class="nc">AppDelegate</span> : <span class="bp">UIResponder</span> <span class="o">&lt;</span><span class="bp">UIApplicationDelegate</span><span class="o">&gt;</span>
+</span><span class='line'><span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="bp">UIWindow</span> <span class="o">*</span><span class="n">window</span><span class="p">;</span>
+</span><span class='line'><span class="k">@end</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">/////////////////</span>
+</span><span class='line'><span class="c1">// AppDelegate.m</span>
+</span><span class='line'><span class="cp">#import &quot;AppDelegate.h&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@interface</span> <span class="nc">AppDelegate</span> <span class="p">()</span>
+</span><span class='line'><span class="k">@end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@implementation</span> <span class="nc">AppDelegate</span>
+</span><span class='line'><span class="c1">// 中略</span>
+</span><span class='line'><span class="k">@end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h3>Swift</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='Swift'><span class='line'><span class="c1">/////////////////////</span>
+</span><span class='line'><span class="c1">// AppDelegate.swift</span>
+</span><span class='line'><span class="k">import</span> <span class="n">UIKit</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Main関数の自動実装？</span>
+</span><span class='line'><span class="p">@</span><span class="n">UIApplicationMain</span>
+</span><span class='line'><span class="k">class</span> <span class="nl">AppDelegate</span><span class="p">:</span> <span class="bp">UIResponder</span><span class="p">,</span> <span class="bp">UIApplicationDelegate</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">var</span> <span class="nl">window</span><span class="p">:</span> <span class="bp">UIWindow</span><span class="o">?</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">func</span> <span class="n">application</span><span class="p">(</span><span class="nl">application</span><span class="p">:</span> <span class="bp">UIApplication</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span> <span class="nl">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="nl">NSObject</span><span class="p">:</span> <span class="n">AnyObject</span><span class="p">]</span><span class="o">?</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bool</span> <span class="p">{</span>
+</span><span class='line'>        <span class="c1">// Override point for customization after application launch.</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">true</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// 中略</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>Objective-C では，単純に<code>UIApplicationMain</code>関数に<code>AppDelegate</code>クラスを渡しているが，Swift の<code>@UIApplicationMain</code>とはなんなのか？<br>
+探してみると，同じ疑問を抱いている人がいた．</p>
+
+<blockquote>
+<p><a href="http://stackoverflow.com/questions/24516250/what-does-uiapplicationmain-mean">swift - What does &quot;@UIApplicationMain&quot; mean? - Stackoverflow</a></p>
+</blockquote>
+
+<p>そもそも，iOSアプリケーションにおける<code>main</code>関数の主な役割は以下の2つである．</p>
+
+<ul>
+<li>C プログラムの入り口になる</li>
+<li><code>UIApplicationMain</code>関数の呼び出し</li>
+</ul>
+
+<p>要は，<code>UIApplicationMain</code>関数と<code>AppDelegate</code>クラスをひもづけられれば良いようだ．これを実現するために，Swift では <strong>Attributes</strong> が用いられている．</p>
+
+<p>Attributes とは定義や型に関して情報を補足するもので，先頭に<code>@</code>を付加して記述する．</p>
+
+<blockquote>
+<p><a href="https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Attributes.html">Attributes - iOS Developer Library</a></p>
+</blockquote>
+
+<p>公式ドキュメントでは，<code>UIApplicationMain</code> attirbute について以下のように記述されている．</p>
+
+<blockquote>
+<p>UIApplicationMain<br>
+Apply this attribute to a class to indicate that it is the application delegate. Using this attribute is equivalent to calling the UIApplicationMain function and passing this class’s name as the name of the delegate class.</p>
+</blockquote>
+
+<p>まとめると&#8230;</p>
+
+<ul>
+<li><code>UIApplicationMain</code> attributes は<code>AppDelegate</code>クラスに付加する</li>
+<li><code>UIApplicationMain</code> 関数を呼び出せる</li>
+<li>付加されたクラスのクラス名を，<code>delegate class</code> のクラス名として登録する</li>
+</ul>
+
+<p>つまり，Objective-C における Main 関数と同等に振る舞うということらしい．ちなみに，この attributes を利用する代わりに<code>main.swift</code>を作成することもできるそうだ．</p>
+
+<p>同じことをやっていることはわかっていたけど，やっぱり公式ドキュメントに記述を発見できたり，明確な理由付けができると，落ち着く．</p>
+
+<h2>参考</h2>
+
+<blockquote>
+<p><a href="http://qiita.com/shu223/items/437d9a9a3502800a891b">Objective-C で書いたアプリを Swift で書き換える5ステップ - Qiita</a><br>
+<a href="http://tomoyaonishi.hatenablog.jp/entry/2015/03/22/144246">SwiftのAttributesをまとめた。 - tomoyaonishiのブログ</a></p>
+</blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[Swift] 関数とクロージャについて]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/05/29/swift-func/"/>
+    <updated>2015-05-29T15:46:10+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/05/29/swift-func</id>
+    <content type="html"><![CDATA[<p>クロージャって何？？？と思ったので．</p>
+
+<!-- more -->
+
+<h2>関数</h2>
+
+<p>クロージャについてまとめる前に，まず関数について理解する．</p>
+
+<h3>定義</h3>
+
+<p><code>func</code>で宣言し，返り値は<code>-&gt;</code>を用いる．<br>
+返り値は複数指定可能．<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+<span class='line-number'>2</span><br>
+<span class='line-number'>3</span><br>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">func</span> <span class="nf">testFunc</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nl">first</span><span class="p">:</span><span class="n">Int</span><span class="p">,</span> <span class="nl">second</span><span class="p">:</span><span class="n">Int</span><span class="p">)</span> <span class="p">{</span><br>
+</span><span class='line'>    <span class="k">return</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span><br>
+</span><span class='line'><span class="p">}</span><br>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h3>特徴</h3>
+
+<p>Swiftの関数には以下の特徴がある．</p>
+
+<ol>
+<li>可変数の引数を指定可能</li>
+<li>ネストして宣言可能</li>
+<li>引数に指定可能</li>
+<li>返り値に指定可能</li>
+</ol>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="c1">///////////////////////////</span>
+</span><span class='line'><span class="c1">// 1. 可変数の引数を指定可能</span>
+</span><span class='line'><span class="c1">//    引数を配列で指定できる．</span>
+</span><span class='line'><span class="k">func</span> <span class="nf">sumOf</span><span class="p">(</span><span class="nl">numbers</span><span class="p">:</span> <span class="n">Int</span><span class="p">...)</span> <span class="o">-&gt;</span> <span class="n">Int</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">var</span> <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>    <span class="k">for</span> <span class="n">number</span> <span class="k">in</span> <span class="n">numbers</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">sum</span> <span class="o">+=</span> <span class="n">number</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">sum</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="n">sumOf</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>        <span class="c1">// 21</span>
+</span><span class='line'><span class="n">sumOf</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="mi">597</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>   <span class="c1">// 651</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">///////////////////////////</span>
+</span><span class='line'><span class="c1">// 2. ネストして宣言可能</span>
+</span><span class='line'><span class="c1">//    ネストした関数は，外の関数の変数にアクセス可能</span>
+</span><span class='line'><span class="k">func</span> <span class="n">returnFifteen</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Int</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">var</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">10</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">func</span> <span class="n">add</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">y</span> <span class="o">+=</span> <span class="mi">5</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">add</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="n">y</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="n">returnFifteen</span><span class="p">()</span>     <span class="c1">// 15</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">///////////////////////////</span>
+</span><span class='line'><span class="c1">// 3. 引数に指定可能</span>
+</span><span class='line'><span class="c1">// 数値のリストと条件となる関数を与えると，</span>
+</span><span class='line'><span class="c1">// 条件にマッチした数値がリスト内に存在するか調べる関数．</span>
+</span><span class='line'><span class="k">func</span> <span class="n">hasAnyMatches</span><span class="p">(</span><span class="nl">list</span><span class="p">:</span> <span class="p">[</span><span class="n">Int</span><span class="p">],</span> <span class="nl">condition</span><span class="p">:</span> <span class="n">Int</span> <span class="o">-&gt;</span> <span class="n">Bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bool</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">for</span> <span class="n">item</span> <span class="k">in</span> <span class="n">list</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="n">conition</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nb">true</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nb">false</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">// 10より小さい値ならば true</span>
+</span><span class='line'><span class="k">func</span> <span class="n">lessThanTen</span><span class="p">(</span><span class="nl">number</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bool</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">number</span> <span class="o">&lt;</span> <span class="mi">10</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">var</span> <span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">12</span><span class="p">]</span>
+</span><span class='line'><span class="n">hasAnyMathces</span><span class="p">(</span><span class="n">numbers</span><span class="p">,</span> <span class="n">lessThanTen</span><span class="p">)</span>    <span class="c1">// true</span>
+</span><span class='line'><span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">12</span><span class="p">]</span>
+</span><span class='line'><span class="n">hasAnyMathces</span><span class="p">(</span><span class="n">numbers</span><span class="p">,</span> <span class="n">lessThanTen</span><span class="p">)</span>    <span class="c1">// false</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">///////////////////////////</span>
+</span><span class='line'><span class="c1">// 4. 返り値に指定可能</span>
+</span><span class='line'><span class="k">func</span> <span class="n">makeIncrementer</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">Int</span> <span class="o">-&gt;</span> <span class="n">Int</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// ネストした関数</span>
+</span><span class='line'>    <span class="k">func</span> <span class="n">addOne</span><span class="p">(</span><span class="nl">number</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Int</span><span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">number</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">// ネストして宣言された関数をそのまま返す</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">addOne</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>クロージャとは？</h2>
+
+<p>実行可能なコードブロックのこと&#8230;?<br>
+一言で言い表そうとすると難しい．公式では，<code>関数は再利用が可能な特別なクロージャである．</code>と言われている．</p>
+
+<h3>宣言</h3>
+
+<p>とりあえず，書き方を見てみる．<br>
+名前が省略可能で，<code>{}</code>で囲んで記述する．引数と返り値の後に<code>in</code>を記述してから本体を記述する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="c1">// クロージャ</span>
+</span><span class='line'><span class="k">var</span> <span class="nl">greetClosure</span><span class="p">:</span> <span class="p">(</span><span class="n">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">String</span>
+</span><span class='line'><span class="n">paramClosure</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">name</span> <span class="o">-&gt;</span> <span class="n">String</span> <span class="k">in</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s">&quot;Hello &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">// 関数でも同様の振る舞いを定義をしてみる</span>
+</span><span class='line'><span class="k">func</span> <span class="n">greetFunc</span><span class="p">(</span><span class="nl">name</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">String</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s">&quot;Hello &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 実行結果はどちらも変わらない．</span>
+</span><span class='line'><span class="n">println</span><span class="p">(</span><span class="n">greetClosure</span><span class="p">(</span><span class="s">&quot;tasuwo&quot;</span><span class="p">))</span>
+</span><span class='line'><span class="n">println</span><span class="p">(</span><span class="n">greetFunc</span><span class="p">(</span><span class="s">&quot;tasuwo&quot;</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>これだけだと，クロージャの意味がイマイチわからない．つまり，なぜ関数じゃダメなのか？<br>
+自分なりの解釈だが，クロージャの良い点は<strong>複数の処理の記述をコンパクトにまとめられること</strong>なのではと思う．<br>
+例えば，<code>map</code>を例にとって考える．<br>
+<code>map</code>はクロージャを引数にとり(つまり，関数を与えても問題はない)，配列の各値にその関数を適用・変換する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">var</span> <span class="n">numArray</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+</span><span class='line'><span class="c1">// 配列の各値を三倍にする</span>
+</span><span class='line'><span class="n">numArray</span><span class="p">.</span><span class="n">map</span><span class="p">({</span>
+</span><span class='line'>    <span class="p">(</span><span class="nl">number</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Int</span> <span class="k">in</span>
+</span><span class='line'>    <span class="k">let</span> <span class="n">result</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">number</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">result</span>
+</span><span class='line'><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>クロージャは，引数や返り値の型が自明である時，その指定を省略可能である．また，返り値が1つに減退されている場合には，<code>return</code>も記述しなくて良い．<br>
+よって，以下のように記述を省略できる</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="n">numArray</span><span class="p">.</span><span class="n">map</span><span class="p">({</span>
+</span><span class='line'>    <span class="n">number</span> <span class="k">in</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">number</span>
+</span><span class='line'><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>記述がかなりコンパクトになったし，何をしているのかも一目見れば大体わかる．<br>
+また，第二引数を以下のように外に出す書き方もできるそうだ．自分はこれを知らなくて，以下のような記述を見るたびに(なんだこれは&#8230;?)と頭をひねっていた．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="n">numArray</span><span class="p">.</span><span class="n">map</span><span class="p">(){</span>
+</span><span class='line'>    <span class="n">number</span> <span class="k">in</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">number</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>もう一つの例を見てみる．<br>
+<code>sorted</code>は，与えられた配列を並び替える．クロージャを引数にとると，その内容に従って並び替える．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">var</span> <span class="n">numArray</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+</span><span class='line'><span class="k">let</span> <span class="n">sortedNum</span> <span class="o">=</span> <span class="n">sorted</span><span class="p">(</span><span class="n">numArray</span><span class="p">){</span>
+</span><span class='line'>    <span class="p">(</span><span class="nl">str1</span><span class="p">:</span> <span class="n">Int</span><span class="p">,</span> <span class="nl">str2</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bool</span> <span class="k">in</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">str1</span> <span class="o">&gt;</span> <span class="n">str2</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>引数，返り値の型と，<code>return</code>を省略する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">let</span> <span class="n">sortedNum</span> <span class="o">=</span> <span class="n">sorted</span><span class="p">(</span><span class="n">numArray</span><span class="p">){</span>
+</span><span class='line'>    <span class="n">str1</span><span class="p">,</span> <span class="n">str2</span> <span class="k">in</span> <span class="n">str1</span> <span class="o">&gt;</span> <span class="n">str2</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>さらに，自分自身が引数となっている時，自身の引数を<code>$0,$1...</code>で記述可能．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">let</span> <span class="n">sortedNum</span> <span class="o">=</span> <span class="n">sorted</span><span class="p">(</span><span class="n">numArray</span><span class="p">){</span><span class="err">$</span><span class="mi">0</span> <span class="o">&gt;</span> <span class="err">$</span><span class="mi">1</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>これでかなり省略できる．</p>
+
+<h1>参考文献</h1>
+
+<blockquote>
+<p><a href="http://qiita.com/yuinchirn/items/2ebb6fed6de0c9c1c3c9">Swift さくっと確認したい基礎文法 クロージャ(closure)<br>
+</a><br>
+<a href="http://qiita.com/mst/items/b18e9531ac0cbdf2f3c3">swift Sort関数とClosure</a><br>
+<a href="https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/GuidedTour.html">A Swift Tour</a><br>
+<a href="http://chicketen.blog.jp/archives/14886216.html">iOS Swiftのクロージャを使う</a></p>
+</blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[Swift] Optional型まとめ]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/05/29/swift/"/>
+    <updated>2015-05-29T14:22:24+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/05/29/swift</id>
+    <content type="html"><![CDATA[<p>Optional型がよくわからなかったのでまとめておく．<br>
+定義のメモだけなので，使い方とかもそのうち追記していきたい．</p>
+
+<!-- more -->
+
+<h2>Optional型とは？</h2>
+
+<p><strong>nil を許す型</strong>のこと．</p>
+
+<h2>宣言</h2>
+
+<p>型に<code>?</code>を付加すると，Optional型を宣言できる．<br>
+ちなみに<code>T?</code>は<code>Optional&lt;T&gt;</code>のシンタックスシュガー．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">var</span> <span class="nl">optionalSuger</span><span class="p">:</span> <span class="n">Int</span><span class="o">?</span>           <span class="c1">// Optional型の宣言．初期値はnil．</span>
+</span><span class='line'><span class="k">var</span> <span class="nl">optional</span><span class="p">:</span>      <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Int</span><span class="o">&gt;</span>  <span class="c1">// Int? と同じ意味</span>
+</span><span class='line'><span class="k">var</span> <span class="nl">notOptional</span><span class="p">:</span>   <span class="n">Int</span>            <span class="c1">// 非Optional型．初期値は空(nilですらない)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>wrap と unwrap</h2>
+
+<p><code>T</code>と<code>T?</code>は違う型．<br>
+同様に扱うためには<strong>unwrap</strong>する必要がある．</p>
+
+<ul>
+<li><strong>unwrap</strong>とは？
+
+<ul>
+<li>Optional<T>型から<code>T</code>型の変数を取り出すこと．</li>
+</ul></li>
+</ul>
+
+<p><strong>unwrap</strong>の方法には以下の4種類がある．</p>
+
+<ol>
+<li>Forced unwrapping</li>
+<li>Optional Chaining</li>
+<li>Optional Binding</li>
+<li>比較演算子</li>
+</ol>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="c1">////////////////////////////////////////////</span>
+</span><span class='line'><span class="c1">// Optional型の宣言</span>
+</span><span class='line'><span class="k">class</span> <span class="n">Dog</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">func</span> <span class="n">bark</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">String</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s">&quot;BowWow!&quot;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">var</span> <span class="nl">wrappedDog</span><span class="p">:</span> <span class="n">Dog</span><span class="o">?</span> <span class="o">=</span> <span class="n">Dog</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">////////////////////////////////////////////</span>
+</span><span class='line'><span class="c1">// 1. Forced Unwrapping</span>
+</span><span class='line'><span class="c1">//    「!」を付加する．</span>
+</span><span class='line'><span class="c1">//    値が nil だった場合はランタイムエラー．</span>
+</span><span class='line'><span class="n">println</span><span class="p">(</span><span class="n">wrappedDog</span><span class="o">!</span><span class="p">.</span><span class="n">bark</span><span class="p">)</span>           <span class="c1">// &quot;BowWow!&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">////////////////////////////////////////////</span>
+</span><span class='line'><span class="c1">// 2. Optional Chaining</span>
+</span><span class='line'><span class="c1">//    「?」を付加する</span>
+</span><span class='line'><span class="c1">//    値が nil だった場合は nil を返す．</span>
+</span><span class='line'><span class="c1">//    最終的な戻り値は Optional型 となる．</span>
+</span><span class='line'><span class="n">println</span><span class="p">(</span><span class="n">wrappedDog</span><span class="o">?</span><span class="p">.</span><span class="n">bark</span><span class="p">())</span>         <span class="c1">// Optional(&quot;BowWow!&quot;)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">////////////////////////////////////////////</span>
+</span><span class='line'><span class="c1">// 3. Optional Binding</span>
+</span><span class='line'><span class="c1">//    if，while 等の条件式内で宣言，代入されると unwrap される．</span>
+</span><span class='line'><span class="c1">//    値が nil の場合は条件式が false となる．</span>
+</span><span class='line'><span class="k">if</span> <span class="k">var</span> <span class="n">unwrappedDog</span> <span class="o">=</span> <span class="n">wrappedDog</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">println</span><span class="p">(</span><span class="n">unwrappedDog</span><span class="p">.</span><span class="n">bark</span><span class="p">())</span>    <span class="c1">// &quot;BowWow!&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">////////////////////////////////////////////</span>
+</span><span class='line'><span class="c1">// 4. 比較演算子</span>
+</span><span class='line'><span class="c1">//    比較演算子を使うと unwrap される．</span>
+</span><span class='line'><span class="k">var</span> <span class="nl">wrappedInt</span><span class="p">:</span> <span class="n">Int</span><span class="o">?</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'><span class="n">println</span><span class="p">(</span><span class="n">wrappedInt</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>            <span class="c1">// &quot;true&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>Implicitly Unwrapped Optional型とは？</h2>
+
+<p>型に<code>!</code>を付加すると，Implicitly Unwrapped Optional型を宣言できる．<br>
+ちなみに<code>T!</code>は<code>ImplicitlyUnwrappedOptional&lt;T&gt;</code>のシンタックスシュガー．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">var</span> <span class="nl">iuOptionalSuger</span><span class="p">:</span> <span class="n">Int</span><span class="o">!</span>                              <span class="c1">// Implicitly Unwrapped Optional型の宣言．初期値はnil．</span>
+</span><span class='line'><span class="k">var</span> <span class="nl">iuOptional</span><span class="p">:</span>      <span class="n">ImplicitlyUnwrappedOptional</span><span class="o">&lt;</span><span class="n">Int</span><span class="o">&gt;</span>  <span class="c1">// Int! と同じ意味</span>
+</span><span class='line'><span class="k">var</span> <span class="nl">Optional</span><span class="p">:</span>        <span class="n">Int</span><span class="o">?</span>                              <span class="c1">// Optional型</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">iuOptional</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'><span class="n">Optional</span>   <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 自動的に unwrap される．</span>
+</span><span class='line'><span class="n">println</span><span class="p">(</span><span class="n">iuOptional</span><span class="p">)</span>    <span class="c1">// &quot;1&quot;</span>
+</span><span class='line'><span class="n">println</span><span class="p">(</span><span class="n">Optional</span><span class="p">)</span>      <span class="c1">// &quot;Optional(1)&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>比較演算子：??</h2>
+
+<p>nil かどうか判定する比較演算子．<br>
+<code>a ?? b</code>は<code>a != nil ? a! : b</code>のシンタックスシュガー．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">var</span> <span class="nl">wrappedInt</span><span class="p">:</span> <span class="n">Int</span><span class="o">?</span>
+</span><span class='line'><span class="n">ptinrln</span><span class="p">(</span><span class="n">wrappedInt</span> <span class="o">??</span> <span class="mi">2</span><span class="p">)</span>    <span class="c1">// &quot;2&quot;</span>
+</span><span class='line'><span class="n">wrappedInt</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'><span class="n">println</span><span class="p">(</span><span class="n">wrappedInt</span> <span class="o">??</span> <span class="mi">2</span><span class="p">)</span>    <span class="c1">// &quot;1&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h1>参考サイト</h1>
+
+<blockquote>
+<p><a href="http://qiita.com/cotrpepe/items/518c4476ca957a42f5f1">Swift Optional 型についてのまとめ Ver2</a><br>
+<a href="http://qiita.com/koher/items/c6f446bad54442a28bf4">SwiftのOptional型を極める</a></p>
+</blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[論文の管理に Mendeley を導入した話]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/05/14/mendeley/"/>
+    <updated>2015-05-14T10:59:35+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/05/14/mendeley</id>
+    <content type="html"><![CDATA[<p>何も大したことはしてないので雑記みたいな感じです．<br>
+いつものことだけど，Mac OS X Yosemite での話です．</p>
+
+<!-- more -->
+
+<h2><a href="https://www.mendeley.com/dashboard/">Mendeley</a> を導入した</h2>
+
+<p>フリーの文献管理アプリケーション．<br>
+Win/Mac/Linux で使用可能．<br>
+使ってみた感じを書いておく．</p>
+
+<h3>悪い部分</h3>
+
+<ul>
+<li>論文情報の自動抽出はあまりあてにならない
+
+<ul>
+<li>海外製なので，日本語論文より英語論文の方が精度が良い(気がする)</li>
+<li>というか，日本語論文でも英語タイトルの方が抽出されたりする</li>
+</ul></li>
+<li>「Google Scholar を参照して補完する」と聞いてすごいって思ったけどあまりあてにならない</li>
+<li>たまにうまく表示されない PDF がある
+
+<ul>
+<li>保護されているものとか(しょうがない)</li>
+<li>それ以外でも表示されない場合がある</li>
+</ul></li>
+<li>タグ付けは有用かとおもいきやそうでもなかった
+
+<ul>
+<li>いちいちつけるのが面倒になる</li>
+</ul></li>
+<li>日本語でキーワード検索できない
+
+<ul>
+<li><del>Spotlight使え</del></li>
+</ul></li>
+</ul>
+
+<h3>良い部分</h3>
+
+<ul>
+<li>論文に Note をつけられるところ
+
+<ul>
+<li>今のところ一番うれしい</li>
+<li>ダウンロードした時，なぜ有用だと思ったのかをメモっておくと，後から見返すときに便利</li>
+</ul></li>
+<li>他のデバイスとの同期が簡単
+
+<ul>
+<li>ストレージが2GB与えられる</li>
+<li>足りなくなりそう</li>
+</ul></li>
+<li>iPhone/iPad からも利用できる
+
+<ul>
+<li>まだあまり活用してない</li>
+<li>結構大きいと思う</li>
+</ul></li>
+</ul>
+
+<h2>やったこと</h2>
+
+<ol>
+<li>論文PDF をダウンロード</li>
+<li>ダウンロードしたPDF を Mendeley に追加</li>
+</ol>
+
+<p>という作業がだるい．</p>
+
+<p>Mendeley には Watch Folder という機能がある．<br>
+フォルダを指定すると，そのフォルダにPDFが追加された時に自動で取得できる．<br>
+でも&#8230;</p>
+
+<ul>
+<li>ダウンロードフォルダを Watch Folder にしたくない
+
+<ul>
+<li>具体的には，PDF だけダウンロードするフォルダを別にして，そのフォルダを Watch Folder にしたい</li>
+<li>別にダウンロードフォルダを Watch Folder にしても大丈夫(だと思う)だけど，気持ちの問題</li>
+</ul></li>
+</ul>
+
+<p>なので，以下のようにした</p>
+
+<ol>
+<li>ダウンロードフォルダに PDF が追加されたら，専用フォルダに移動させる</li>
+<li>専用フォルダを Watch Folder に指定する</li>
+</ol>
+
+<p>Automator を使ったら簡単に出来た．<br>
+以下のサイトのソースをほぼコピペ．</p>
+
+<blockquote>
+<p><a href="http://www.virment.com/automator-tips/">Automatorのフォルダアクションを使った小技.ファイル自動振り分けとファイルの自動アップロード</a></p>
+</blockquote>
+
+<p>ありがとうございました．</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[開発モデルの話]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/05/07/model/"/>
+    <updated>2015-05-07T09:48:27+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/05/07/model</id>
+    <content type="html"><![CDATA[<p>開発モデルについて，調べる機会があったのでメモしておく．<br>
+調査記録なので，間違い等が含まれる可能性がある．</p>
+
+<!-- more -->
+
+<h1>はじめに</h1>
+
+<h2>開発プロセスとは</h2>
+
+<p>開発の企画からリリース，運用・保守までの作業段階．以下のように分けられる．</p>
+
+<ol>
+<li>要件定義
+
+<ul>
+<li>機能やパフォーマンス等の条件の明確化</li>
+</ul></li>
+<li>基本設計(外部設計)
+
+<ul>
+<li>UIや入出力等</li>
+</ul></li>
+<li>詳細設計(内部設計)
+
+<ul>
+<li>具体的な機能の設計</li>
+</ul></li>
+<li>実装</li>
+<li>単体テスト</li>
+<li>結合テスト</li>
+<li>総合テスト</li>
+<li>導入・運用</li>
+</ol>
+
+<h2>開発モデルとは</h2>
+
+<p>開発プロセスを実施する順番・形式をモデル化したもの．</p>
+
+<h1>1. ウォーターフォールモデル</h1>
+
+<p>最も基本的な開発モデル．前のプロセスの成果物を基に次のプロセスの作業を行う．</p>
+
+<ul>
+<li>主流．ドキュメントの作成量が多い．</li>
+<li>大規模システム開発に有効とされる</li>
+</ul>
+
+<h3>メリット</h3>
+
+<ul>
+<li>計画を立て易い
+
+<ul>
+<li>各開発プロセスの区切りが明確で，流れを把握しやすい</li>
+</ul></li>
+<li>進捗管理がし易い</li>
+</ul>
+
+<h3>デメリット</h3>
+
+<ul>
+<li>上流工程でしか要件定義をしない</li>
+<li>仕様変更の影響が強い
+
+<ul>
+<li>手戻りの発生</li>
+</ul></li>
+<li>成果物管理の稼働不可
+
+<ul>
+<li>成果物の作成が重みになる</li>
+</ul></li>
+</ul>
+
+<h1>2. プロトタイピングモデル</h1>
+
+<ul>
+<li>比較的小規模な開発向け．</li>
+<li>プロトタイプをユーザに提示し，システムの機能を確認してもらう
+
+<ul>
+<li>評価と改善を繰り替えし，要件に見合った製品を作り上げる</li>
+</ul></li>
+</ul>
+
+<h3>メリット</h3>
+
+<ul>
+<li>設計段階でユーザの意見が取り入れられるため，手戻りが少なくなる</li>
+</ul>
+
+<h3>デメリット</h3>
+
+<ul>
+<li>プロトタイプ作りから始めるため，手間と費用がかかる</li>
+</ul>
+
+<h1>3. 繰り返し型開発モデル</h1>
+
+<p>ウォーターフォールにおける，手戻りの大きいデメリットを改善するために考えられた．</p>
+
+<h2>3.1 スパイラルモデル</h2>
+
+<p>ソフトウェア全体を，独立性の高いサブシステムに分割する</p>
+
+<ul>
+<li><code>要件定義⇒設計⇒プログラミング⇒テスト</code> の流れを繰り返す</li>
+<li>開発のリスクが最小となるように改良しながらシステムを育てる
+
+<ol>
+<li>リスク分析・代替手段評価</li>
+<li>開発と検証</li>
+<li>次のフェーズの計画</li>
+<li>目標の設定・代替手段検討</li>
+</ol></li>
+</ul>
+
+<h3>メリット</h3>
+
+<ul>
+<li>リスクの現象が計れる</li>
+<li>大きな手戻りが発生しにくい
+
+<ul>
+<li>ユーザとの認識の違い，設計・要件定義のミスを早期発見可能</li>
+</ul></li>
+<li>仕様変更に対応しやすい</li>
+</ul>
+
+<h3>デメリット</h3>
+
+<ul>
+<li>システムの分割方法によっては運用しにくい</li>
+<li>ユーザに仕様変更の余地を与えてしまう</li>
+<li>プロジェクト全体の管理が困難
+
+<ul>
+<li>終了時期の見極めが難しい</li>
+</ul></li>
+</ul>
+
+<h2>3.2 インクリメンタルモデル(漸増型)</h2>
+
+<p>要求を一度に全て実現するのではなく，開発単位毎に新規の増分を追加していく．<br>
+スパイラルモデルとは，繰り返しの範囲が異なる．<br>
+スパイラルモデルは <code>要求定義〜テスト工程</code> を繰り返すが，インクリメンタルモデルは要求定義は最初の1回だけ行い，それ以後の <code>設計〜テスト工程</code> のみを繰り返す．</p>
+
+<ul>
+<li>最初にシステム全体の要求定義を行う
+
+<ul>
+<li>ソフトウェアを独立性の高い機能に分割する</li>
+</ul></li>
+<li>機能ごとに並行して開発を行う
+
+<ul>
+<li>各機能について段階的にリリースする</li>
+</ul></li>
+</ul>
+
+<h3>メリット</h3>
+
+<ul>
+<li>機能毎のソフトウェア構造がまったく異なるもの，依存関係のないものに適している
+
+<ul>
+<li>繰り返しの単位の独立性が保てる</li>
+</ul></li>
+<li>機能毎に開発する
+
+<ul>
+<li>全ての機能が揃っていなくても，最初のリリースからシステムの動作を確認できる</li>
+</ul></li>
+</ul>
+
+<h3>デメリット</h3>
+
+<ul>
+<li>開発単位間に共通した構造が存在した場合，二重に開発を行ってしまう
+
+<ul>
+<li>保守性に問題が生じる</li>
+</ul></li>
+<li>細部まで作り込んでしまうと，修正が大変</li>
+</ul>
+
+<h2>3.3 イテレーションモデル(反復型)</h2>
+
+<p>何度も薄く色を塗ることで，最終的にしっかりとした色へもっていくイメージ．<br>
+スパイラルモデルとの違いは，分割の仕方．<br>
+スパイラルモデルは <code>設計〜テスト工程</code> を繰り返すが，イテレーションモデルは <code>機能追加</code> の工程を繰り返し，各機能の完成度を高めていく．</p>
+
+<ul>
+<li>ソフトウェアの全体，あるいは部分について，最初は薄く作り，少しずつ肉付けしていく
+
+<ul>
+<li>システムの要素をとりあえず完成させ，段階的に要素を開発・追加してく</li>
+</ul></li>
+<li>OS の開発に向いている
+
+<ul>
+<li>どんなモジュールからも呼び出すカーネル(プロセス管理等)を先に開発する</li>
+<li>カーネルのモジュールを利用しながらシェルを追加して行く</li>
+</ul></li>
+</ul>
+
+<p>エヴォリューショナルモデルと同義(たぶん&#8230;)．</p>
+
+<h3>メリット</h3>
+
+<ul>
+<li>徐々に確認しながら肉付けし，中身を濃くしていける
+
+<ul>
+<li>非常に重要かつ複雑なソフトウェアの箇所に対して有効</li>
+</ul></li>
+</ul>
+
+<h3>デメリット</h3>
+
+<ul>
+<li>ユーザーの要求が発散してしまい，ソフトウェアがいつまでたっても完成しないリスクがある</li>
+</ul>
+
+<h2>UP(Unified Process)</h2>
+
+<p>開発モデルというわけじゃないけど，このタイミングで書いておく．<br>
+UP は有名な反復型プロセス(イテレーション + インクリメンタル)フレームワーク．<br>
+実際の現場では，インクリメンタルモデル，イテレーションモデルをミックスした戦略がよくとられる．</p>
+
+<ul>
+<li>機能単位の開発：インクリメンタル戦略</li>
+<li>コアアーキテクチャの開発：イテレーション戦略</li>
+</ul>
+
+<h3>最終目標</h3>
+
+<p>品質の高いソフトウェアを開発するためのガイドラインを提供する</p>
+
+<h3>思想</h3>
+
+<ul>
+<li>ユーザーの求める真の要求を満足させる</li>
+<li>要求や環境の変化に対応できる</li>
+<li>ソフトウエア開発のリスクを減少させる</li>
+<li>再利用可能なコンポーネントベースのシステムを実現する</li>
+</ul>
+
+<h3>アプローチ</h3>
+
+<ul>
+<li>ユースケース駆動
+
+<ul>
+<li>ユースケースを出発点として開発する</li>
+<li>反復の度に1つ以上のユースケースを実装していく</li>
+</ul></li>
+<li>アーキテクチャセントリック
+
+<ul>
+<li>アーキテクチャ中心で開発する</li>
+<li>開発早期でアーキテクチャを確立する</li>
+<li>開発者視点ではなく，ユーザ視点(ユースケース)から考える
+
+<ul>
+<li>開発者視点の関連モジュールではなく，ユースケースを実現するモジュール群を優先して開発する</li>
+</ul></li>
+</ul></li>
+<li>反復型開発
+
+<ul>
+<li>要求，成果物，人，リスク等を管理しつつ，マイルストーンを設定した計画のもとで反復開発を行う</li>
+</ul></li>
+</ul>
+
+<h3>フェーズ</h3>
+
+<ol>
+<li>インセプション(方向づけ)フェーズ
+
+<ul>
+<li>アイデアのプロトタイプの開発と評価</li>
+<li>開発を進めるべきか，止めるべきかを判断する</li>
+</ul></li>
+<li>エラボレーション(推敲)フェーズ
+
+<ul>
+<li>システム構築のための核となるアーキテクチャベースラインを作る</li>
+<li>骨組みと黄金ルート(必ず通る基本のルート)を作る</li>
+</ul></li>
+<li>コンストラクション(作成)フェーズ
+
+<ul>
+<li>システムとして仕上げる</li>
+<li>β版のリリースが目標</li>
+</ul></li>
+<li>トランジション(移行)フェーズ
+
+<ul>
+<li>β版のリリース</li>
+<li>フィールドでの評価結果の反映.</li>
+</ul></li>
+</ol>
+
+<h2>3.4 アジャイルプロセスモデル</h2>
+
+<ul>
+<li>重厚長大な開発手法(UP)に対するアンチテーゼ
+
+<ul>
+<li>小さいシステムはもっと簡単に作っても良い</li>
+</ul></li>
+<li>状況に対して柔軟かつ迅速に対応する</li>
+<li>イテレーションを区切り，必須度の高い機能から定義・開発して行く</li>
+</ul>
+
+<h3>メリット</h3>
+
+<ul>
+<li>最低限だが使用可能なソフトを早期リリース可能</li>
+<li>優先度の低い開発を後続のイテレーションに後回しに出来る</li>
+</ul>
+
+<h3>デメリット</h3>
+
+<ul>
+<li>大規模システムに向かない</li>
+<li>場当たり的なシステムになってしまう可能性がある</li>
+<li>習熟した技術者によってのみ成し遂げられる</li>
+</ul>
+
+<h1>参考文献</h1>
+
+<blockquote>
+<p><a href="http://www.linuxacademy.ne.jp/lablog/programmer/98/">開発手法の基礎、ウォーターフォールモデルの特徴とは</a><br>
+<a href="http://gihyo.jp/lifestyle/serial/01/ipa-terminology/0012">第12回　システム開発の工程とソフトウェア開発モデル | めざせ!情報処理技術者試験</a><br>
+<a href="http://monoist.atmarkit.co.jp/mn/articles/1011/25/news112.html">【問題5】ソフトウェア開発モデルについて</a><br>
+<a href="http://www.itmedia.co.jp/im/articles/0310/08/news001.html">第10回 開発プロセスの上手な組み合わせ</a><br>
+<a href="http://d.hatena.ne.jp/incarose86/20121117/1353144430">インクリメンタル開発とイテレーション開発</a><br>
+<a href="http://itpro.nikkeibp.co.jp/article/lecture/20070221/262716/">Part1　Unified Process，その生い立ちと構造を知る</a><br>
+<a href="http://hhhuang.homelinux.com/lectures/OO_Dalian/Lesson05.pdf">第5講 オブジェクト指向開発とは何か</a><br>
+<a href="http://itpro.nikkeibp.co.jp/article/lecture/20070221/262716/">Part1 Unified Process，その生い立ちと構造を知る</a><br>
+<a href="http://codezine.jp/article/detail/6423">第１回 RUPはどこに消えたのか？</a><br>
+<a href="http://blog.livedoor.jp/yasuyukimiyoshi/archives/51283739.html">テーマ０１：ソフトウェア開発モデル</a><br>
+<a href="http://stackoverflow.com/questions/3897335/whats-the-difference-between-incremental-software-process-model-evolutionary-m">What&#39;s the difference between incremental software process model, evolutionary model, and the spiral model?</a><br>
+<a href="http://www.it-shikaku.jp/top30.php?hidari=13-01-01.php&amp;migi=km13-01.php">1.ソフトウェア開発手法 - it-shikaku.jp</a></p>
+</blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[MATLAB のコーディングガイドラインについてメモ]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/04/28/matlab-guideline/"/>
+    <updated>2015-04-28T12:13:30+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/04/28/matlab-guideline</id>
+    <content type="html"><![CDATA[<p>研究で MATLAB を利用しているので，コードを綺麗にかくためのメモ．</p>
+
+<!-- more -->
+
+<h2>コーディング作法</h2>
+
+<p>MATLAB のコードを書く際のコーディング作法を記述しているドキュメントを発見した．</p>
+
+<blockquote>
+<p><a href="http://www.mathworks.com/matlabcentral/fileexchange/46056-matlab-style-guidelines-2-0">MATLAB Programming Style Guidelines 2.0 | MATLAB CENTRAL</a></p>
+</blockquote>
+
+<p>日本語訳をしていらっしゃる方もいて素晴らしい．</p>
+
+<blockquote>
+<p><a href="http://myenigma.hatenablog.com/entry/20120103/1325575787#fn-a7d7d54e">MATLAB Programming Style Guidelines 1 - はてなダイアリー</a></p>
+</blockquote>
+
+<p>自分はプログラミング経験が浅いので，とても参考になる．コードがぐっと見やすくなった．</p>
+
+<h2>単体テスト</h2>
+
+<p>作成しているツールの規模が大きくなってきたので，しっかりテストしたいと思うようになってきた．MATLAB には単体テスト用のフレームワークが用意されているようだ．</p>
+
+<blockquote>
+<p><a href="http://jp.mathworks.com/help/matlab/write-unit-tests-1.html">単体テストの作成 - MATLAB &amp; Simulink - MathWorks 日本</a><br>
+<a href="http://blog.smooth-works.net/archives/2183">スムーズワークス日想 » Blog Archive » m-fileに品質を！（2）</a><br>
+<a href="http://d.hatena.ne.jp/hkob/20131226">Jenkins 導入と MATLAB の自動テスト (教員のための Mac Tips:9)</a></p>
+</blockquote>
+
+<p>Jenkins による継続的インテグレーションにも興味があるので，気が向けば触れてみたいと思う．具体的なやり方については，そのうちまとめる．たぶん．</p>
+
+<h2>その他の参考文献</h2>
+
+<blockquote>
+<p><a href="http://blog.smooth-works.net/archives/2901">MATLABプログラミングスタイル | スムーズワークス日想 シミュレーション業界関連情報</a></p>
+</blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[iOSアプリ開発初心者がTwitterクライアントを作成する その1]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/04/12/title/"/>
+    <updated>2015-04-12T21:55:11+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/04/12/title</id>
+    <content type="html"><![CDATA[<p>久しぶりの更新です．iOSアプリ作ってました．</p>
+
+<!-- more -->
+
+<h1>これはなに</h1>
+
+<p>Twitterクライアントを使っていて，欲しい機能がなかったので安易な気持ちで手を出した．とりあえずの叩き台として，簡単なTwitterクライアントを作成した．<br>
+知識ゼロからのスタートだったので，やったことを簡単にまとめておく．</p>
+
+<h1>つくったもの</h1>
+
+<p>とりあえず1週間くらいでつくった拙作が以下になります．</p>
+
+<p><img src="http://tasuwo.github.io/images/tasuwotter.png" alt="tasuwotter"></p>
+
+<blockquote>
+<p><a href="https://github.com/tasuwo/tasuwotter">tasuwo/tasuwotter</a></p>
+</blockquote>
+
+<ul>
+<li>できること
+
+<ul>
+<li>ホームタイムラインの表示と更新</li>
+<li>メンションの表示と更新</li>
+<li>ツイートする</li>
+</ul></li>
+<li>できないこと
+
+<ul>
+<li>その他全部</li>
+</ul></li>
+</ul>
+
+<h1>前提知識</h1>
+
+<ul>
+<li>Xcode使用経験
+
+<ul>
+<li>なし</li>
+</ul></li>
+<li>iOS/Android アプリ開発経験
+
+<ul>
+<li>なし</li>
+</ul></li>
+<li>Twitter クライアント開発経験
+
+<ul>
+<li>なし</li>
+</ul></li>
+<li>Swift 使用経験
+
+<ul>
+<li>なし</li>
+</ul></li>
+<li>使用経験のある言語
+
+<ul>
+<li>C，C++，Java，<del>Common Lisp</del></li>
+</ul></li>
+</ul>
+
+<h1>やったこと</h1>
+
+<h2>はじまりからつまづくまで(悪い例)</h2>
+
+<p>最初に見たサイト</p>
+
+<blockquote>
+<p><a href="http://qiita.com/mokumoku/items/bf0460f420acac3c04fc">(iOS)FabricでTwitterクライアントを作った</a></p>
+</blockquote>
+
+<p>Twitter産の SNS Framework である <a href="https://get.fabric.io">Fabric</a> を用いてTwitterクライアントを作成する，という内容．詳しいことは割愛．上記サイトの内容に従って以下を実行した．</p>
+
+<ol>
+<li>Fabric.app のダウンロード</li>
+<li>Xcode プロジェクトの作成</li>
+<li>Xcode プロジェクトに，Fabric SDK および Twitter Kit をダウンロード</li>
+<li>サンプルコードをためす</li>
+</ol>
+
+<p>サンプルコードを動かしたところで，これ以上どう動けばいいかわからない．つまづく．</p>
+
+<ol>
+<li><a href="http://qiita.com/mokumoku/items/bf0460f420acac3c04fc">参考サイト</a>の著者様のソースコードを拝見する</li>
+</ol>
+
+<p>コードが読めない(swiftがわからない &amp; iOSアプリのアーキテクチャがわからない)．つまづく．</p>
+
+<h2>やったほうがいいこと(良い例)</h2>
+
+<h3>Apple のドキュメントを読む</h3>
+
+<p>iOSアプリの開発経験がない場合は，まず公式のチュートリアルを一通りやると良い．</p>
+
+<ul>
+<li><a href="https://developer.apple.com/library/ios/referencelibrary/GettingStarted/RoadMapiOS/index.html#//apple_ref/doc/uid/TP40011343-CH2-SW1">Start Developing iOS Apps Today</a>
+
+<ul>
+<li>Apple 公式の初心者向け iOS アプリ作成ガイド</li>
+<li>簡単な To-do list アプリを作成しながら，iOSアプリの仕組みと特徴について学べる</li>
+<li>英語です</li>
+</ul></li>
+</ul>
+
+<p>チュートリアルだけでは iOS アプリについて理解しきれないので，適宜公式のドキュメントを参照すると良い．</p>
+
+<ul>
+<li><a href="https://developer.apple.com">Apple Developer</a></li>
+<li><a href="https://developer.apple.com/jp/">Apple Developer(日本語)</a>
+
+<ul>
+<li>Apple 公式の開発者用サイト</li>
+<li><code>Resources(リソース) &gt; iOS Developer Library(日本語ドキュメントを見る)</code> でiOSのドキュメントを閲覧できる</li>
+<li>日本語サイトよりも英語サイトのほうが情報量が多い上に最新</li>
+</ul></li>
+</ul>
+
+<p>特に，自分が参考にしたドキュメントは以下．</p>
+
+<ul>
+<li><p><a href="https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIKit_Framework/index.html#//apple_ref/doc/uid/TP40006955">UIKit Framework Reference</a></p>
+
+<ul>
+<li>UIKit のリファレンス．クラスやメソッド等について調べたい時に</li>
+<li>自分は特に以下のクラスについては目を通しておいた
+
+<ul>
+<li>UIApplication，UIApplicationDelegate，UIResponder，UIViewController</li>
+</ul></li>
+<li>英語です</li>
+</ul></li>
+<li><p><a href="https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/index.html#//apple_ref/doc/uid/TP40014097-CH3-ID0">The Swift Programming Language</a></p>
+
+<ul>
+<li>Swift のドキュメント</li>
+<li>とりあえず Swift Tour を通してやるべき</li>
+<li>英語です</li>
+</ul></li>
+<li><p><a href="https://developer.apple.com/jp/documentation/ViewPG_iPhoneOS.pdf">iOS View プログラミングガイド</a></p></li>
+<li><p><a href="https://developer.apple.com/jp/documentation/ViewControllerPGforiOS.pdf">iOS View Controller プログラミングガイド</a></p>
+
+<ul>
+<li>View と View Controller に関するガイド</li>
+<li>画面遷移とからへんについて学びたい時に読むと良い</li>
+<li>日本語です</li>
+</ul></li>
+<li><p><a href="https://developer.apple.com/jp/documentation/EventHandlingiPhoneOS.pdf">イベント処理カイド (iOS用)</a></p>
+
+<ul>
+<li>イベント処理について学ぶなら</li>
+<li>日本語の方は少し古いけど，概要を学ぶだけならいいかもしれない</li>
+</ul></li>
+</ul>
+
+<p>自分も各々隅々まで読んでいないので理解は大分あやしい．View Controller の役割についてはもう少しよく読む必要がある気がする．</p>
+
+<h3>Twitter のドキュメントを読む</h3>
+
+<p>iOS アプリについて大雑把に理解したら，Twitter のドキュメントを読んで利用の仕方を学ぶ．</p>
+
+<ul>
+<li><p><a href="https://dev.twitter.com/twitter-kit/ios">Twitter Kit for iOS | Twitter Developers</a></p>
+
+<ul>
+<li>Fabric の公式ドキュメント</li>
+<li>「ログインの仕方」，「タイムラインの表示の仕方」，「ツイートの仕方」等，使用方法とサンプルコードがいくつか紹介されている</li>
+</ul></li>
+<li><p><a href="https://dev.twitter.com/twitter-kit/ios-reference">iOS Reference | Twitter Developers</a></p>
+
+<ul>
+<li>Twitter Kit に含まれるクラスのリファレンス</li>
+<li>上記を一通り眺めた後に，より詳細に知りたい場合には参考にする</li>
+</ul></li>
+<li><p><a href="https://dev.twitter.com/twitter-kit/ios/api">Access Twitter&#39;s REST API | Twitter developers</a></p>
+
+<ul>
+<li>上記の公式ドキュメントのうちの一つ</li>
+<li>Twitterクライアントは REST API を叩いて様々な情報を取得する．本ドキュメントに叩き方が書かれているので，あとは好きにやれば良い</li>
+</ul></li>
+<li><p><a href="https://dev.twitter.com/rest/public">REST APIs | Twitter Developers</a></p></li>
+<li><p><a href="http://dx.24-7.co.jp/twitterapi1-1-rest-api/">【保存版】TwitterAPI1.1 REST API 全項目解説</a></p>
+
+<ul>
+<li>REST API の一覧</li>
+<li>公式とその日本語訳がある</li>
+</ul></li>
+<li><p><a href="https://dev.twitter.com/rest/public/timelines">working with timeline | twiter developers</a></p>
+
+<ul>
+<li>タイムライン更新処理を適切に行うために必要な技術について記述されている</li>
+<li>要約すると，<code>since_id</code> と <code>max_id</code> を，リクエスト発行の際にパラメータとして指定してやれば良い，ということ</li>
+</ul></li>
+</ul>
+
+<h3>その他の参考サイト</h3>
+
+<blockquote>
+<p><a href="http://dev.classmethod.jp/smartphone/ios-fabric-sign-in-with-twitter/"><iOS> Fabric 入門 #1 アカウント登録 &amp; Twitter Kit を使ってログインする</a><br>
+<a href="http://nonbiri-tereka.hatenablog.com/entry/2014/03/06/220015">Twitter API Timeline解説 | のんびりしているエンジニアの日記</a></p>
+</blockquote>
+
+<h1>総括</h1>
+
+<ul>
+<li>ドキュメントをいろいろ参考にして，簡単なTwitterクライアントを作成した</li>
+<li>参考サイトにならって Storyboard を使用していないが，使用した場合の開発もしてみたい</li>
+<li>これを叩き台として個性溢れるTwitterクライアントを作成していきたい</li>
+</ul>
+
+<p>途中つまった部分(Swift で Objective-C のライブラリを使うところとか)や得られた知識等，そのうちちょくちょくまとめていく予定．</p>
+
+<h1>雑記</h1>
+
+<p>ずっと iOS アプリの勉強をしていたら，他のことが進んでいない．組み込みの知識をつけたいので，自作OSの方も頑張っていこう．</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Lispメモ]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/03/24/land-of-lisp/"/>
+    <updated>2015-03-24T12:49:43+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/03/24/land-of-lisp</id>
+    <content type="html"><![CDATA[<p>Land of Lisp を読んでいるのでメモ．<br>
+本ブログは自己啓発の意味合いもあるため，定期的に何かしらはブログにアップすることを目標にする．<br>
+そのうち綺麗にまとめます．</p>
+
+<!-- more -->
+
+<ul>
+<li><p>関数型プログラミング</p>
+
+<ul>
+<li>関数は，引数か関数内で宣言された変数しか参照せず，また値を返す以外の動作をしない．</li>
+</ul></li>
+<li><p>比較についてのルール</p>
+
+<ul>
+<li>シンボル同士は<strong>EQ</strong>で比較する</li>
+<li>それ以外は<strong>EQUAL</strong>で比較する</li>
+</ul></li>
+<li><p>Common Lispでは，空リスト( &#39;(),(),&#39;nil,nil )が<strong>唯一の</strong>偽値</p></li>
+<li><p>リストはコンスセルがつながってできている</p></li>
+<li><p>コンスセルは<code>cons</code>コマンドで作られる</p></li>
+<li><p><code>car</code>と<code>cdr</code>でリストの中身を調べることができる</p></li>
+<li><p>Lispには<strong>コードモード</strong>と<strong>データモード</strong>がある</p>
+
+<ul>
+<li>デフォルトではコードモード</li>
+<li>REPLへの入力は<strong>フォーム</strong>の形式でなくてはならない
+
+<ul>
+<li><code>(command bla bla bla bla ...)</code></li>
+</ul></li>
+<li><code>&#39;</code>(シングルクオート)を式に付加すると，データモードで扱われる(<strong>クオートする</strong>)</li>
+<li>準クオート
+
+<ul>
+<li><strong>`</strong>(バッククオート)を付加した式の中で<code>,</code>(コンマ)を使用すると，一部分だけコードモードに戻すことができる(<strong>アンクオートする</strong>)</li>
+</ul></li>
+</ul></li>
+<li><p>関数</p>
+
+<ul>
+<li><code>assoc</code>：キーをもとに要素を抜き出す</li>
+<li><code>mapcar</code>：関数とリストを引数とする．リストの要素1つ1つに対し，関数を実行する</li>
+<li><code>append</code>：リストをつなげて1つのリストにする</li>
+<li><code>apply</code>：関数とリストを引数とする．リストの各要素を引数として関数を呼び出したかのように動作する</li>
+<li><code>remove-if-not</code>：関数とリストを受け取る．リストの各要素に関数を適用し，真でなかったものを除いたリストを返す</li>
+</ul></li>
+<li><p>高階関数：他の関数を引数として受け取る関数</p>
+
+<ul>
+<li><code>#&#39;</code>：functionオペレータの略記．関数を値として扱う場合にそれを明示する必要がある(Common Lispでは)</li>
+</ul></li>
+<li><p>典型的なLispコードスタイル</p>
+
+<ul>
+<li><code>(apply #&#39;append (mapcar #&#39;describe-path (cdr (assoc location edges))))</code></li>
+<li>複雑なデータの塊を幾つかのステップで受け渡しながら処理を進める</li>
+<li>高階関数も頻繁に使われる</li>
+</ul></li>
+<li><p>関数末尾のp</p>
+
+<ul>
+<li>nilか真を返す場合，Common Lisp では関数名の最後に<strong>p</strong>をつける</li>
+<li>真偽値を確かめる関数は<strong>述語(predicate)</strong>と呼ばれるため</li>
+</ul></li>
+</ul>
+
+<h3>雑記</h3>
+
+<p>一週間ほど海外なので，更新はないです．<br>
+自作OSは飛行機の中やホテルでの夜にも進める予定だけど，リモートにpushするのは帰国してからかも．</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Palletを導入した]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/03/21/pallet/"/>
+    <updated>2015-03-21T22:37:06+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/03/21/pallet</id>
+    <content type="html"><![CDATA[<p>EmacsにPalletを導入しました．</p>
+
+<!-- more -->
+
+<p>Cask + Pallet に移行した，みたいな話はよく聞いていたけど，cask はわかるが Pallet のうまみがわからなかったのでインストールしていなかった．</p>
+
+<blockquote>
+<p><a href="https://github.com/rdallasgray/pallet">rdallasgray/pallet</a></p>
+</blockquote>
+
+<h2>1. Pallet の目的と利点</h2>
+
+<p>Pallet の主目的は，Emacs備え付けのパッケージ管理システムを用いたパッケージのインストール，アンインストールにあわせて，Cask ファイルの記述を追加・削除すること．<br>
+すなわち，<code>M-x package-install</code>などを用いても自動で同期をとってくれるので，パッケージのインストール/アンインストールと Cask ファイルの記述内容との生合成について気を使わなくてよくなる．</p>
+
+<h2>2. 導入</h2>
+
+<p>Cask ファイルに以下を記述</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nv">source</span> <span class="nv">melpa</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;cask&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>インストール</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>cask
+</span></code></pre></td></tr></table></div></figure>
+
+<p>設定ファイル内に<code>(pallet-mode t)</code>を記述，もしくは<code>pallet-mode</code>を呼び出す(<code>M-x pallet-mode</code>)ことにより使用できる．<br>
+例えば，<code>init.el</code>に以下のように記述する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;pallet</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">pallet-mode</span> <span class="no">t</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>3. 使い方</h2>
+
+<ul>
+<li><p><code>M-x pallet-init</code></p>
+
+<ul>
+<li><code>package.el</code>によってインストールされたパッケージを元に Cask ファイル生成</li>
+</ul></li>
+<li><p><code>M-x pallet-install</code></p>
+
+<ul>
+<li>Cask ファイルに記述されたパッケージをインストール</li>
+</ul></li>
+<li><p><code>M-x pallet-update</code></p>
+
+<ul>
+<li>インストールされたパッケージの更新</li>
+</ul></li>
+</ul>
+
+<h2>4. おまけ</h2>
+
+<p>Cask の記述を Pallet に無視させたい場合は以下のように記述する</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nv">source</span> <span class="nv">melpa</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;s&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;;;pallet-ignore</span>
+</span><span class='line'><span class="c1">;;;これ以降が無視される</span>
+</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;newlisp&quot;</span> <span class="ss">:git</span>
+</span><span class='line'><span class="s">&quot;https://github.com/coldnew/newlisp-mode.git&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>5. 参考</h2>
+
+<blockquote>
+<p><a href="http://gongo.hatenablog.com/entry/2014/05/09/230836">Emacs のパッケージ管理を package.el + el-get から Cask + pallet に乗り換えました</a></p>
+</blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[自作OSの途中経過(8/30)]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/03/19/harib-git/"/>
+    <updated>2015-03-19T02:21:23+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/03/19/harib-git</id>
+    <content type="html"><![CDATA[<p>途中経過です．</p>
+
+<!-- more -->
+
+<h2>近況</h2>
+
+<p>GitHubに公開しました．</p>
+
+<blockquote>
+<p><a href="https://github.com/tasuwo/hariboteOS">tasuwo/hariboteOS</a></p>
+</blockquote>
+
+<p>進捗ダメです状態．学んだことのメモとかは<code>README.md</code>にまとめてあります．でも自分以外が読んでもわからないかもしれない．<br>
+今後は記事としての更新はやめて，こっちに色々メモしていくことにします．</p>
+
+<h2>雑記</h2>
+
+<p>最近プログラミングしてなさすぎてやばい．まつもとゆきひろさんのインタビュー記事読んでたらRubyに興味が出てきた．でもLand of Lispもあるしやばい．自作OSも理解が遅いせいで進捗がやばい．うおー．<br>
+それと<a href="https://qiita.com">Qiita</a>に興味が出てきた．でもポストできるだけの知識がない．いつか自分がお世話になったコミュニティーには何らかの形で貢献できるようにしたい．</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Gitの基礎知識をまとめたよ]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/03/19/about-git/"/>
+    <updated>2015-03-19T02:02:03+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/03/19/about-git</id>
+    <content type="html"><![CDATA[<h2>Gitについてまとめる</h2>
+
+<p>GitHubを本格的に利用し始めたので．<br>
+基本的な知識は，<a href="http://git-scm.com/book/ja/v1/%E4%BD%BF%E3%81%84%E5%A7%8B%E3%82%81%E3%82%8B">公式ドキュメント</a>を参照すれば身につくと思う．今回は必要最低限の知識をメモしておく．飽くまで自分用メモ．</p>
+
+<!-- more -->
+
+<p>Gitって何？というのは省略する．途中，よく使うコマンドをいくつかあげるけど，まずは読み飛ばして後から確認したほうがいいかもしれない．</p>
+
+<h1>1. はじめようGit</h1>
+
+<p>Gitのはじめ方は二種類ある．</p>
+
+<ol>
+<li>ローカルのディレクトリにGitを導入する</li>
+<li>サーバに公開されているGitプロジェクトを導入する</li>
+</ol>
+
+<p>それぞれ以下のコマンドを用いる．</p>
+
+<ol>
+<li><code>git init</code>
+
+<ul>
+<li><code>.git</code>ディレクトリを生成する</li>
+<li>リポジトリに必要な全てのファイルがその中に格納される</li>
+<li>Gitディレクトリ，ステージングエリアが準備される</li>
+</ul></li>
+<li><code>git clone [url]</code>
+
+<ul>
+<li>既存のGitリポジトリのコピーを取得する</li>
+<li>サーバが保持しているデータをほぼ全てコピーする</li>
+</ul></li>
+</ol>
+
+<p><code>2.</code>はひとまずおいておく．<code>1.</code>の話をしていきます．</p>
+
+<h1>2. Gitでずばりやることとは</h1>
+
+<p>Git は3つのデータ領域から構成される．</p>
+
+<ul>
+<li><strong>作業ディレクトリ</strong>(ワークツリー)
+
+<ul>
+<li>作業ファイルなどを保持しているディレクトリ</li>
+</ul></li>
+<li><strong>ステージングエリア</strong>(インデックス)
+
+<ul>
+<li>次のコミットに何が含まれるかに関しての情報を蓄えたファイル</li>
+<li>Gitディレクトリに含まれる</li>
+</ul></li>
+<li><strong>Gitディレクトリ</strong>
+
+<ul>
+<li>プロジェクトのためのメタデータとオブジェクトのデータベースがある所</li>
+</ul></li>
+</ul>
+
+<p>フォルダ構成のイメージは↓こんなかんじ．</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>root          ;; 作業ディレクトリ
+</span><span class='line'>├ test.txt    ;; 作業ファイル
+</span><span class='line'>└ .git        ;; Gitディレクトリ
+</span><span class='line'>　├ index     ;; ステージング・エリア
+</span><span class='line'>　├ config
+</span><span class='line'>　...</span></code></pre></td></tr></table></div></figure>
+
+<p><code>root</code>ディレクトリで<code>git init</code>を実行すると，上記のような<code>.git</code>フォルダが作成されて，3つの領域が準備される，という仕組み．</p>
+
+<p>ここで，作業ディレクトリはわかるけれど，ステージングエリアとGitディレクトリは一体何なのか．<br>
+Gitはバージョン管理システムだから，当然システムの状態を時系列順に保持しておく必要がある．その保存のための場所が<strong>Gitディレクトリ</strong>である．<br>
+ただ，作業が一区切りついた時に，ファイルA の変更は保存しておきたいけど，ファイルB の変更はまだ保存しなくていいな&#8230;なんてことがあると思う．こういう時のための準備用の領域として用意されてるのが<strong>ステージングエリア</strong>である．<br>
+作業して色々なファイルを変更した後，ステージングエリアにどのファイルの変更内容を保存するか通知しておき，それを元にGitディレクトリに変更内容を保存する，という流れ．箇条書きにすると↓のようなかんじ．</p>
+
+<ol>
+<li><strong>作業ディレクトリ</strong>で作業して，一区切りつく</li>
+<li>保存しておきたいファイルを<strong>ステージングエリア</strong>に通知する</li>
+<li><strong>ステージングエリア</strong>を元に<strong>Gitディレクトリ</strong>にシステムの状態を保存する</li>
+</ol>
+
+<p>そして，このデータ領域間のファイル操作のために<code>git</code>コマンドを用いる，というのがGitの基本．主に用いるコマンドは↓のようなかんじ．</p>
+
+<ul>
+<li><code>git add &lt;filepatter&gt; ...</code>
+
+<ul>
+<li><strong>作業ディレクトリ</strong>から<strong>ステージングエリア</strong>に対象ファイルがステージされる</li>
+<li>ディレクトリは独自のツリー構造でステージされる</li>
+</ul></li>
+<li><code>git commit -m &lt;msg&gt;</code>
+
+<ul>
+<li><strong>ステージングエリア</strong>の内容を<strong>Gitディレクトリ</strong>に登録する</li>
+<li>登録すると，変更内容に対して一意のコミットIDが発行される</li>
+<li>一番最近発行されたコミットIDが<code>HEAD</code>となる</li>
+</ul></li>
+<li><code>git reset HEAD &lt;file&gt;</code>
+
+<ul>
+<li><strong>ステージングエリア</strong>を<strong>Gitディレクトリ</strong>のHEAD状態に戻す</li>
+</ul></li>
+<li><code>git checkout -- &lt;file&gt;</code>
+
+<ul>
+<li><strong>作業ディレクトリ</strong>を<strong>ステージングエリア</strong>の状態に戻す</li>
+</ul></li>
+</ul>
+
+<p>上記のコマンドを用いた大まかな作業の流れは↓のようなかんじ</p>
+
+<ol>
+<li>作業ディレクトリで作業する</li>
+<li>作業内容を<strong>ステージングエリア</strong>に<code>git add</code>する</li>
+<li><strong>ステージングエリア</strong>の内容を<strong>Gitディレクトリ</strong>に<code>git commit</code>する</li>
+<li>再び作業する</li>
+<li>変更したファイルを<strong>ステージングエリア</strong>に<code>git add</code>する</li>
+<li><strong>Gitディレクトリ</strong>に<code>git commit</code>する</li>
+<li>〜繰り返し〜</li>
+</ol>
+
+<h1>3. Gitのデータ構造に関する予備知識</h1>
+
+<p>説明したこと．</p>
+
+<ul>
+<li>作業ディレクトリでファイルを編集する</li>
+<li>ステージングエリアに変更内容を準備する</li>
+<li>Gitディレクトリに変更内容を保存する</li>
+<li>これらの作業は<code>git</code>コマンドにより行う</li>
+</ul>
+
+<p>次は，Gitがどういう仕組みでバージョン管理を行っているのかについて説明する．一口にバージョン管理とは言っても，ファイルの変更履歴の格納の仕方には色々ある．一般的なVCSは，各ファイルの基本バージョンからの変更・差分を時系列順に管理すると思う．</p>
+
+<p>↓イメージ</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Version1</th>
+<th style="text-align: center">Version2</th>
+<th style="text-align: center">Version3</th>
+<th style="text-align: center">Version4</th>
+<th style="text-align: center">Version5</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">file A</td>
+<td style="text-align: center">差分1</td>
+<td style="text-align: center">→</td>
+<td style="text-align: center">差分2</td>
+<td style="text-align: center">→</td>
+</tr>
+<tr>
+<td style="text-align: center">file B</td>
+<td style="text-align: center">→</td>
+<td style="text-align: center">→</td>
+<td style="text-align: center">差分1</td>
+<td style="text-align: center">差分2</td>
+</tr>
+<tr>
+<td style="text-align: center">file C</td>
+<td style="text-align: center">差分1</td>
+<td style="text-align: center">差分2</td>
+<td style="text-align: center">→</td>
+<td style="text-align: center">差分3</td>
+</tr>
+</tbody></table>
+
+<p>しかし，Gitの場合はデータをスナップショットの集合として考える．</p>
+
+<ul>
+<li><p>スナップショットって何だよ&#8230;</p>
+
+<ul>
+<li>つまり<strong>その時点のファイル丸ごと</strong>です</li>
+<li>例えば，以下のような 1〜1000000 を記述したファイルがあったとする<br>
+<code>1 2 3 ... 1000000</code></li>
+<li>これをGitディレクトリに commit したとする</li>
+<li>その後，以下のように内容を変更したとする<br>
+<code>1 2 3 ... 1000000 1000001</code></li>
+<li>これをGitディレクトリに commit した場合，どのようなデータがGitディレクトリに格納されるか？</li>
+<li>一般的なVCSなら，<code>1000001</code>の箇所を<strong>差分として保持</strong>する</li>
+<li>一方，Gitは 1〜1000000 を記述したファイルと 1〜1000001 を記述した<strong>両方のファイルを保持</strong>する</li>
+</ul></li>
+<li><p>それってリポジトリが肥大化しない？</p>
+
+<ul>
+<li>画像，映像等のメディアファイルを扱っているとやばいそうです</li>
+<li><code>git media</code>とか<code>git gc</code>とか，色々対策方法はあるようです
+
+<ul>
+<li><a href="http://endorno.github.io/blog/2013/10/06/how-to-use-git-media/">もう巨大なデータをgitignoreしなくていい！ ~git-mediaの使い方~</a></li>
+<li><a href="http://ja.stackoverflow.com/questions/2546/%E8%82%A5%E5%A4%A7%E5%8C%96%E3%81%97%E3%81%9Fgit%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA%E3%81%AB%E3%81%8A%E3%81%84%E3%81%A6%E6%AD%B4%E5%8F%B2%E3%81%AE%E7%B2%92%E5%BA%A6%E3%82%92%E8%90%BD%E3%81%A8%E3%81%95%E3%81%9A%E3%81%AB%E3%82%B5%E3%82%A4%E3%82%BA%E3%82%92%E6%B8%9B%E3%82%89%E3%81%99%E3%81%AB%E3%81%AF">肥大化したGitリポジトリにおいて歴史の粒度を落とさずにサイズを減らすには</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+<p>コミット時に全てのファイルの状態のスナップショットをとり，そのスナップショットへの参照を格納する．ファイルに変更がない場合は，既に格納してある以前の同一ファイルへのリンクを格納する．</p>
+
+<p>↓イメージ(括弧で囲んでいる場所は，過去のオブジェクトを参照している)</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Version1</th>
+<th style="text-align: center">Version2</th>
+<th style="text-align: center">Version3</th>
+<th style="text-align: center">Version4</th>
+<th style="text-align: center">Version5</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">A</td>
+<td style="text-align: center">A1</td>
+<td style="text-align: center">(A1)</td>
+<td style="text-align: center">A2</td>
+<td style="text-align: center">(A2)</td>
+</tr>
+<tr>
+<td style="text-align: center">B</td>
+<td style="text-align: center">(B)</td>
+<td style="text-align: center">(B)</td>
+<td style="text-align: center">B1</td>
+<td style="text-align: center">B2</td>
+</tr>
+<tr>
+<td style="text-align: center">C</td>
+<td style="text-align: center">C1</td>
+<td style="text-align: center">C2</td>
+<td style="text-align: center">(C2)</td>
+<td style="text-align: center">C3</td>
+</tr>
+</tbody></table>
+
+<p>また，Gitのデータはすべて，格納される前にチェックサムが取られる．</p>
+
+<ul>
+<li>チェックサムって何だよ&#8230;<br>
+
+<ul>
+<li>誤り検出のためのものです</li>
+<li>データの転送中に情報を失う，もしくは壊れたファイルを取得した場合にGitが検知できるようにするためのものです</li>
+<li>とりあえず，各ディレクトリやファイルに対する<strong>一意の識別子</strong>を算出している，と思っておけば良い</li>
+</ul></li>
+</ul>
+
+<p>Gitがチェックサムに用いる機構は<strong>SHA-1ハッシュ</strong>と呼ばれる．16進数の文字で構成された40文字の文字列で，ファイルの内容もしくはGit内のディレクトリ構造を元に計算される．<br>
+↓みたいな．</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>24b9da6552252987aa493b52f8696cd6d3b00373</span></code></pre></td></tr></table></div></figure>
+
+<h1>4. Gitディレクトリに格納されているcommitオブジェクトとは</h1>
+
+<p>説明したこと．</p>
+
+<ul>
+<li>Gitは差分ではなく，スナップショット(ファイルまるごと)をGitディレクトリに保持している</li>
+<li>Gitディレクトリで扱う各データからは，チェックサムという一意の識別子が算出され，利用される</li>
+</ul>
+
+<p>スナップショットってどうなっているのか？チェックサムってどうやって使っているのか？について説明する．<br>
+<code>git commit</code>を実行すると，ステージングエリアの情報を元にGitディレクトリにシステムの状態が保存される．この時の具体的な処理が↓のようなかんじ．</p>
+
+<ol>
+<li>全てのディレクトリ，ファイルのチェックサムを計算する</li>
+<li>各ファイルの中身を表す<strong>blobオブジェクト</strong>，ディレクトリ構成に加え，blobオブジェクトとファイル名の対応関係を表す<strong>treeオブジェクト</strong>を作成する</li>
+<li>メタデータとtreeオブジェクトへのポインタを含んだ<strong>commitオブジェクト</strong>を作成する</li>
+</ol>
+
+<p>例えば，<code>fileA</code>，<code>fileB</code>，<code>fileC</code>をcommitしたとする．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git add fileA fileB fileC
+</span><span class='line'><span class="nv">$ </span>git commit -m <span class="s1">&#39;initial commit of my project&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>すると，以下のような5つのオブジェクトが作成される．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'> 98ca9...           92ec2..             5d1d3..
+</span><span class='line'><span class="p">|</span>commit         <span class="p">|</span>  <span class="p">|</span>tree            <span class="p">|</span>  <span class="p">|</span>blob       <span class="p">|</span>
+</span><span class='line'>-----------------  ------------------  -------------
+</span><span class='line'><span class="p">|</span>tree    <span class="p">|</span>92ec2 <span class="p">|</span>  <span class="p">|</span>blob<span class="p">|</span>5b1d3<span class="p">|</span>fileA<span class="p">|</span>  <span class="p">|</span>fileAの内容 <span class="p">|</span>
+</span><span class='line'><span class="p">|</span>author  <span class="p">|</span>tasuwo<span class="p">|</span>  <span class="p">|</span>blob<span class="p">|</span>911e7<span class="p">|</span>fileB<span class="p">|</span>
+</span><span class='line'><span class="p">|</span>comitter<span class="p">|</span>tasuwo<span class="p">|</span>  <span class="p">|</span>blob<span class="p">|</span>cda0a<span class="p">|</span>fileC<span class="p">|</span>  911e7..
+</span><span class='line'>                                       <span class="p">|</span>blob       <span class="p">|</span>
+</span><span class='line'>                                       -------------
+</span><span class='line'>                                       <span class="p">|</span>fileBの内容 <span class="p">|</span>
+</span><span class='line'>
+</span><span class='line'>                                       cda0a..
+</span><span class='line'>                                       <span class="p">|</span>blob       <span class="p">|</span>
+</span><span class='line'>                                       -------------
+</span><span class='line'>                                       <span class="p">|</span>fileCの内容 <span class="p">|</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>各テーブルの上部にある<code>98ca9..</code>とか<code>92ec2..</code>とかがチェックサム．これが各オブジェクトの一意の識別子になる．今回は3つのファイルをcommitしたので，各ファイルに対応する3つの<strong>blobオブジェクト</strong>が作成される．さらに，それをまとめた<strong>treeオブジェクト</strong>が作成され，treeオブジェクトへのポインタと，著者やコミッターといったメタデータを保持した<strong>commitオブジェクト</strong>が作成される．</p>
+
+<p>commitを重ねると，commitオブジェクトは前回のcommitオブジェクトへのポインタを保持するようになる(下図において，commitは左から時系列順)．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'> 98ca9..       34ac2..         f30ab..
+</span><span class='line'><span class="p">|</span>commit    <span class="p">|</span>  <span class="p">|</span>commit      <span class="p">|</span>  <span class="p">|</span>commit      <span class="p">|</span>
+</span><span class='line'>------------  --------------  --------------
+</span><span class='line'><span class="p">|</span>...       <span class="p">|</span>  <span class="p">|</span>parent<span class="p">|</span>98ca9<span class="p">|</span>  <span class="p">|</span>parent<span class="p">|</span>34ac2<span class="p">|</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h1>5. ブランチ</h1>
+
+<p>説明したこと．</p>
+
+<ul>
+<li><code>git commit</code>すると，その時のシステムの状態がGitディレクトリに保存される
+
+<ul>
+<li>各ファイルの内容は<strong>blobオブジェクト</strong>として保持される</li>
+<li>blobオブジェクトとファイル名の関係，ディレクトリ構成は<strong>treeオブジェクト</strong>として保持される</li>
+<li>treeオブジェクトとメタデータは<strong>commitオブジェクト</strong>として保持される
+
+<ul>
+<li>commitオブジェクトを参照すれば，1回の commit における全てのデータにアクセスできる</li>
+</ul></li>
+</ul></li>
+<li>commitオブジェクトは直前のcommitオブジェクトへのポインタを保持する
+
+<ul>
+<li>commitオブジェクトは時系列順に数珠繋ぎになっている</li>
+</ul></li>
+</ul>
+
+<p>プロジェクトが進み，commit が重なるにつれて commitオブジェクト は増えて行く．しかし，保存するだけでは意味がない．バージョン管理システムなのだから，過去・現在のcommitオブジェクト間を行ったり来たりできる必要がある．しかし，そのためには特定のcommitオブジェクトを指定する仕組みが必要になる．そのために用意されているポインタが<strong>ブランチ</strong>である．<br>
+各commitオブジェクトはチェックサムで一意に識別できる．そのため，<strong>ブランチ</strong>は特定のコミットを指すチェックサムだけを記録したシンプルなファイルである．<br>
+プロジェクトを進める上で必要不可欠なブランチが1つある．それは，自分の作業している現在位置を示すブランチである．Git 開始時のデフォルトでは，この役割を担う<code>master</code>ブランチが用意されている．<br>
+また，ブランチは複数作成できる．しかしその場合，現在位置を示すブランチがどれなのかわからなくなってしまう．そこで，自分が今現在作業しているブランチを指し示す<strong>HEAD</strong>という特別ポインタが用意されている．HEADとHEADで示されたブランチは，commitにあわせて自動的に指し示す先が変化する．</p>
+
+<p><code>master</code>ブランチを使っていて，3回ほどcommitした場合のポインタの状態は↓のようなかんじ(commitは左から時系列順)．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>                HEAD
+</span><span class='line'>                 ↓
+</span><span class='line'>               master
+</span><span class='line'>                 ↓
+</span><span class='line'><span class="p">|</span>commit<span class="p">|</span> <span class="p">|</span>commit<span class="p">|</span> <span class="p">|</span>commit<span class="p">|</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>ブランチ操作のための<code>git</code>コマンドとしては↓のようなものがある．</p>
+
+<ul>
+<li><code>git branch &lt;new_branch&gt;[&lt;start_point&gt;]</code>
+
+<ul>
+<li>ブランチを作成する</li>
+<li><strong>Gitディレクトリ</strong>では，ブランチが出来る(HEADの位置は変わらない)</li>
+<li><strong>ステージングエリア</strong>では，何も起こらない</li>
+</ul></li>
+<li><code>git checkout &lt;branch&gt;</code>
+
+<ul>
+<li>ブランチを切り替える</li>
+<li><strong>Gitディレクトリ</strong>では，HEADの位置が変わる</li>
+<li><strong>ステージングエリア</strong>では，HEADに合わせて内容が復元される</li>
+</ul></li>
+<li><code>git merge &lt;branch&gt;</code>
+
+<ul>
+<li>ブランチをマージする</li>
+<li><strong>Gitディレクトリ</strong>では，２つのブランチをマージしたcommitが発行される
+
+<ul>
+<li>新たなcommitは，マージ元の2つのcommitを親とする</li>
+</ul></li>
+<li><strong>ステージングエリア</strong>では，結合したブランチの変更内容が反映される</li>
+</ul></li>
+</ul>
+
+<h1>6. リモートでの作業</h1>
+
+<p>説明したこと．</p>
+
+<ul>
+<li>commitオブジェクトは<strong>ブランチ</strong>によって指定できる</li>
+<li>現在作業しているブランチは<strong>HEAD</strong>によって示される</li>
+</ul>
+
+<p>最後にリモートリポジトリとの操作についてまとめる．<br>
+Gitはローカルでの操作だけでなく，リモートリポジトリから作業環境をひっぱってきたり，逆にローカルの編集内容をリモートに反映させたりできる．リモートリポジトリからデータを引っ張ってくることを<strong>クローン</strong>という．一番最初に説明した，Git を導入する2つの方法の内の2つ目である．<br>
+クローンは以下のように行う．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git clone git://github.com/schacon/grit.git mygrit
+</span></code></pre></td></tr></table></div></figure>
+
+<p>上記コマンドは，<code>github.com/schacon/grit.git</code>からデータを引っ張ってきてディレクトリ<code>mygrit</code>に格納する．</p>
+
+<p>また，プロジェクトを進めていく上で，リモートサーバ(上記の例で言うなら<code>github.com/schacon/grit.git</code>)とデータのやり取りを頻繁に行う．しかし，1つのプロジェクトに対して1つのリモートサーバとは限らない．</p>
+
+<p>例えば，本ブログはその雛形として<code>Octopress</code>というプロジェクトをcloneしている．しかし，記事などのデータの送信先は自分のリポジトリである．なので，</p>
+
+<ul>
+<li>ブログの雛形を引っ張ってきたリポジトリ</li>
+<li>自分のブログを公開するためのリポジトリ</li>
+</ul>
+
+<p>の２つのリモートリポジトリとやり取りを行っている．</p>
+
+<p>だからどうなのだ，というと，つまり，</p>
+
+<ul>
+<li>プロジェクトを進めていく上では，<strong>複数のリモートリポジトリとやりとりする</strong>可能性があって，</li>
+<li>その時に各リモートリポジトリを一々<strong>URLで指定するのは面倒</strong>だ</li>
+</ul>
+
+<p>ということ．<br>
+なので，リモートリポジトリには名前をつけることができる．ちなみに，プロジェクトをクローンした場合は，クローン元のサーバには<code>origin</code>という名前がデフォルトでつけられる．</p>
+
+<p>設定されたリモートサーバはコマンド<code>git remote</code>で確認できる．<code>-v</code>オプションを指定すると，名前に対応するURLを表示する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span><span class="nb">cd </span>mygrit
+</span><span class='line'><span class="nv">$ </span>git remote
+</span><span class='line'>origin
+</span><span class='line'>
+</span><span class='line'><span class="nv">$ </span>git -v remote
+</span><span class='line'>origin  git://github.com/schacon/grit.git <span class="o">(</span>fetch<span class="o">)</span>
+</span><span class='line'>origin  git://github.com/schacon/grit.git <span class="o">(</span>push<span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>その他，よく使うコマンドは↓みたいなかんじ．</p>
+
+<ul>
+<li><code>git remote add [shortname] [url]</code>
+
+<ul>
+<li>リモートリポジトリの追加</li>
+</ul></li>
+<li><code>git fetch [remote-name]</code>
+
+<ul>
+<li>リモートプロジェクトの中から作業ディレクトリにデータを引き出す</li>
+<li>ローカルの環境でマージされたり，作業内容を書き換えることはないため，自分でマージをする必要がある．</li>
+</ul></li>
+<li><code>git push [remote-name] [branch-name]</code>
+
+<ul>
+<li>指定サーバにプロジェクトをプッシュする</li>
+<li><code>git push origin master</code></li>
+</ul></li>
+<li><code>git remote rename</code>
+
+<ul>
+<li>リモートを参照する名前を変更できる</li>
+</ul></li>
+<li><code>git remote rm</code>
+
+<ul>
+<li>リモートの山椒を削除する</li>
+<li>サーバが移動したとか，特定のミラーを使わなくなったとか，プロジェクトからメンバーが抜けたとか</li>
+</ul></li>
+</ul>
+
+<h1>7. まとめ</h1>
+
+<p>Git の基礎知識についてまとめた．</p>
+
+<ul>
+<li>作業ディレクトリで作業して，ステージングエリアに変更内容を準備(<code>add</code>)して，Gitディレクトリに保存(<code>commit</code>)する</li>
+<li>Gitディレクトリには commitオブジェクト が時系列順に保存される
+
+<ul>
+<li>特定の commitオブジェクト をブランチで指定できる</li>
+<li>デフォルトでは<code>master</code>ブランチが用意される</li>
+<li>現在作業しているブランチは<code>HEAD</code>で示される</li>
+</ul></li>
+<li>リモートリポジトリとやりとりする際，やりとり先のサーバには名前をつける
+
+<ul>
+<li>デフォルトでは<code>origin</code>という名前がつく</li>
+</ul></li>
+</ul>
+
+<p>これらの知識を踏まえれば，様々なページで説明されているgitの関連知識やコマンドが理解しやすくなる&#8230;と思う．説明がド下手なので，この記事は何回も修正することになることが予想される．</p>
+
+<blockquote>
+<p><a href="http://git-scm.com/book/ja/v1/%E4%BD%BF%E3%81%84%E5%A7%8B%E3%82%81%E3%82%8B">公式</a><br>
+<a href="http://dqn.sakusakutto.jp/2013/09/git_patch_snapshot.html">Gitレポジトリはパッチの集積ではなくてスナップショットの集積である。</a><br>
+<a href="http://d.hatena.ne.jp/zariganitosh/20080905/1220621182">アリスとボブになりきってgitをちゃんと理解したい！</a><br>
+<a href="http://qiita.com/usamik26/items/28be7d2c221a7a53c2c3">git push の反対は git pull ではない</a><br>
+<a href="http://qiita.com/osamu1203/items/cb94ef9da02e1ec3e921">git fetchの理解からgit mergeとpullの役割</a></p>
+</blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[コマンド構文の表記規則についてメモ]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/03/18/biao-ji-gui-ze/"/>
+    <updated>2015-03-18T16:57:24+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/03/18/biao-ji-gui-ze</id>
+    <content type="html"><![CDATA[<p>ちょっとしたメモ</p>
+
+<!-- more -->
+
+<p>コマンドの説明の例．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># これとか</span>
+</span><span class='line'><span class="nv">$ </span>git remote add <span class="o">[</span>shortname<span class="o">]</span> <span class="o">[</span>url<span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># これとか</span>
+</span><span class='line'><span class="nv">$ </span>git add &lt;file&gt;...
+</span></code></pre></td></tr></table></div></figure>
+
+<p>括弧が「[]」と「&lt;&gt;」で異なっている．<br>
+今までイマイチ気にしていなかったので，少し調べてみる．</p>
+
+<p>調べればごろごろ出てくる．</p>
+
+<blockquote>
+<p><a href="http://publib.boulder.ibm.com/tividd/td/TRM/GC32-1320-00/ja_JA/HTML/cmdref18.htm">コマンド構文規則 - IBM</a><br>
+<a href="https://docs.oracle.com/cd/E37520_01/b69426/vmutl-preface-syntax.html">4. コマンド構文</a><br>
+<a href="http://itdoc.hitachi.co.jp/manuals/3020/30203R3331/PCRE0058.HTM">コマンドの記載形式</a><br>
+<a href="http://support.ca.com/cadocs/0/CA%20ARCserve%20%20Backup%20r16-JPN/Bookshelf_Files/HTML/cmndline/index.htm?toc.htm?cl_cmd_line_syntax_char.htm">コマンド ライン構文の文字 - CA ARCserve® Backup for &#8230;</a><br>
+<a href="http://otndnld.oracle.co.jp/document/products/oracleVM/220/generic/B57076-01/preface.htm">表記規則 - 日本オラクル</a></p>
+</blockquote>
+
+<p>ここら辺を見れば意味はわかるんだけど，何が元になってるのか気になってもうちょっとうろうろしてみた．すると以下のような記載を発見．</p>
+
+<blockquote>
+<p>ってかこれって統一文法みたいなのがあるのか？UNIXのmanコマンド表記がベースになってるのかな？<br>
+<a href="http://yakinikunotare.boo.jp/orebase/index.php?%A5%B3%A5%DE%A5%F3%A5%C9%C9%BD%B5%AD%CB%A1">コマンド表記法 - 俺の基地</a></p>
+</blockquote>
+
+<p>UNIXの<code>man</code>コマンドを知らなかったので調べてみる．</p>
+
+<blockquote>
+<p><a href="http://www.cc.kyoto-su.ac.jp/%7Ehirai/text/unixcommand.html">基本的なUNIXコマンド</a><br>
+<a href="http://www.k-tanaka.net/unix/man.php">UNIXコマンド - man (Linux/FreeBSD/Solaris) - k-tanaka.net</a><br>
+<a href="http://ja.wikipedia.org/wiki/Man%E3%83%9A%E3%83%BC%E3%82%B8">manページ - Wikipedia</a></p>
+</blockquote>
+
+<p><code>man</code>コマンドは，UNIXコマンドのマニュアルを表示するコマンドのようだ．その前身ともいえる UNIX Programmer&#39;s Manual は1971年に出版され，その後オンラインのmanページが1971年に執筆された．そのレイアウトは以下のような構成になっている．</p>
+
+<ul>
+<li>NAME(名前)</li>
+<li>SYNOPSIS(書式)</li>
+<li>DESCRIPTION(説明)</li>
+<li>EXAMPLES(使用例)</li>
+<li>SEE ALSO(関連項目)</li>
+</ul>
+
+<p>このうち，<strong>SYNOPSIS</strong>に構文規則を用いた表記法が用いられているので，これが元なのではないかということ．実際にこれが元かはわからないけど，とりあえず<del>無駄</del>知識を増やすことができたので満足した．暇があったらまた調べてみよう．</p>
+
+<p>とりあえず，代表的なものをまとめておく．</p>
+
+<table><thead>
+<tr>
+<th>表記法</th>
+<th>概要</th>
+<th>例</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>[]</td>
+<td>なくてもよい</td>
+<td>hoge [-h]：<code>-h</code>はなくてもよい</td>
+</tr>
+<tr>
+<td>{}, &lt;&gt;</td>
+<td>必須</td>
+<td>hoge &lt;<em>filename</em>&gt;：<code>filename</code>は必ず記載</td>
+</tr>
+<tr>
+<td>斜体</td>
+<td>変数</td>
+<td>hoge &lt;<em>filename</em>&gt;：<code>filename</code>は変数．適切な値を記述する</td>
+</tr>
+<tr>
+<td>&#124;</td>
+<td>エレメントの選択</td>
+<td>hote [-a&#124;-b]：<code>-a</code>か<code>-b</code>を選択</td>
+</tr>
+<tr>
+<td>&#8230;</td>
+<td>繰り返し</td>
+<td>hoge &lt;<em>file</em>&gt;&#8230; ：<code>hoge file1 file2 file3</code>と使用できる</td>
+</tr>
+</tbody></table>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[OctopressのCSSをいじる]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/03/17/title01/"/>
+    <updated>2015-03-17T15:01:37+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/03/17/title01</id>
+    <content type="html"><![CDATA[<p>やったこと．</p>
+
+<ol>
+<li>CSSを変更</li>
+<li>テーブル表記を修正・変更</li>
+</ol>
+
+<!-- more -->
+
+<h1>1. やったこと</h1>
+
+<h2>1.1 CSSを変更</h2>
+
+<p><code>sass/custom/_styles.scss</code>の末尾に追記すれば反映される．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="o">//</span> <span class="err">追記</span>
+</span><span class='line'><span class="nt">h1</span><span class="nc">.entry-title</span> <span class="nt">a</span> <span class="p">{</span> <span class="k">font-size</span><span class="o">:</span> <span class="m">0.8em</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'><span class="nt">h1</span> <span class="p">{</span> <span class="k">font-size</span><span class="o">:</span> <span class="m">1.6em</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'><span class="nt">h2</span> <span class="p">{</span> <span class="k">font-size</span><span class="o">:</span> <span class="m">1.3em</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'><span class="nt">h3</span> <span class="p">{</span> <span class="k">font-size</span><span class="o">:</span> <span class="m">1em</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'><span class="nt">h4</span> <span class="p">{</span> <span class="k">font-size</span><span class="o">:</span> <span class="m">0.9em</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">ul</span><span class="p">{</span><span class="k">margin</span><span class="o">:</span><span class="m">1em</span> <span class="m">0</span> <span class="m">1em</span> <span class="m">2em</span><span class="p">;}</span>
+</span><span class='line'><span class="nt">ol</span><span class="p">{</span><span class="k">margin</span><span class="o">:</span><span class="m">1em</span> <span class="m">0</span> <span class="m">1em</span> <span class="m">2em</span><span class="p">;}</span>
+</span><span class='line'><span class="nt">ul</span> <span class="nt">li</span><span class="o">,</span><span class="nt">ol</span> <span class="nt">li</span><span class="p">{</span><span class="k">margin-top</span><span class="o">:.</span><span class="m">5em</span><span class="p">;</span><span class="k">margin-bottom</span><span class="o">:.</span><span class="m">5em</span><span class="p">;}</span>
+</span><span class='line'><span class="nt">ul</span> <span class="nt">ul</span><span class="o">,</span><span class="nt">ul</span> <span class="nt">ol</span><span class="o">,</span><span class="nt">ol</span> <span class="nt">ol</span><span class="o">,</span><span class="nt">ol</span> <span class="nt">ul</span><span class="p">{</span><span class="k">margin-top</span><span class="o">:</span><span class="m">0</span><span class="p">;</span><span class="k">margin-bottom</span><span class="o">:</span><span class="m">0</span><span class="p">;}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p><a href="http://blog.textfile.org/20140920/font/">Octopressでフォントサイズを変える&lt;</a></p>
+</blockquote>
+
+<h2>1.2 テーブル表記を修正・変更</h2>
+
+<p>テーブルがちゃんと表示されていないことに気づく．extensionが足りなかったらしい．<code>config.yml</code>を以下のように編集．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='basic'><span class='line'><span class="err">#</span><span class="w"> </span><span class="vg">markdown</span>
+</span><span class='line'><span class="nl">markdown:</span><span class="w"> </span><span class="vg">redcarpet</span>
+</span><span class='line'><span class="nl">redcarpet:</span>
+</span><span class='line'><span class="w">  </span><span class="nl">extensions:</span><span class="w"> </span><span class="p">[</span>
+</span><span class='line'><span class="w">      </span><span class="s2">&quot;hard_wrap&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="w">      </span><span class="s2">&quot;no_intra_emphasis&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="w">      </span><span class="s2">&quot;fenced_code_blocks&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="w">      </span><span class="s2">&quot;autolink&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="w">      </span><span class="s2">&quot;tables&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="w">      </span><span class="s2">&quot;footnotes&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="w">      </span><span class="s2">&quot;strikethrough&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="w">      </span><span class="s2">&quot;lax_html_blocks&quot;</span>
+</span><span class='line'><span class="w">      </span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>ついでに，テーブルをいい感じのレイアウトに変更する．以下のような<code>source/stylesheets/data-table.css</code>を追加．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">border-style</span><span class="o">:</span><span class="k">solid</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">border-width</span><span class="o">:</span><span class="m">1px</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">border-color</span><span class="o">:</span><span class="m">#e7e3e7</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">margin</span><span class="o">:</span> <span class="m">10px</span> <span class="m">0</span> <span class="m">30px</span> <span class="m">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">th</span><span class="o">,</span> <span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">td</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">border-style</span><span class="o">:</span><span class="k">dashed</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">border-width</span><span class="o">:</span><span class="m">1px</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">border-color</span><span class="o">:</span><span class="m">#e7e3e7</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">th</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">border-style</span><span class="o">:</span><span class="k">solid</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">font-weight</span><span class="o">:</span><span class="k">bold</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">background</span><span class="o">:</span> <span class="sx">url(&quot;/images/noise.png?1330434582&quot;)</span> <span class="k">repeat</span> <span class="k">scroll</span> <span class="k">left</span> <span class="k">top</span> <span class="m">#F7F3F7</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">padding</span><span class="o">:</span> <span class="m">2px</span> <span class="m">9px</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">td</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">padding</span><span class="o">:</span> <span class="m">2px</span> <span class="m">9px</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">th</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="o">],</span> <span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">td</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="o">]</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">text-align</span><span class="o">:</span><span class="k">left</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">th</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="o">],</span> <span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">td</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="o">]</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">text-align</span><span class="o">:</span><span class="k">right</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">th</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="o">],</span> <span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">td</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="o">]</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">text-align</span><span class="o">:</span><span class="k">center</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">tr</span><span class="nd">:nth-child</span><span class="o">(</span><span class="nt">even</span><span class="o">)</span><span class="p">{</span>
+</span><span class='line'>    <span class="k">background</span><span class="o">:</span> <span class="sx">url(&quot;/images/noise.png?1330434582&quot;)</span> <span class="k">repeat</span> <span class="k">scroll</span> <span class="k">left</span> <span class="k">top</span> <span class="m">#F7F3F7</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p><code>source/_includes/head.html</code>に以下を追記して反映させる．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;link</span> <span class="na">href=</span><span class="s">&quot;/stylesheets/data-table.css&quot;</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">type=</span><span class="s">&quot;text/css&quot;</span><span class="nt">&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p><a href="http://whiskers.nukos.kitchen/2014/08/02/markdown.html">Redcarpetを使ったmarkdown記法サンプル</a><br>
+<a href="http://morizyun.github.io/blog/octopress-table-tag-css/">Octopressでテーブルをmarkdownで編集できるようにする</a></p>
+</blockquote>
+
+<h1>2. 関連知識</h1>
+
+<p>CSSを修正するときに参考になりそうなサイトをメモ．</p>
+
+<blockquote>
+<p><a href="http://tokkonopapa.github.io/blog/2012/01/03/customizing-octopress-styles/">Octopressのスタイル設定とカスタマイズ</a></p>
+</blockquote>
+
+<h1>3. 雑記</h1>
+
+<p>前回の記事でプレビューを表示できるように四苦八苦していたけど，<code>rake preview</code>しながらファイル内容を変更しても動的に編集結果が反映されることに気づいた．これは便利だ．<br>
+ただし，動的に変更を反映しているため，一度プレビューを終了すると次回プレビュー/デプロイ時に変更は反映されない．<code>rake generate</code>してから各操作を行うこと．</p>
+
+<p>ブログが少し見やすくなった気がする．ひとまずemacsとブログに関する諸々はこれでOKかな．</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Rubyの基礎知識についてのメモ]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/03/17/title2/"/>
+    <updated>2015-03-17T02:18:06+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/03/17/title2</id>
+    <content type="html"><![CDATA[<p>Rubyの基礎知識についてまとめたので，自分用のメモを残す．</p>
+
+<!-- more -->
+
+<h2>今回の目的</h2>
+
+<p>gemとかbundlerとかevmとかrbenvとか，言葉は聞いたことあるし利用したことあっても理解してなかったので，まとめる．</p>
+
+<h2>そもそもRubyとは</h2>
+
+<p>日本人発のスクリプト言語&#8230;?くらいの知識しかない．一言で言い表すなら，オブジェクト指向スクリプト言語，ということらしい．</p>
+
+<blockquote>
+<p><a href="https://www.ruby-lang.org/ja/">公式</a></p>
+</blockquote>
+
+<h1>1. 設計思想</h1>
+
+<p>Wikipediaもあるけど，インタビュー記事とかも見つけたのでざっと読んでみる．</p>
+
+<blockquote>
+<p><a href="http://doda.jp/engineer/guide/yosoku/07_1.html">三年予測 -トップリーダーと考えるエンジニアの未来- 第7回 Ruby言語設計者まつもとゆきひろ</a></p>
+</blockquote>
+
+<p>印象に残った文章をいくつか引用しておく．</p>
+
+<blockquote>
+<p>Ruby言語は純粋なオブジェクト指向言語なので、数値や文字列を含めすべてをオブジェクトとして扱う。&quot;Hello, World!&quot;の文字列を表示するだけの最も簡単なプログラムを動かすにも、まずオブジェクトを管理する枠組みを作り、最小限必要なクラス群を作り、さらにI/Oライブラリを作らなければならない。この段階に到達するまでに半年を要したのだ。</p>
+
+<p>まつもとゆきひろの有名な言葉の一つに「Rubyをキメると気持ちいい！」というものがある。「新しいものを作ろうとは思っていない。気分がよく開発できる言語を作りたい」のだ。</p>
+
+<p>特定分野に特化して設計された言語よりも、プログラミング言語として隅々まで配慮されている汎用言語が好みだという。「Rubyには目的はない。科学技術計算とかWeb開発とか、特定の目的に偏った言語ではない」</p>
+</blockquote>
+
+<p>まつもと氏の言語愛から生まれた言語なんだね．</p>
+
+<h1>2. 環境構築</h1>
+
+<p>公式サイトを見ると，インストール方法は以下のように示されている．</p>
+
+<ul>
+<li>Linux/Unix
+
+<ul>
+<li>システムのパッケージ管理ツール</li>
+<li>rbenv，RVM等のサードパーティ製のツール</li>
+</ul></li>
+<li>OS X
+
+<ul>
+<li>rbenv，RVM等のサードパーティ製のツール</li>
+</ul></li>
+<li>Windows
+
+<ul>
+<li>RubyInstaller</li>
+</ul></li>
+</ul>
+
+<p>わざわざ管理ツールを用いてインストールするのは，Rubyはバージョン更新が早く，バージョンによってはアプリケーションが動作しないことがよくあるから，だと思う．たぶん．<br>
+当方Macのため，今回はrbenvとRVMの概要についてまとめる．</p>
+
+<h2>2.1 rbenv</h2>
+
+<p>複数バージョンのRubyを管理できる．</p>
+
+<p>デフォルトでは，Rubyのインストール自体はサポートしていない．<br>
+しかし，<code>ruby-build</code>というプラグインによってインストール可能となる．</p>
+
+<blockquote>
+<p><a href="https://github.com/sstephenson/rbenv">rbenvドキュメント</a><br>
+<a href="http://takatoshiono.hatenablog.com/entry/2015/01/09/012040">rbenv + ruby-build はどうやって動いているのか</a><br>
+<a href="https://www.qoosky.net/references/128/">rbenvおよびbundlerの基本的な使用方法</a><br>
+<a href="http://mukaer.com/archives/2012/03/09/rubyrvmgemrbenv/">Rubyのrvmやgemってなんだ？て調べたらrbenvが出てきたの巻</a></p>
+</blockquote>
+
+<h2>2.2 RVM</h2>
+
+<p>略はそのまま，Ruby Version Manager．<br>
+複数のRubyのインストール及び管理をサポートする．</p>
+
+<blockquote>
+<p><a href="http://rvm.io">rvm.io</a></p>
+</blockquote>
+
+<h2>2.3 その他の方法</h2>
+
+<p>その他の方法として，システムのパッケージマネージャを用いる方法がある．</p>
+
+<ul>
+<li>Debian or Ubuntu
+
+<ul>
+<li>apt</li>
+</ul></li>
+<li>CentOS, Fedora, or RHEL
+
+<ul>
+<li>yum</li>
+</ul></li>
+<li>OS X
+
+<ul>
+<li>homebrew</li>
+</ul></li>
+</ul>
+
+<h2>2.4 MacにおけるRuby</h2>
+
+<p>Mac OS X には<code>ruby 2.2.0</code>，OS X Moutain Lion, Lion, Snow Leopardには<code>1.8.7</code>が含まれている．また，Homebrewを用いると簡単にインストールが可能．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew install ruby
+</span></code></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p><a href="https://www.qoosky.net/references/128/">rbenvおよびbundlerの基本的な使用方法</a><br>
+<a href="http://mukaer.com/archives/2012/03/09/rubyrvmgemrbenv/">Rubyのrvmやgemってなんだ？て調べたらrbenvが出てきたの巻</a><br><br>
+<a href="http://takatoshiono.hatenablog.com/entry/2015/01/09/012040">rbenv + ruby-build はどうやって動いているのか</a></p>
+</blockquote>
+
+<h1>3. ライブラリ</h1>
+
+<h2>3.1 Gem</h2>
+
+<p>Rubyではサードパーティ製のライブラリやアプリケーションが多く提供されている．これらは<code>Gem</code>という形式でパッケージングされ，公開されている．有名なフレームワークである<code>Rails</code>も，Gem形式でパッケージ化されている．たまに，<code>.zip</code>や <code>.tar.gz</code>等のアーカイブ形式で配布されている場合もある．</p>
+
+<h2>3.2 RubyGems</h2>
+
+<p>gemのためのパッケージ管理ツール．コマンド名は<code>gem</code>．gem形式のパッケージの公開，インストールを助けるシステムで，Ruby のバージョン 1.9 以降では標準添付されている．<br>
+gem形式で公開されている様々なライブラリを使用できる窓口として動作するっぽい．</p>
+
+<ul>
+<li>Gemファイルの検索
+
+<ul>
+<li><a href="https://rubygems.org">RubyGems.org</a></li>
+</ul></li>
+<li> RubyGemsドキュメント
+
+<ul>
+<li><a href="http://guides.rubygems.org">RubyGems&#39; docs</a></li>
+</ul></li>
+<li>Gemコマンドリファレンス
+
+<ul>
+<li><a href="http://guides.rubygems.org/command-reference/">RubyGems Guide</a></li>
+</ul></li>
+<li>使用頻度の高いコマンド
+
+<ul>
+<li><code>gem search -r</code>：RubyGems のリポジトリを調べる</li>
+<li><code>gem search -l</code>：インストール済のgemを調べる</li>
+<li><code>gem list</code>：インストール済のgem一覧</li>
+<li><code>gem install [gem]</code>：gemのインストール</li>
+</ul></li>
+</ul>
+
+<blockquote>
+<p><a href="https://www.ruby-lang.org/ja/libraries/">ライブラリ - Ruby</a><br>
+<a href="http://qiita.com/muran001/items/14f34b735e0a6b4af98c">初心者は覚えておきたいRubygemsのコマンドまとめ</a><br><br>
+<a href="http://qiita.com/sumyapp/items/5ec58bf3567e557c24d7">Rubygemsのススメ | Rubyに慣れていない初心者さんへ</a></p>
+</blockquote>
+
+<h2>3.3 Bundler</h2>
+
+<p>アプリケーションが依存するgemを管理するツール．gem形式で公開されている．</p>
+
+<p>アプリケーション開発の際，いくつも<code>gem install</code>していると，どのアプリケーションがどの gem に依存しているのか？必要なバージョンは？等の依存関係がわからなくなる．bundlerはこれを解決するためのツール．</p>
+
+<h3>3.3.1 インストール</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>gem install bundler
+</span></code></pre></td></tr></table></div></figure>
+
+<h3>3.3.2 Gemfile</h3>
+
+<p>アプリケーションのルートディレクトリ直下に，<code>Gemfile</code>というファイルを作成する．ここに，アプリケーションに依存する gem を記述しておく．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># 例</span>
+</span><span class='line'><span class="n">source</span> <span class="s1">&#39;https://rubygems.org&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;sinatra&quot;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;mysql2&quot;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;activerecord&quot;</span><span class="p">,</span> <span class="s2">&quot;3.1.1&quot;</span><span class="p">,</span> <span class="ss">:require</span> <span class="o">=&gt;</span> <span class="s1">&#39;active_record&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">group</span> <span class="ss">:development</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s2">&quot;shotgun&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h3>3.3.3 依存gemのインストール</h3>
+
+<p><code>Gemfile</code>に従って，依存する gem をインストールする．<code>--path</code>を指定すると，gemのインストール先ディレクトリを指定できる．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>bundle install --path<span class="o">=</span>./vendor/bundler
+</span></code></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p><a href="http://bundler.io">Bundler(公式)</a><br>
+<a href="http://www.rubylife.jp/rails/ini/index2.html">Bundlerを使ったGemパッケージの管理</a><br>
+<a href="http://tech.kayac.com/archive/ruby3rubygems.html">Rubyで開発するときに入れておきたい三種のRubyGems</a></p>
+</blockquote>
+
+<h1>4. まとめ</h1>
+
+<h2>Rubyとは？</h2>
+
+<p>Rubyは，<em>オブジェクト指向スクリプト言語</em>．<br>
+特定の目的のために作成されたわけではなく，プログラマが楽しくプログラミングできるように設計された汎用的な言語，とされている．<br>
+Webページを楽に制作できるフレームワーク<em>Rails</em>に採用されたことで広く認知されるようになった．</p>
+
+<h2>環境は？</h2>
+
+<p>Rubyはオープンソースであり，更新がめまぐるしい．<br>
+そのため，複数バージョンを切り替えるための<em>rbenv</em>や<em>RVM</em>等のサードパーティ製のパッケージ管理ツールによってインストール・管理するのが一般的．</p>
+
+<h2>ライブラリは？</h2>
+
+<p>また，ライブラリは<em>gem</em>という形式でパッケージングされている．<br>
+<em>RubyGems</em>を用いてこれらのライブラリを利用できる．<br>
+また，その依存関係を管理するのに<em>bundler</em>というgemパッケージが広く用いられている．<br>
+bundler は アプリケーション毎に Gemfile を用意する．<br>
+Gemfile にアプリケーションが依存する gem やそのバージョンを記述することで，アプリケーションとライブラリの依存関係を管理する．</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Emacsに色々設定したメモ]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/03/17/title/"/>
+    <updated>2015-03-17T02:14:21+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/03/17/title</id>
+    <content type="html"><![CDATA[<p>やったことは以下</p>
+
+<ol>
+<li>タブ，全角/半角スペースを可視化(whitespaceの導入)</li>
+<li>タブをスペースで変換するように設定</li>
+<li>Markdownにおける行頭タブの自動整形の無効化</li>
+<li>GFMを利用する</li>
+</ol>
+
+<p>それぞれまとめていく．</p>
+
+<!-- more -->
+
+<h1>1. やったこと</h1>
+
+<h2>1.1 whitespace導入</h2>
+
+<blockquote>
+<p><a href="http://qiita.com/itiut@github/items/4d74da2412a29ef59c3a">whitespace-modeを使って、ファイルの保存時に行末のスペースや末尾の改行を削除する</a></p>
+</blockquote>
+
+<p>上記を参考に，whitespace-modeを導入．<br>
+<code>(setq-default show-trailing-whitespace t)</code>と設定がかぶっていたので削除した．</p>
+
+<h2>1.2 タブをスペースに変換</h2>
+
+<p><code>(setq-default indent-tabs-mode nil)</code>を使っていたのだけど，タブがスペースに置換されない．<br>
+そもそもどのタイミングで置換されていたのか?</p>
+
+<blockquote>
+<p><a href="http://www.math.s.chiba-u.ac.jp/%7Ematsu/lisp/emacs-lisp-intro-jp_17.html#SEC198">16. .emacs ファイル</a></p>
+</blockquote>
+
+<p>上記サイトによれば，自動インデントをした際のインデントがスペースになる，ということらしい．<br>
+普段入力するタブをスペースに置換するにはどうすればよいかと考えたけれど，単純にキーバインドに割り当てればよいだけだということに気づく．<br>
+<code>init.el</code>内でのタブ周りの設定は以下．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="c1">;; タブ幅</span>
+</span><span class='line'><span class="p">(</span><span class="nv">custom-set-variables</span> <span class="o">&#39;</span><span class="p">(</span><span class="nv">tab-width</span> <span class="mi">4</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; インデント整形時，タブの代わりにスペースを用いる</span>
+</span><span class='line'><span class="p">(</span><span class="nv">setq-default</span> <span class="nv">indent-tabs-mode</span> <span class="no">nil</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>これとは別に，キーバインドとして以下を設定したらうまくいった．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nv">global-set-key</span> <span class="s">&quot;\C-i&quot;</span> <span class="o">&#39;</span><span class="p">(</span><span class="k">lambda</span> <span class="p">()</span>
+</span><span class='line'>                          <span class="p">(</span><span class="nv">interactive</span><span class="p">)</span>
+</span><span class='line'>                          <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">width</span> <span class="nv">tab-width</span><span class="p">)</span>
+</span><span class='line'>                                <span class="p">(</span><span class="nv">str</span>   <span class="s">&quot;&quot;</span><span class="p">))</span>
+</span><span class='line'>                            <span class="p">(</span><span class="nb">dotimes</span> <span class="p">(</span><span class="nv">i</span> <span class="nv">width</span><span class="p">)</span>
+</span><span class='line'>                              <span class="p">(</span><span class="k">setq</span> <span class="nv">str</span> <span class="p">(</span><span class="nv">concat</span> <span class="nv">str</span> <span class="s">&quot; &quot;</span><span class="p">)))</span>
+</span><span class='line'>                            <span class="p">(</span><span class="nv">insert</span> <span class="nv">str</span><span class="p">))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>タブを<code>C-i</code>で入力できるように，<code>C-i</code>を<code>\t</code>で置き換えていた．<br>
+タブ文字の挿入を割り当てているのだから，設定が反映されないのは当たり前だった．<br>
+スペース4つ分で代わりに置き換えようと思ったが，タブ幅の設定を反映できた方が良いと思ったのでこうなった．<br>
+ちょっとやり方が苦しい．もっと上手い方法があるかもしれない．</p>
+
+<h2>1.3 Markdownにおける行頭タブの自動整形の無効化</h2>
+
+<p>タブ入力した後に字句入力して改行するとタブが削除されてしまうのでなんとかしかった．<br>
+これはつまり，直前にインデントがない場合，Emacs が余分なインデントだと判断して自動整形してしまっているのだと思われる．</p>
+
+<blockquote>
+<p><a href="http://www.nofuture.tv/diary/20141114.html">emacs 24.4のmarkdown-modeでリストのインデントが行頭に揃えられてしまう(解決)</a><br><br>
+<a href="http://www.muskmelon.jp/?p=1068">Emacs 24.4 のインデントを無効化</a></p>
+</blockquote>
+
+<p>コーディングの際には自動インデントは欲しいので，Markdownの編集時のみ自動インデントを無効化したい．<br>
+Emacsはモードが設定されると，対応するモードフック変数に登録されている関数を呼び出す．<br>
+各モードのカスタマイズのためには，このモードフック変数を編集する．<br>
+今回は，以下のように設定を追記して自動インデントを無効化した．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="c1">;; markdown</span>
+</span><span class='line'><span class="p">(</span><span class="nv">autoload</span> <span class="ss">&#39;markdown-mode</span> <span class="s">&quot;markdown-mode.el&quot;</span> <span class="s">&quot;Major mode for editing Markdown files&quot;</span> <span class="no">t</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">setq</span> <span class="nv">auto-mode-alist</span> <span class="p">(</span><span class="nb">cons</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;\\.md&quot;</span> <span class="o">.</span> <span class="nv">gfm-mode</span><span class="p">)</span> <span class="nv">auto-mode-alist</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="nv">add-hook</span> <span class="ss">&#39;gfm-mode-hook</span>
+</span><span class='line'>          <span class="o">&#39;</span><span class="p">(</span><span class="k">lambda</span> <span class="p">()</span>
+</span><span class='line'>             <span class="p">(</span><span class="k">setq</span> <span class="nv">global-linum-mode</span> <span class="no">nil</span><span class="p">)</span>
+</span><span class='line'>             <span class="p">(</span><span class="nv">electric-indent-local-mode</span> <span class="mi">-1</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p><code>global-linum-mode</code>は画面外にはみ出した文章の改行指定．<br>
+コーディングでは全体の形が崩れるので無効にしておくが，Markdownは文章なので改行したほうが読みやすい．</p>
+
+<h2>1.4 GFMモードを利用する</h2>
+
+<p>行末のスペースも削除されてしまうので，どうしようと思っていたが，GFMモードというものを利用すれば良いらしい．<br>
+具体的な使い方は前項に示した．gfm-mode は markdown-mode.el 内に定義されているようだ．<br>
+GFMモードを快適に利用したいので，さらに以下を設定していく．</p>
+
+<ol>
+<li>OctopressでGFMが使用できるように設定する</li>
+<li>GFMのプレビューができるようにする</li>
+</ol>
+
+<h3>1.4.1 OctopressでGFMが使用できるように設定する</h3>
+
+<ol>
+<li><code>Gemfile</code>に<code>gem &#39;redcarpet&#39;, &#39;~&gt; 3.1</code>を追記(他のgemがこのバージョンに依存していたため，参考サイトと違うバージョンを指定)</li>
+<li>なかったので，<code>gem &#39;albino&#39;, &#39;~&gt; 1.3.3&#39;</code>も追加</li>
+<li><code>bundle install</code></li>
+<li><code>plugins</code>ディレクトリに，<code>redcarpet2_markdown.rb</code>を追加(<a href="https://github.com/nono/Jekyll-plugins">source</a>)</li>
+<li><code>_config.yml</code>の<code>markdown: rdiscount</code>を下記のように書き換え</li>
+</ol>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="nv">markdown:</span> <span class="nv">redcarpet</span>
+</span><span class='line'><span class="nv">redcarpet:</span>
+</span><span class='line'>  <span class="nv">extensions:</span> <span class="nv">[</span><span class="s">&quot;hard_wrap&quot;</span><span class="nv">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p><code>redcarpet2</code>を指定するとエラーとなった．(<a href="https://github.com/clayallsopp/rubymotion-tutorial/issues/30">参考</a>)</p>
+
+<blockquote>
+<p><a href="http://blog.tdksk.com/2013/05/06/use-gfm-in-octopress.html">Octopress で GitHub Flavored Markdown (GFM) を使う</a></p>
+</blockquote>
+
+<h3>1.4.2 emacs上からGFMのプレビューができるようにする</h3>
+
+<p>Grip は Markdown を GitHub Flavor に変換してプレビューできる．</p>
+
+<ol>
+<li>Gripをインストール</li>
+</ol>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo pip install grip
+</span></code></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p><a href="http://blog.wonderrabbitproject.net/2014/07/github-flavored-markdown-grip.html">GitHub Flavored Markdown に対応した Grip というツールが便利だったので備忘録</a><br>
+<a href="http://www.moongift.jp/2014/01/grip-github%E9%A2%A8%E3%81%ABmarkdown%E3%82%92html%E3%83%97%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC/">Grip - GitHub風にMarkdownをHTMLプレビュー</a></p>
+</blockquote>
+
+<ol>
+<li>binファイルを作成し，パスの通ったディレクトリにおく</li>
+</ol>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>which grip
+</span><span class='line'><span class="nv">$ </span>emacs /usr/local/bin/markdown
+</span><span class='line'>
+</span><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="nv">filename</span><span class="o">=</span><span class="nv">$1</span>
+</span><span class='line'>/usr/local/bin/grip --export --gfm <span class="k">${</span><span class="nv">filename</span><span class="k">}</span> &gt; /dev/null
+</span><span class='line'>cat <span class="k">${</span><span class="nv">filename</span><span class="p">%.*</span><span class="k">}</span>.html
+</span></code></pre></td></tr></table></div></figure>
+
+<p>GFMモードでプレビューするためには，<code>--gfm</code>オプションを追加する．<br>
+<code>markdown</code>ファイルについて．既にパス内に存在している場合がある(通常のプレビュー時に用いていたのかも)<br>
+なので，<code>which markdown</code>で存在するかどうか調べて，存在したならバックアップをとって新たに置き換えると良い．<br>
+また，権限を755に設定しておくこと．</p>
+
+<ol>
+<li>設定の追加</li>
+</ol>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="c1">;; markdown mode</span>
+</span><span class='line'><span class="p">(</span><span class="nv">autoload</span> <span class="ss">&#39;markdown-mode</span> <span class="s">&quot;markdown-mode&quot;</span>
+</span><span class='line'>   <span class="s">&quot;Major mode for editing Markdown files&quot;</span> <span class="no">t</span><span class="p">)</span>
+</span><span class='line'>   <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;auto-mode-alist</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;\\.text\\&#39;&quot;</span> <span class="o">.</span> <span class="nv">gfm-mode</span><span class="p">))</span>
+</span><span class='line'>   <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;auto-mode-alist</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;\\.markdown\\&#39;&quot;</span> <span class="o">.</span> <span class="nv">gfm-mode</span><span class="p">))</span>
+</span><span class='line'>   <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;auto-mode-alist</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;\\.md\\&#39;&quot;</span> <span class="o">.</span> <span class="nv">gfm-mode</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; ファイルパスを渡す</span>
+</span><span class='line'><span class="p">(</span><span class="nb">defun</span> <span class="nv">markdown-custom</span> <span class="p">()</span>
+</span><span class='line'>  <span class="s">&quot;markdown-mode-hook&quot;</span>
+</span><span class='line'>    <span class="p">(</span><span class="k">setq</span> <span class="nv">markdown-command-needs-filename</span> <span class="no">t</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">)</span>
+</span><span class='line'>      <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">&#39;markdown-mode-hook</span> <span class="o">&#39;</span><span class="p">(</span><span class="k">lambda</span><span class="p">()</span> <span class="p">(</span><span class="nv">markdown-custom</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<ol>
+<li><code>C-c C-c p</code>，<code>C-c C- v</code>で実行</li>
+</ol>
+
+<h3>トラブルシューティング</h3>
+
+<p>これでok&#8230;と思ったら，文字化けする上にちっともGitHub Flavor でない．</p>
+
+<p>試しに，Markdownファイルに対して直接<code>grip</code>を叩く．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>grip test.md
+</span></code></pre></td></tr></table></div></figure>
+
+<p>するとエラーがでて，プレビューできない．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>UnicodeDecodeError: <span class="s1">&#39;utf8&#39;</span> codec can<span class="err">&#39;</span>t decode byte 0xa4 in position 2: invalid start byte
+</span></code></pre></td></tr></table></div></figure>
+
+<p>文字コード関連かと思い，対象ファイルの文字コードをnkfで調べる．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>nkf --guess test.md
+</span><span class='line'>EUC-JP <span class="o">(</span>LF<span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>UTF-8に変換．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>nkf -u --overwrite test.md
+</span></code></pre></td></tr></table></div></figure>
+
+<p>再び実行．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>nkf --guess test.md
+</span><span class='line'>UTF-8 <span class="o">(</span>LF<span class="o">)</span>
+</span><span class='line'><span class="nv">$ </span>grip test.md
+</span></code></pre></td></tr></table></div></figure>
+
+<p>うまくいった．<br>
+ただ，エラーが表示されてしまう．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>/usr/local/lib/python2.7/site-packages/requests/packages/urllib3/connectionpool.py:769: InsecureRequestWarning: Unverified HTTPS request is being made. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.org/en/latest/security.html InsecureRequestWarning<span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>証明書関連のエラーだと思われる．<br>
+詳しくは後日調べることにして，プレビューもできたのでとりあえずコレでOK．<br>
+ただ，<code>#</code>で指定する見出しがなぜか変換されない．これもとりあえず後日調べることにする．</p>
+
+<blockquote>
+<p><a href="http://blog.s-amemiya.com/development/emacs%E3%81%AEmarkdown-mode%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%82%8B/">Emacsのmarkdown-modeを使ってみる</a>  </p>
+</blockquote>
+
+<h1>2. 今後やりたいことのメモ</h1>
+
+<ul>
+<li>Emacsにおける文字コードの設定</li>
+<li>認証局関連の知識ほしい&#8230;(<a href="http://qiita.com/kawaz/items/f90810b9ea823b6556a8">認証局を立ててぼろもうけしたいんですが＞無理な理由を理解しよう</a>)</li>
+<li>ブログの見た目を少し変えたい(文字が大きい&#8230;)</li>
+</ul>
+
+<p>とりあえず，MarkdownをEmacsから手軽に書いて，ブログを更新するという目標は達成できた．</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Emacsについて 02]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/03/14/title/"/>
+    <updated>2015-03-14T21:30:29+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/03/14/title</id>
+    <content type="html"><![CDATA[<p>研究会とか諸々で忙しかったため，久しぶりの更新．Emacsの設定をしたので自分用にメモ．<br>
+やったことは&#8230;</p>
+
+<ul>
+<li>基本設定</li>
+<li>Caskを導入してのパッケージ管理</li>
+</ul>
+
+<!-- more -->
+
+<h1>1. インストール</h1>
+
+<p>emacsのインストール．前回やった．<br>
+homebrewでemacsをインストールしたため，インストール先は<code>/usr/local/Cellar</code>にある．<code>Emacs.app</code>をAppフォルダに移動しておく．</p>
+
+<h1>2. ディレクトリ構成</h1>
+
+<p>まず，ホームディレクトリがどこか確認する．Emacsを立ち上げて<code>C-x C-f</code>で<code>~/</code>を指定すれば分かる．</p>
+
+<p>ホームディレクトリに，設定を保存するための<code>.emacs.d</code>フォルダを作成する(自動生成されている場合もある)．下記のサイトを参考にすると．</p>
+
+<blockquote>
+<p><a href="http://www.gfd-dennou.org/member/uwabami/cc-env/EmacsBasic.html">Emacs の基本設定</a></p>
+</blockquote>
+
+<p>Emacs22以降は，<code>~/.emacs.d/</code>以下に設定ファイル群をまとめておくと便利だそう．このサイトはいろいろ作っているけど，よくわからないので最低限のものだけ作成する．とりあえず，<code>inits</code>フォルダと<code>init.el</code>ファイルを作成する．それぞれの役割は以下．</p>
+
+<ul>
+<li>init.el
+
+<ul>
+<li>Emacsの初期化ファイル</li>
+<li>ウインドウの大きさ，フォントの種類とか</li>
+<li>elispパッケージの読み込みとか</li>
+</ul></li>
+<li>inits
+
+<ul>
+<li>各種設定ファイルをおく</li>
+<li>init-loaderの項で説明する</li>
+</ul></li>
+</ul>
+
+<h1>3. 設定を書く</h1>
+
+<p>下記サイトをとりあえず参考に．</p>
+
+<blockquote>
+<p><a href="http://d.hatena.ne.jp/sandai/20120304/p2">うわっ&#8230;私のEmacs、使いにくすぎ？だったら&#8230;ｶｽﾀﾏｲｽﾞｼﾔｯｾｰ!!ﾀﾞｧﾀﾞｧｼｴﾘｲｪｯｽｯｼｪｰｼｮｰﾍｲﾍｲ!!!</a></p>
+</blockquote>
+
+<h2>3.1 load-pathの設定</h2>
+
+<p>いろいろなライブラリを利用できた方が便利だ．EmacsのライブラリはEmacs Lispで記述されており，拡張子は<code>.el</code>である．<code>M-x load-library</code>を実行すると，<code>load-path</code>に存在するライブラリが読み込まれる．<br>
+よって，この<code>load parh</code>を設定しておく必要がある．<code>load path</code>は変数<code>load-path</code>として定義されているため，これを書き換えればよい．<br>
+初期化ファイルである<code>init.el</code>に，以下を追記する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="c1">;; load-pathの追加関数</span>
+</span><span class='line'><span class="p">(</span><span class="nb">defun</span> <span class="nv">add-to-load-path</span> <span class="p">(</span><span class="k">&amp;rest</span> <span class="nv">paths</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">let</span> <span class="p">(</span><span class="nv">path</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="nb">dolist</span> <span class="p">(</span><span class="nv">path</span> <span class="nv">paths</span> <span class="nv">paths</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">default-directory</span> <span class="p">(</span><span class="nv">expand-file-name</span> <span class="p">(</span><span class="nv">concat</span> <span class="nv">user-emacs-directory</span> <span class="nv">path</span><span class="p">))))</span>
+</span><span class='line'>        <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;load-path</span> <span class="nv">default-directory</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">fboundp</span> <span class="ss">&#39;normal-top-level-add-subdirs-to-load-path</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">(</span><span class="nv">normal-top-level-add-subdirs-to-load-path</span><span class="p">))))))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; load-pathに追加するフォルダ</span>
+</span><span class='line'><span class="c1">;; 2つ以上フォルダを指定する場合の引数 =&gt; (add-to-load-path &quot;elisp&quot; &quot;xxx&quot; &quot;xxx&quot;)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">add-to-load-path</span> <span class="s">&quot;elisp&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>やり方はいろいろあると思うけど，関数として定義しておけば，追加が楽だ．</p>
+
+<h2>3.2 全体的な設定</h2>
+
+<p>途中フォントの設定があるが，Emacsで使用可能なフォント一覧は<code>(font-family-list)</code>をscratchバッファ実行すれば良い．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="c1">;; 文字コード</span>
+</span><span class='line'><span class="c1">;; WindowsとMacでわける</span>
+</span><span class='line'><span class="p">(</span><span class="nv">set-language-environment</span> <span class="s">&quot;Japanese&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">ws</span> <span class="nv">window-system</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nb">cond</span> <span class="p">((</span><span class="nb">eq</span> <span class="nv">ws</span> <span class="ss">&#39;w32</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nv">prefer-coding-system</span> <span class="ss">&#39;utf-8-unix</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nv">set-default-coding-systems</span> <span class="ss">&#39;utf-8-unix</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="k">setq</span> <span class="nv">file-name-coding-system</span> <span class="ss">&#39;sjis</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="k">setq</span> <span class="nv">locale-coding-system</span> <span class="ss">&#39;utf-8</span><span class="p">))</span>
+</span><span class='line'>        <span class="p">((</span><span class="nb">eq</span> <span class="nv">ws</span> <span class="ss">&#39;ns</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;ucs-normalize</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nv">prefer-coding-system</span> <span class="ss">&#39;utf-8-hfs</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="k">setq</span> <span class="nv">file-name-coding-system</span> <span class="ss">&#39;utf-8-hfs</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="k">setq</span> <span class="nv">locale-coding-system</span> <span class="ss">&#39;utf-8-hfs</span><span class="p">))))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; Windowsで英数と日本語にMeiryoを指定</span>
+</span><span class='line'><span class="c1">;; Macで英数と日本語にRictyを指定</span>
+</span><span class='line'><span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">ws</span> <span class="nv">window-system</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nb">cond</span> <span class="p">((</span><span class="nb">eq</span> <span class="nv">ws</span> <span class="ss">&#39;w32</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nv">set-face-attribute</span> <span class="ss">&#39;default</span> <span class="no">nil</span>
+</span><span class='line'>                             <span class="ss">:family</span> <span class="s">&quot;Meiryo&quot;</span>  <span class="c1">;; 英数</span>
+</span><span class='line'>                             <span class="ss">:height</span> <span class="mi">100</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nv">set-fontset-font</span> <span class="no">nil</span> <span class="ss">&#39;japanese-jisx0208</span> <span class="p">(</span><span class="nv">font-spec</span> <span class="ss">:family</span> <span class="s">&quot;Meiryo&quot;</span><span class="p">)))</span>  <span class="c1">;; 日本語</span>
+</span><span class='line'>        <span class="p">((</span><span class="nb">eq</span> <span class="nv">ws</span> <span class="ss">&#39;ns</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nv">set-face-attribute</span> <span class="ss">&#39;default</span> <span class="no">nil</span>
+</span><span class='line'>                             <span class="ss">:family</span> <span class="s">&quot;Ricty&quot;</span>  <span class="c1">;; 英数</span>
+</span><span class='line'>                             <span class="ss">:height</span> <span class="mi">140</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nv">set-fontset-font</span> <span class="no">nil</span> <span class="ss">&#39;japanese-jisx0208</span> <span class="p">(</span><span class="nv">font-spec</span> <span class="ss">:family</span> <span class="s">&quot;Ricty&quot;</span><span class="p">)))))</span>  <span class="c1">;; 日本語</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; スタートアップ非表示</span>
+</span><span class='line'><span class="p">(</span><span class="k">setq</span> <span class="nv">inhibit-startup-screen</span> <span class="no">t</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; scratchの初期メッセージ消去</span>
+</span><span class='line'><span class="p">(</span><span class="k">setq</span> <span class="nv">initial-scratch-message</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; ツールバー非表示</span>
+</span><span class='line'><span class="p">(</span><span class="nv">tool-bar-mode</span> <span class="mi">-1</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; メニューバーを非表示</span>
+</span><span class='line'><span class="p">(</span><span class="nv">menu-bar-mode</span> <span class="mi">-1</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; スクロールバー非表示</span>
+</span><span class='line'><span class="p">(</span><span class="nv">set-scroll-bar-mode</span> <span class="no">nil</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; 行番号表示</span>
+</span><span class='line'><span class="p">(</span><span class="nv">global-linum-mode</span> <span class="no">t</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">set-face-attribute</span> <span class="ss">&#39;linum</span> <span class="no">nil</span>
+</span><span class='line'>                    <span class="ss">:foreground</span> <span class="s">&quot;#800&quot;</span>
+</span><span class='line'>                    <span class="ss">:height</span> <span class="mf">0.9</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; タイトルバーにファイルのフルパス表示</span>
+</span><span class='line'><span class="p">(</span><span class="k">setq</span> <span class="nv">frame-title-format</span>
+</span><span class='line'>      <span class="p">(</span><span class="nb">format</span> <span class="s">&quot;%%f - Emacs@%s&quot;</span> <span class="p">(</span><span class="nv">system-name</span><span class="p">)))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; 選択領域の色</span>
+</span><span class='line'><span class="p">(</span><span class="nv">set-face-background</span> <span class="ss">&#39;region</span> <span class="s">&quot;#555&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; 行末の空白を強調表示</span>
+</span><span class='line'><span class="p">(</span><span class="nv">setq-default</span> <span class="nv">show-trailing-whitespace</span> <span class="no">t</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">set-face-background</span> <span class="ss">&#39;trailing-whitespace</span> <span class="s">&quot;#b14770&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; タブをスペースで扱う</span>
+</span><span class='line'><span class="p">(</span><span class="nv">setq-default</span> <span class="nv">indent-tabs-mode</span> <span class="no">nil</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; タブ幅</span>
+</span><span class='line'><span class="p">(</span><span class="nv">custom-set-variables</span> <span class="o">&#39;</span><span class="p">(</span><span class="nv">tab-width</span> <span class="mi">4</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; 行間</span>
+</span><span class='line'><span class="p">(</span><span class="nv">setq-default</span> <span class="nv">line-spacing</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; 1行ずつスクロール</span>
+</span><span class='line'><span class="p">(</span><span class="k">setq</span> <span class="nv">scroll-conservatively</span> <span class="mi">35</span>
+</span><span class='line'>      <span class="nv">scroll-margin</span> <span class="mi">0</span>
+</span><span class='line'>      <span class="nv">scroll-step</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">setq</span> <span class="nv">comint-scroll-show-maximum-output</span> <span class="no">t</span><span class="p">)</span> <span class="c1">;; shell-mode</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; フレームの透明度</span>
+</span><span class='line'><span class="p">(</span><span class="nv">set-frame-parameter</span> <span class="p">(</span><span class="nv">selected-frame</span><span class="p">)</span> <span class="ss">&#39;alpha</span> <span class="o">&#39;</span><span class="p">(</span><span class="mf">0.85</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; モードラインに行番号表示</span>
+</span><span class='line'><span class="p">(</span><span class="nv">line-number-mode</span> <span class="no">t</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; モードラインに列番号表示</span>
+</span><span class='line'><span class="p">(</span><span class="nv">column-number-mode</span> <span class="no">t</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; yes or noをy or n</span>
+</span><span class='line'><span class="p">(</span><span class="nv">fset</span> <span class="ss">&#39;yes-or-no-p</span> <span class="ss">&#39;y-or-n-p</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>3.3 追記</h2>
+
+<p>上記のような設定を<code>init.el</code>にだらだらと書いたら，<code>init-loader</code>なるものを見つけたので，後述する．また，<code>init.el</code>に設定を追記したものの，ちゃんと機能しているかが不安というときは，式の後ろで<code>C-x C-e</code>を実行するとlisp式を評価できるので，これで確認すると良い．</p>
+
+<h1>4. パッケージ管理</h1>
+
+<p>Emacsのパッケージ管理が必要となるが，どうやらいろいろあるようだ．</p>
+
+<ul>
+<li>package.elを使う</li>
+<li>Cask,Palletを使う</li>
+</ul>
+
+<p>後者の方が便利らしい．よくわからないのでとりあえずどちらも見ておく．</p>
+
+<h2>4.1 package.el</h2>
+
+<p>Emacsのパッケージは，リポジトリにまとまって公開されている．</p>
+
+<ul>
+<li>GNU ELPA
+
+<ul>
+<li>公式のリポジトリ</li>
+<li>デフォルトではこれのみ利用可能</li>
+</ul></li>
+<li>MELPA
+
+<ul>
+<li>非公式のリポジトリ</li>
+<li>リポジトリに変更があるたびに更新されるため，最新版をインストール可能</li>
+</ul></li>
+</ul>
+
+<p>上記のようなリポジトリを登録したのちに，インストールしたいパッケージを指定する，という流れになる．リポジトリ情報は<code>package-archives</code>変数に格納されているので，新規に追加する場合はこれをいじる．以下が設定例．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;package</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; MELPAを追加</span>
+</span><span class='line'><span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;package-archives</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;melpa&quot;</span> <span class="o">.</span> <span class="s">&quot;http://melpa.milkbox.net/packages/&quot;</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; 初期化</span>
+</span><span class='line'><span class="p">(</span><span class="nv">package-initialize</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>指定したパッケージをインストールするには，<code>M-x package-install</code>を実行する．更新は<code>M-x package-refresh-contents</code>．</p>
+
+<p>以上がパッケージをインストールする流れになるが，環境が変わった際にいちいちパッケージをインストールしなおすのは面倒．そこで，<code>package.el</code>にインストールすべきパッケージを記載しておき，これを実行すれば同様の環境が構築できるようにしておく．</p>
+
+<p><code>(package-installed-p package-name)</code>で<code>package-name</code>がインストール済みかどうか確認できるため，これが<code>nil</code>を返すようなパッケージについてインストールすれば，同様の環境が構築できる．<code>package.el</code>に必要なパッケージを記述し(例は省略)，<code>M-x eval-buffer</code>を実行することでパッケージ群をインストールできる．便利．</p>
+
+<blockquote>
+<p><a href="http://emacs-jp.github.io/packages/package-management/package-el.html">package.el - Emacs JP</a></p>
+</blockquote>
+
+<h2>4.2 Cask</h2>
+
+<p><code>package.el</code>は便利だなーと思ったけれど，最近だと<code>Cask</code>なるものを使うらしい．<code>Cask</code>は，ざっくりいうとパッケージ管理システム．パッケージの依存関係をみながらライブラリを管理してくれる，のかな？</p>
+
+<p><code>package.el</code>もライブラリの依存関係を考慮して必要ライブラリを一括でダウンロードできるが，個人の設定であるため<code>~./emacs.d</code>にダウンロードするのが前提．<br>
+よって，ライブラリ開発で利用するのには向かない．<code>Cask</code>は Cask ファイルに依存しているライブラリを記述することで，一括ダウンロードや<code>PATH</code>，<code>load-path</code>の調整をしてくれる．</p>
+
+<h3>4.2.1 Caskのインストール</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew install cask
+</span></code></pre></td></tr></table></div></figure>
+
+<h3>4.2.2 Caskファイルの初期化</h3>
+
+<p><code>~/.emacs.d</code>(設定ファイルが置かれた場所)で<code>cask init</code>．<br>
+<code>Cask</code>というファイルができるため，今後このファイルでパッケージを管理する．<br>
+本ファイルには，すでにCaskオススメのパッケージが依存関係として記述されているので，これを好みに記述し直していけば良い．</p>
+
+<h3>4.2.3 Caskファイルの記述</h3>
+
+<h4>source</h4>
+
+<p>パッケージリポジトリを指定する．<br>
+現状，gnu, melpa, marmalade, SC, orgが指定可能．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nv">source</span> <span class="nv">gnu</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">source</span> <span class="nv">melpa</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h4>depends-on</h4>
+
+<p>インストールするパッケージをいろいろ書いていく．指定方法は以下が可能．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span> <span class="s">&quot;0.8.1&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span> <span class="ss">:git</span> <span class="s">&quot;https://github.com/magit/magit.git&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span> <span class="ss">:git</span> <span class="s">&quot;https://github.com/magit/magit.git&quot;</span> <span class="ss">:ref</span> <span class="s">&quot;7j3bj4d&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span> <span class="ss">:git</span> <span class="s">&quot;https://github.com/magit/magit.git&quot;</span> <span class="ss">:branch</span> <span class="s">&quot;next&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span> <span class="ss">:git</span> <span class="s">&quot;https://github.com/magit/magit.git&quot;</span> <span class="ss">:files</span> <span class="p">(</span><span class="s">&quot;*.el&quot;</span> <span class="p">(</span><span class="ss">:exclude</span> <span class="s">&quot;magit-svn.el&quot;</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h3>4.2.4 ライブラリのインストール</h3>
+
+<p><code>Cask</code>に記述されたライブラリがインストールされる．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>cask install
+</span></code></pre></td></tr></table></div></figure>
+
+<h3>4.2.5 インストールされたパッケージにパスを通す</h3>
+
+<p>cask.elをロードし，cask-initializeを呼ぶ．こうすることで，load-path，autoloadの設定を読み込んでくれる．<br>
+<code>init.el</code>に以下を記述．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="c1">;; homebrewで導入したtool用のpathを追加</span>
+</span><span class='line'><span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;load-path</span> <span class="s">&quot;/usr/local/share/emacs/site-lisp&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; ------------------------------------------------------------------------</span>
+</span><span class='line'><span class="c1">;; @ Cask設定</span>
+</span><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;cask</span> <span class="s">&quot;cask.el&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">cask-initialize</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h3>4.2.6 おまけ</h3>
+
+<p>とりあえず初期設定のままでパッケージをインストールした．暇なときに以下のサイトを見たりしておく．</p>
+
+<blockquote>
+<p><a href="http://posaune.hatenablog.com/entry/2014/06/17/221041">Cask init して入ってくるライブラリ一覧 - 亀岡的プログラマ日記</a></p>
+
+<p><a href="https://github.com/cask/cask">Cask</a><br>
+<a href="http://kiririmode.hatenablog.jp/entry/20141228/1419762171">Cask とは何であるのか、および init.el が非常にシンプルになった件</a><br>
+<a href="http://www.kaichan.info/blog/2014-02-23-emacs-cask.html">Emacs Lispのテスト、依存性管理、CI</a><br>
+<a href="http://d.hatena.ne.jp/syohex/20140424/1398310931">package.elから Caskに切り替えました</a></p>
+</blockquote>
+
+<h1>5. init-loaderによる設定ファイルの分割</h1>
+
+<p><code>init-loader</code>は，指定したディレクトリ内のelファイルを読み込んでくれるelisp．それだけではなく，ファイル名を見て環境に合わせて読み込んでくれたり，エラーのあるファイルをスルーしてくれたりする．他にも，環境依存な設定を分離できたりするので便利．</p>
+
+<h2>5.1 init-loaderインストール</h2>
+
+<p>Caskを導入したので，利用してパッケージをいれる．Caskファイルにinit-loaderを追加．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;init-loader&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>インストール</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>cask install
+</span></code></pre></td></tr></table></div></figure>
+
+<p>アップデート</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>cask update
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>5.2 設定ファイル記述</h2>
+
+<p><code>inits</code>フォルダの中に設定ファイルを書いていく．ファイルは以下の設定に従って作成していく．</p>
+
+<ul>
+<li>環境に依存しない設定はファイル名の最初に2けたの数字をつける
+
+<ul>
+<li>番号は優先度．00が最初，99が最後に読み込まれる</li>
+<li>同じ数字も可</li>
+</ul></li>
+<li>環境依存な設定は各環境のプレフィックスをファイル名の最初につける</li>
+</ul>
+
+<p>プレフィックスは以下</p>
+
+<table><thead>
+<tr>
+<th>環境</th>
+<th>prefix</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Meadow</td>
+<td>meadow</td>
+</tr>
+<tr>
+<td>Carbon Emacs</td>
+<td>carbon-emacs</td>
+</tr>
+<tr>
+<td>Cocoa Emacs</td>
+<td>cocoa-emacs</td>
+</tr>
+<tr>
+<td>emacs -nw</td>
+<td>nw</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>windows</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>linux</td>
+</tr>
+</tbody></table>
+
+<h2>5.3 設定の反映</h2>
+
+<p><code>inits.el</code>に設定追記</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="c1">;;; init-loader 設定</span>
+</span><span class='line'><span class="c1">;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;</span>
+</span><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;init-loader</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">setq</span> <span class="nv">init-loader-show-lod-after-init</span> <span class="s">&quot;error-only&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">init-loader-load</span> <span class="s">&quot;~/.emacs.d/inits&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p><code>C-x C-e</code>で評価してエラーがないか確かめたら，一度終了して<code>emacs</code>コマンドでemacsを再起動．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="nv">-------</span> <span class="nb">error</span> <span class="nb">log</span> <span class="nv">-------</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nv">-------</span> <span class="nv">init</span> <span class="nb">log</span> <span class="nv">-------</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">loaded</span> <span class="nv">/Users/hogehoge/.emacs.d/inits/00_hoge.</span> <span class="mf">0.002511</span>
+</span><span class='line'><span class="nv">loaded</span> <span class="nv">/Users/hogehoge/.emacs.d/inits/01_hoge.</span> <span class="mf">0.00703</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">-------</span> <span class="nb">load</span> <span class="nv">path</span> <span class="nv">-------</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">/Users/hogehoge/.emacs.d/inits</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>エラーがなく，inits内のファイルが呼び出されていることが確認できる．設定ファイルの分け方はまた考える．</p>
+
+<blockquote>
+<p><a href="http://tech.kayac.com/archive/divide-dot-emacs.html">.emacs分割のすゝめ</a><br>
+<a href="https://github.com/emacs-jp/init-loader">emacs-jp/init-loader</a><br>
+<a href="http://block-given.hatenablog.com/entry/2014/11/09/134725">モダンなEmacsを求めて (3) init-loaderで設定ファイルを分割する</a><br>
+<a href="http://qiita.com/catatsuy/items/5f1cd86e2522fd3384a0">init-loader.el と package.el を導入して快適 Emacs ライフ</a><br>
+<a href="http://blog.shibayu36.org/entry/2013/12/03/213942">自分流の .emacs管理</a></p>
+</blockquote>
+
+<h2>6. 最終的に</h2>
+
+<p>Caskとinit-loaderを導入した．<br>
+ので，次はどのパッケージを導入するか？設定(と，その分割)をどうするか？を考える．</p>
+
+<p>設定については，どんなものがあるのかわからないし，いろんな人の.emacs.dを参考にする．</p>
+
+<blockquote>
+<p><a href="https://github.com/shibayu36/emacs/tree/master/emacs.d">shibayu36/emacs</a><br>
+<a href="https://github.com/shomah4a/.emacs.d">shomah4a/.emacs.d</a><br>
+<a href="https://github.com/catatsuy/dot.emacs.d">catatsuy/dot.emacs.d</a><br>
+<a href="https://github.com/gongo/elfactory">gongo/elfactory</a></p>
+</blockquote>
+
+<h2>6.1 導入パッケージ</h2>
+
+<p>下記サイトを参考にいくつか</p>
+
+<blockquote>
+<p><a href="http://qiita.com/hottestseason/items/1e8a46ad1ebcf7d0e11c#2-3">Emacsパッケージ特集</a></p>
+</blockquote>
+
+<ul>
+<li>init-loader
+
+<ul>
+<li>いわずもがな</li>
+</ul></li>
+<li>auto-complete
+
+<ul>
+<li>字句保管機能</li>
+<li>バッファ内にある文字列を自動的に保管対象にする</li>
+<li>tabを押して選択</li>
+</ul></li>
+<li>popup
+
+<ul>
+<li>emacsでpopupメニューを使う．auto-completeで使われている．<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;auto-complete</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;auto-complete-config</span><span class="p">)</span>    <span class="c1">; 必須ではないですが一応</span>
+</span><span class='line'><span class="p">(</span><span class="nv">global-auto-complete-mode</span> <span class="no">t</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></li>
+</ul></li>
+<li>smartparens
+
+<ul>
+<li>括弧やクォート等の自動挿入・管理<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;smartparens-config</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">smartparens-global-mode</span> <span class="no">t</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></li>
+</ul></li>
+<li>rainbow-delimiters
+
+<ul>
+<li>括弧の対応を色付けする<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;rainbow-delimiters</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;(add-hook &#39;clojure-mode-hook &#39;rainbow-delimiters-mode)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">add-hook</span> <span class="ss">&#39;prog-mode-hook</span> <span class="ss">&#39;rainbow-delimiters-mode</span><span class="p">)</span>
+</span><span class='line'><span class="c1">;(global-rainbow-delimiters-mode)</span>
+</span></code></pre></td></tr></table></div></figure></li>
+</ul></li>
+<li>helm
+
+<ul>
+<li>超絶便利らしいので勉強してみる</li>
+</ul></li>
+<li>ace-jump-mode
+
+<ul>
+<li>特定語句にジャンプする</li>
+<li>練習が必要そう</li>
+</ul></li>
+</ul>
+
+<blockquote>
+<p><a href="http://kiririmode.hatenablog.jp/entry/20131231/p1">smartparens.el での括弧処理</a><br>
+<a href="http://d.hatena.ne.jp/murase_syuka/20140815/1408061850">rainbow-delimiters.elの括弧色付けをデフォルトより強調する方法</a><br>
+<a href="http://dev.ariel-networks.com/wp/documents/aritcles/emacs/part9">「Emacsのトラノマキ」連載第09回「auto-completeを使おう」(松山智大)</a></p>
+</blockquote>
+
+<h1>7. おわりに</h1>
+
+<p>設定は奥が深いようだ．使いながら欲しい機能を探すのがいいだろう．あとは今回設定した中でも，気に入らない設定が出てくるかもしれない．落ち着いたら，設定はgithubで公開したい．<br>
+自作OSの方は8日目くらいまで進んでいるのだけど，まとめが終わっていない．明日はそちらをまとめることを目標にする．</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[自作OS3日目]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/02/26/title/"/>
+    <updated>2015-02-26T00:13:10+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/02/26/title</id>
+    <content type="html"><![CDATA[<p>3日目です．</p>
+
+<!-- more -->
+
+<p>余計なことをしていたら，結構時間がかかってしまった．現在進めている本は2006年の本なので，実はかなり情報が古い．でも，OSの根本の部分ってそんな簡単に変わらないと思うので，無駄になることはないはずだ．多分．また，組み込みOSの方はたぶんCPUとかの組み立てからやるのだけど，レジスタとかメモリとか利用していると実際にそれらを見てみたくなるのはわかる．余裕があればいつかやってみたいな．そっちは2010年でまだ新しいしね．<br>
+前回同様やったことの整理をする．</p>
+
+<h1>2日目</h1>
+
+<h3>今まで</h3>
+
+<ol>
+<li>naskでアセンブリコードからディスクイメージ全体を生成する</li>
+<li>qemuでエミュレートする</li>
+</ol>
+
+<h3>これから</h3>
+
+<ol>
+<li>naskにはアセンブリコードからブートセクタを生成してもらう</li>
+<li>ディスクイメージは，edimg(筆者作のディスクイメージ管理ツール) を使用して生成する</li>
+<li>qemuでエミュレートする</li>
+</ol>
+
+<h3>つまり</h3>
+
+<p>Makefileが以下のように書きかわるというワケ．</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>run :
+</span><span class='line'>  ../../z_tools/nask helloos.nas helloos.img
+</span><span class='line'>  cp helloos.img ../../z_tools/qemu/fdimage0.bin
+</span><span class='line'>  make -C ../../z_tools/qemu</span></code></pre></td></tr></table></div></figure>
+
+<p>↓</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ipl.bin : ipl.nas Makefile
+</span><span class='line'>  ../../z_tools/nask ipl.nas ipl.bin ipl.lst
+</span><span class='line'>helloos.img : ipl.bin Makefile
+</span><span class='line'>  ../../z_tools/edimg   imgin:../../z_tools/fdimg0at.tek \
+</span><span class='line'>  wbinimg src:ipl.bin len:512 from:0 to:0   imgout:helloos.img
+</span><span class='line'>img :
+</span><span class='line'>  make -r helloos.img
+</span><span class='line'>run :
+</span><span class='line'>  make img
+</span><span class='line'>  cp helloos.img ../../z_tools/qemu/fdimage0.bin
+</span><span class='line'>  make -C ../../z_tools/qemu</span></code></pre></td></tr></table></div></figure>
+
+<h1>3日目</h1>
+
+<p>アセンブラの命令とかレジスタの略称とかをまとめた用紙を作った．すぐわからなくなる．<br>
+今まで作っていたのはIPL(初期プログラムローダ)というらしい．今回はOS本体のプログラムをロードするまでが目的(即ち，IPLの完成)．<br>
+IPLにはフロッピーディスクの全情報を読み込ませる(実際にはシリンダー10まで)．OS本体はC言語とアセンブリ言語を組み合わせて記述し，ロードする．</p>
+
+<p>コンパイル時に様々な中間言語が登場する．かなり回りくどい．でも，こういう中身を知っておくのは大事だと思う(だからこそ自作OSに手を出してる部分もある)．</p>
+
+<p>とりあえず，真っ黒な画面を生成しただけだけど今回はおしまい．</p>
+
+<h1>雑記</h1>
+
+<p>書籍の古さもあって，出来上がりのGUIが一昔前のOSになりそう．フロッピーディスクも今時使えないし．</p>
+
+<ul>
+<li>GUIを今風にする</li>
+<li>USBからブートする</li>
+</ul>
+
+<p>の2点がこの本から発展した個人的な課題になりそう．とりあえず，見れるものを作っておきたい．</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[自作OS2日目]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/02/24/title/"/>
+    <updated>2015-02-24T16:48:16+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/02/24/title</id>
+    <content type="html"><![CDATA[<p>間が空いて2日目です．</p>
+
+<!-- more -->
+
+<p>わからないことについて調べながらだと，膨大な時間がかかるなぁと気づいてしまった．4月までに終わるといいな，くらいの認識．また，こういう風に本を使った学習だと，たまに，自分は今一体何をしようとしているのか？見失ってしまうことがある．整理の意味も込めて，前回と今回でやったことを簡単にまとめておく．</p>
+
+<h1>1日目</h1>
+
+<ul>
+<li>目標：ブートセクタを作る
+
+<ul>
+<li>ブートセクタって？
+
+<ul>
+<li>OSを呼び出すためのプログラムが格納された，ハードディスク上の一部分(セクタ)のこと</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<ol>
+<li><p>まずは，バイナリエディタでディスクイメージファイルを書く</p>
+
+<ul>
+<li>バイナリエディタって？
+
+<ul>
+<li>2進数をかくやつ</li>
+</ul></li>
+<li>ディスクイメージファイルって？
+
+<ul>
+<li>仮想イメージファイルとも</li>
+<li>ファイルシステムの完全な内容と構造を1つのファイルに格納したデータのこと</li>
+</ul></li>
+<li>なぜバイナリエディタで？
+
+<ul>
+<li>コンピュータの心臓はCPU</li>
+<li>CPUは機械語の通りに電気信号を他の回路とやりとりする</li>
+<li>電気信号はON/OFFの2通りしかない</li>
+<li>なので，機械語も1/0の2通りしかない</li>
+<li>つまり，バイナリエディタで書ける</li>
+</ul></li>
+</ul></li>
+<li><p>バイナリエディタで開発は無理があったので，アセンブリ言語で書く</p>
+
+<ul>
+<li>DB命令，RESB命令等ですっきりしたコードがかける</li>
+<li>アセンブラは<code>nask</code>を使う</li>
+<li><code>nasm(netwide assembler)</code>というフリーのアセンブラの派生？</li>
+</ul></li>
+</ol>
+
+<h1>2日目</h1>
+
+<ol>
+<li>アセンブリ言語のコードをもう少し見やすくした(アセンブリ言語の勉強)</li>
+<li>Makefileについて勉強した</li>
+</ol>
+
+<h1>わからないこと</h1>
+
+<p><code>tolsetOSX</code>と<code>Q.app</code>が何をしているのか．</p>
+
+<h1>雑記</h1>
+
+<p>やることがつまっているのにうまくやる気が出せない．根性が必要．生活を豊かにするために，とりあえず積極的に自炊することにした．やりたいことがでてくるとお金に困りそうなので，アルバイトについても少し考えておく．</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[読書：伽藍とバザール]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/02/23/title/"/>
+    <updated>2015-02-23T15:31:21+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/02/23/title</id>
+    <content type="html"><![CDATA[<p>概要と気づいたことなどメモ．</p>
+
+<!-- more -->
+
+<h1>Motivation</h1>
+
+<p>論文『伽藍とバザール』を読んだ．ソフトウェア工学というキーワードでネットサーフィンしたらみかけて，タイトルが気になったので．本稿はオープンソース・ムーブメントの理論的指導者，エリック・レイモンドにより書かれたもの．その概要と気づいたことなどを簡単にまとめておく．</p>
+
+<h1>伽藍形式とバザール形式</h1>
+
+<p><strong>伽藍形式</strong>とは，従来のソフトウェア開発手法のことを指す．特に，OSやEmacs等の大規模ソフトウェアは，少数精鋭の閉じたコミュニティで粛々と伽藍のように作成されるべき，とされていた．<br>
+<strong>バザール形式</strong>とは，オープンソース開発のような自由で開けた開発を指す．高頻度のリリースを行い，任せられるものはなんでも他人に任せて，バザールのように騒々しくオープンに開発された．この形式を用いた例として，Linuxが挙げられている．<br>
+  この二者のうち，後者が特に良い結果を生み出すことができる(場合もある)として紹介されている．</p>
+
+<h1>バザール形式の利点とは?</h1>
+
+<p>利点というか，こんな形式でも安定したシステムを作り上げることができるということ自体が驚きだという話．しかも，高品質で満足のいく品が出来上がる．では，なぜそんなことができたのだろう? 従来の開発手法との違いはどこにあったのだろう?</p>
+
+<h1>バザール形式の成功した理由とは?</h1>
+
+<p>バザール形式の特徴は，「分散性」と「多様性」と「集合知」であると言われている．本形式では数多くの参加者による作業分担が行われる．この場合，作業の重複が懸念されるが，高頻度のリリースによりそのリスクも削減される．<br>
+経済学の用語として<strong>デルファイ効果</strong>というものが説明されていた．噛み砕くと，一人の技術者に意見を仰ぐより，同等の技術者住人から意見を聞いて，それを平均化した方が良いというもの．リーヌスも，「問題を理解してそれを直す人物は、必ずしもどころか普通は同一人物ではない。だれかが問題を見つける。そしてそれを理解するのはだれか別の人なんだ。」と言っている．人はそれぞれ異なる観点を持つため，バザール形式では参加人数が多いほどバグの発見数も増える．そして，その修正は他の誰かに任せることができる．<br>
+従来の開発手法では，このようなバグの発見に少人数が何ヶ月もの時間を費やす．その結果リリースの間隔が大きくなり，その結果リリースが完璧でない場合の失望が大きい．しかし，バザール方式ではこのようなバグは深刻な問題ではない．誰かがそれを発見し，それを直すためにリリースは増え，たまにヘマがあったところで，失うものは多くない．</p>
+
+<h1>伽藍形式との比較</h1>
+
+<p>従来のソフトウェア開発とバザール形式を比較して，レイモンドは以下のようなことを言っている．</p>
+
+<blockquote>
+<p>オープンソースが成功した理由の一部は、その文化がプログラミング人 口のトップ 5% しか受け入れないからだ、と信じている。彼女は、残り 95% の動員を組織するのに時間を費やしている。<br>
+&#8230;<br>
+もし伝統的なソフト管理の唯一の機能が、一番使えないやつらを、せめて損害は出さずにトントンに持っていくくらいだとしたら、そんな仕事は何の価値もないんじゃないか</p>
+</blockquote>
+
+<p>さらに，以下のように締めくくられる．</p>
+
+<blockquote>
+<p>ぼくたちは、もっといいソフトがつくれることを示しただけじゃない。よろこびが資産であることを証明してもいるんだ。<br>
+&#8230;<br>
+人間は仕事をするとき、それが最適な挑戦ゾーンになっていると、いちばん嬉しい。簡単すぎて退屈でもいけないし。達成不可能なほどむずかしくてもダメだ。シヤワセなプログラマは、使いこなされていないこともなく、どうしようもない目標や、ストレスだらけのプロセスの摩擦でげんなりしていない。<br>
+&#8230;<br>
+オープンソースの成功のいちばんだいじな影響の一つというのは、いちばん頭のいい仕事の仕方は遊ぶことだということを教えてくれることかもしれない。</p>
+</blockquote>
+
+<p>やりたいことをやる，という当たり前のことが，結果的に製品の品質や生産性の向上につながる．<a href="http://www.lifehacker.jp/2012/08/120824google8020rule.html">Googleの20%ルールの話</a>や，少し気色が異なるけど，<a href="http://www.ted.com/talks/simon_sinek_how_great_leaders_inspire_action?language=ja">Appleのゴールデンサークルの話</a>を思い出した．<br>
+これは本当に個人的な話になるけど，自分の場合は「やりたいこと」というのが今の所あまりはっきりしていないので，これは本当に大切なことなんだなぁと他人事みたいにしか思えない．</p>
+
+<p>論文には著者の教訓が記されている．最後に，そのうちのいくつかを紹介しておく．</p>
+
+<blockquote>
+<ul>
+<li>よいソフトはすべて、開発者の個人的な悩み解決から始まる。</li>
+<li>まともな行動をとってれば、おもしろい問題のほうからこっちを見つけだしてくれる。</li>
+<li>おもしろい問題を解決するには、まず自分にとっておもしろい問題を見つけることから始めよう。</li>
+</ul>
+</blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[自作OS1日目]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/02/17/title/"/>
+    <updated>2015-02-17T00:28:46+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/02/17/title</id>
+    <content type="html"><![CDATA[<h2>Motivation</h2>
+
+<p>前々から勉強しようと思っていた<a href="">この本</a>にやっと手をつけました．</p>
+
+<!-- more -->
+
+<p>以下，自分の環境です．</p>
+
+<ul>
+<li>Mac OS X Yosemite</li>
+</ul>
+
+<h2>やったこと</h2>
+
+<p>Windows用に書かれている本なので，Macで実行するためには工夫が必要になる．以下のサイトを参考にしました．先人に感謝します．</p>
+
+<blockquote>
+<p><a href="https://github.com/sandai/30nichideosjisaku">『30日でできる！ OS自作入門』川合 秀実氏(著)のMacOSX開発環境を整えることができます</a></p>
+</blockquote>
+
+<p>エディタは<a href="http://www.suavetech.com/0xed/">0xED</a>を使用．1日目は，とりあえず恒例のHello, Worldをやった．仮想環境での実行なので，あまり実感はないけど&#8230;</p>
+
+<h1>感想</h1>
+
+<p>馬鹿正直にバイナリエディタで手書きした後にアセンブラで手書きした．何もわかってないけど，とりあえずできた!って感じ．明日からわくわくである．<br>
+<a href="http://www.amazon.co.jp/12%E3%82%B9%E3%83%86%E3%83%83%E3%83%97%E3%81%A7%E4%BD%9C%E3%82%8B%E7%B5%84%E8%BE%BC%E3%81%BFOS%E8%87%AA%E4%BD%9C%E5%85%A5%E9%96%80-%E5%9D%82%E4%BA%95-%E5%BC%98%E4%BA%AE/dp/4877832394/ref=sr_1_2?ie=UTF8&amp;qid=1424273418&amp;sr=8-2&amp;keywords=OS%E8%87%AA%E4%BD%9C%E5%85%A5%E9%96%80">組み込み0S自作入門</a>も購入してある．こっちを進める予定はしばらくないけど，気が向いたらちょこちょこ読んでみようかなぁ．</p>
+
+<h1>雑記</h1>
+
+<p><a href="http://www.amazon.co.jp/Land-Lisp-M-D-Conrad-Barski/dp/4873115876/ref=sr_1_1?ie=UTF8&amp;qid=1424274333&amp;sr=8-1&amp;keywords=land+on+lisp">Land of Lisp</a>を買いました．読みきれるだろうか．読み切りたい．積み本が増える&#8230;</p>
+
+<h1>参考サイト</h1>
+
+<blockquote>
+<p><a href="http://d.hatena.ne.jp/sandai/20120728/p2">初めてのC言語で『30日でできる！OS自作入門』の通りに初めてのOSを作ってみた</a></p>
+</blockquote>
+]]></content>
+  </entry>
+  
+</feed>

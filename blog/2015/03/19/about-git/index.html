@@ -1,0 +1,782 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Gitの基礎知識をまとめたよ - tasuwo blog</title>
+  <meta name="author" content="tasuwo">
+
+  
+  <meta name="description" content="Gitについてまとめる GitHubを本格的に利用し始めたので．
+基本的な知識は，公式ドキュメントを参照すれば身につくと思う．今回は必要最低限の知識をメモしておく．飽くまで自分用メモ． Gitって何？というのは省略する．途中，よく使うコマンドをいくつかあげるけど， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tasuwo.github.io/blog/2015/03/19/about-git">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="tasuwo blog" type="application/atom+xml">
+  <link href="/stylesheets/data-table.css" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-60860415-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">tasuwo blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:tasuwo.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Gitの基礎知識をまとめたよ</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-03-19T02:02:03+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:02 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tasuwo.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>Gitについてまとめる</h2>
+
+<p>GitHubを本格的に利用し始めたので．<br>
+基本的な知識は，<a href="http://git-scm.com/book/ja/v1/%E4%BD%BF%E3%81%84%E5%A7%8B%E3%82%81%E3%82%8B">公式ドキュメント</a>を参照すれば身につくと思う．今回は必要最低限の知識をメモしておく．飽くまで自分用メモ．</p>
+
+<!-- more -->
+
+<p>Gitって何？というのは省略する．途中，よく使うコマンドをいくつかあげるけど，まずは読み飛ばして後から確認したほうがいいかもしれない．</p>
+
+<h1>1. はじめようGit</h1>
+
+<p>Gitのはじめ方は二種類ある．</p>
+
+<ol>
+<li>ローカルのディレクトリにGitを導入する</li>
+<li>サーバに公開されているGitプロジェクトを導入する</li>
+</ol>
+
+<p>それぞれ以下のコマンドを用いる．</p>
+
+<ol>
+<li><code>git init</code>
+
+<ul>
+<li><code>.git</code>ディレクトリを生成する</li>
+<li>リポジトリに必要な全てのファイルがその中に格納される</li>
+<li>Gitディレクトリ，ステージングエリアが準備される</li>
+</ul></li>
+<li><code>git clone [url]</code>
+
+<ul>
+<li>既存のGitリポジトリのコピーを取得する</li>
+<li>サーバが保持しているデータをほぼ全てコピーする</li>
+</ul></li>
+</ol>
+
+<p><code>2.</code>はひとまずおいておく．<code>1.</code>の話をしていきます．</p>
+
+<h1>2. Gitでずばりやることとは</h1>
+
+<p>Git は3つのデータ領域から構成される．</p>
+
+<ul>
+<li><strong>作業ディレクトリ</strong>(ワークツリー)
+
+<ul>
+<li>作業ファイルなどを保持しているディレクトリ</li>
+</ul></li>
+<li><strong>ステージングエリア</strong>(インデックス)
+
+<ul>
+<li>次のコミットに何が含まれるかに関しての情報を蓄えたファイル</li>
+<li>Gitディレクトリに含まれる</li>
+</ul></li>
+<li><strong>Gitディレクトリ</strong>
+
+<ul>
+<li>プロジェクトのためのメタデータとオブジェクトのデータベースがある所</li>
+</ul></li>
+</ul>
+
+<p>フォルダ構成のイメージは↓こんなかんじ．</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>root          ;; 作業ディレクトリ
+</span><span class='line'>├ test.txt    ;; 作業ファイル
+</span><span class='line'>└ .git        ;; Gitディレクトリ
+</span><span class='line'>　├ index     ;; ステージング・エリア
+</span><span class='line'>　├ config
+</span><span class='line'>　...</span></code></pre></td></tr></table></div></figure>
+
+<p><code>root</code>ディレクトリで<code>git init</code>を実行すると，上記のような<code>.git</code>フォルダが作成されて，3つの領域が準備される，という仕組み．</p>
+
+<p>ここで，作業ディレクトリはわかるけれど，ステージングエリアとGitディレクトリは一体何なのか．<br>
+Gitはバージョン管理システムだから，当然システムの状態を時系列順に保持しておく必要がある．その保存のための場所が<strong>Gitディレクトリ</strong>である．<br>
+ただ，作業が一区切りついた時に，ファイルA の変更は保存しておきたいけど，ファイルB の変更はまだ保存しなくていいな&#8230;なんてことがあると思う．こういう時のための準備用の領域として用意されてるのが<strong>ステージングエリア</strong>である．<br>
+作業して色々なファイルを変更した後，ステージングエリアにどのファイルの変更内容を保存するか通知しておき，それを元にGitディレクトリに変更内容を保存する，という流れ．箇条書きにすると↓のようなかんじ．</p>
+
+<ol>
+<li><strong>作業ディレクトリ</strong>で作業して，一区切りつく</li>
+<li>保存しておきたいファイルを<strong>ステージングエリア</strong>に通知する</li>
+<li><strong>ステージングエリア</strong>を元に<strong>Gitディレクトリ</strong>にシステムの状態を保存する</li>
+</ol>
+
+<p>そして，このデータ領域間のファイル操作のために<code>git</code>コマンドを用いる，というのがGitの基本．主に用いるコマンドは↓のようなかんじ．</p>
+
+<ul>
+<li><code>git add &lt;filepatter&gt; ...</code>
+
+<ul>
+<li><strong>作業ディレクトリ</strong>から<strong>ステージングエリア</strong>に対象ファイルがステージされる</li>
+<li>ディレクトリは独自のツリー構造でステージされる</li>
+</ul></li>
+<li><code>git commit -m &lt;msg&gt;</code>
+
+<ul>
+<li><strong>ステージングエリア</strong>の内容を<strong>Gitディレクトリ</strong>に登録する</li>
+<li>登録すると，変更内容に対して一意のコミットIDが発行される</li>
+<li>一番最近発行されたコミットIDが<code>HEAD</code>となる</li>
+</ul></li>
+<li><code>git reset HEAD &lt;file&gt;</code>
+
+<ul>
+<li><strong>ステージングエリア</strong>を<strong>Gitディレクトリ</strong>のHEAD状態に戻す</li>
+</ul></li>
+<li><code>git checkout -- &lt;file&gt;</code>
+
+<ul>
+<li><strong>作業ディレクトリ</strong>を<strong>ステージングエリア</strong>の状態に戻す</li>
+</ul></li>
+</ul>
+
+<p>上記のコマンドを用いた大まかな作業の流れは↓のようなかんじ</p>
+
+<ol>
+<li>作業ディレクトリで作業する</li>
+<li>作業内容を<strong>ステージングエリア</strong>に<code>git add</code>する</li>
+<li><strong>ステージングエリア</strong>の内容を<strong>Gitディレクトリ</strong>に<code>git commit</code>する</li>
+<li>再び作業する</li>
+<li>変更したファイルを<strong>ステージングエリア</strong>に<code>git add</code>する</li>
+<li><strong>Gitディレクトリ</strong>に<code>git commit</code>する</li>
+<li>〜繰り返し〜</li>
+</ol>
+
+<h1>3. Gitのデータ構造に関する予備知識</h1>
+
+<p>説明したこと．</p>
+
+<ul>
+<li>作業ディレクトリでファイルを編集する</li>
+<li>ステージングエリアに変更内容を準備する</li>
+<li>Gitディレクトリに変更内容を保存する</li>
+<li>これらの作業は<code>git</code>コマンドにより行う</li>
+</ul>
+
+<p>次は，Gitがどういう仕組みでバージョン管理を行っているのかについて説明する．一口にバージョン管理とは言っても，ファイルの変更履歴の格納の仕方には色々ある．一般的なVCSは，各ファイルの基本バージョンからの変更・差分を時系列順に管理すると思う．</p>
+
+<p>↓イメージ</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Version1</th>
+<th style="text-align: center">Version2</th>
+<th style="text-align: center">Version3</th>
+<th style="text-align: center">Version4</th>
+<th style="text-align: center">Version5</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">file A</td>
+<td style="text-align: center">差分1</td>
+<td style="text-align: center">→</td>
+<td style="text-align: center">差分2</td>
+<td style="text-align: center">→</td>
+</tr>
+<tr>
+<td style="text-align: center">file B</td>
+<td style="text-align: center">→</td>
+<td style="text-align: center">→</td>
+<td style="text-align: center">差分1</td>
+<td style="text-align: center">差分2</td>
+</tr>
+<tr>
+<td style="text-align: center">file C</td>
+<td style="text-align: center">差分1</td>
+<td style="text-align: center">差分2</td>
+<td style="text-align: center">→</td>
+<td style="text-align: center">差分3</td>
+</tr>
+</tbody></table>
+
+<p>しかし，Gitの場合はデータをスナップショットの集合として考える．</p>
+
+<ul>
+<li><p>スナップショットって何だよ&#8230;</p>
+
+<ul>
+<li>つまり<strong>その時点のファイル丸ごと</strong>です</li>
+<li>例えば，以下のような 1〜1000000 を記述したファイルがあったとする<br>
+<code>1 2 3 ... 1000000</code></li>
+<li>これをGitディレクトリに commit したとする</li>
+<li>その後，以下のように内容を変更したとする<br>
+<code>1 2 3 ... 1000000 1000001</code></li>
+<li>これをGitディレクトリに commit した場合，どのようなデータがGitディレクトリに格納されるか？</li>
+<li>一般的なVCSなら，<code>1000001</code>の箇所を<strong>差分として保持</strong>する</li>
+<li>一方，Gitは 1〜1000000 を記述したファイルと 1〜1000001 を記述した<strong>両方のファイルを保持</strong>する</li>
+</ul></li>
+<li><p>それってリポジトリが肥大化しない？</p>
+
+<ul>
+<li>画像，映像等のメディアファイルを扱っているとやばいそうです</li>
+<li><code>git media</code>とか<code>git gc</code>とか，色々対策方法はあるようです
+
+<ul>
+<li><a href="http://endorno.github.io/blog/2013/10/06/how-to-use-git-media/">もう巨大なデータをgitignoreしなくていい！ ~git-mediaの使い方~</a></li>
+<li><a href="http://ja.stackoverflow.com/questions/2546/%E8%82%A5%E5%A4%A7%E5%8C%96%E3%81%97%E3%81%9Fgit%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA%E3%81%AB%E3%81%8A%E3%81%84%E3%81%A6%E6%AD%B4%E5%8F%B2%E3%81%AE%E7%B2%92%E5%BA%A6%E3%82%92%E8%90%BD%E3%81%A8%E3%81%95%E3%81%9A%E3%81%AB%E3%82%B5%E3%82%A4%E3%82%BA%E3%82%92%E6%B8%9B%E3%82%89%E3%81%99%E3%81%AB%E3%81%AF">肥大化したGitリポジトリにおいて歴史の粒度を落とさずにサイズを減らすには</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+<p>コミット時に全てのファイルの状態のスナップショットをとり，そのスナップショットへの参照を格納する．ファイルに変更がない場合は，既に格納してある以前の同一ファイルへのリンクを格納する．</p>
+
+<p>↓イメージ(括弧で囲んでいる場所は，過去のオブジェクトを参照している)</p>
+
+<table><thead>
+<tr>
+<th style="text-align: center">Version1</th>
+<th style="text-align: center">Version2</th>
+<th style="text-align: center">Version3</th>
+<th style="text-align: center">Version4</th>
+<th style="text-align: center">Version5</th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: center">A</td>
+<td style="text-align: center">A1</td>
+<td style="text-align: center">(A1)</td>
+<td style="text-align: center">A2</td>
+<td style="text-align: center">(A2)</td>
+</tr>
+<tr>
+<td style="text-align: center">B</td>
+<td style="text-align: center">(B)</td>
+<td style="text-align: center">(B)</td>
+<td style="text-align: center">B1</td>
+<td style="text-align: center">B2</td>
+</tr>
+<tr>
+<td style="text-align: center">C</td>
+<td style="text-align: center">C1</td>
+<td style="text-align: center">C2</td>
+<td style="text-align: center">(C2)</td>
+<td style="text-align: center">C3</td>
+</tr>
+</tbody></table>
+
+<p>また，Gitのデータはすべて，格納される前にチェックサムが取られる．</p>
+
+<ul>
+<li>チェックサムって何だよ&#8230;<br>
+
+<ul>
+<li>誤り検出のためのものです</li>
+<li>データの転送中に情報を失う，もしくは壊れたファイルを取得した場合にGitが検知できるようにするためのものです</li>
+<li>とりあえず，各ディレクトリやファイルに対する<strong>一意の識別子</strong>を算出している，と思っておけば良い</li>
+</ul></li>
+</ul>
+
+<p>Gitがチェックサムに用いる機構は<strong>SHA-1ハッシュ</strong>と呼ばれる．16進数の文字で構成された40文字の文字列で，ファイルの内容もしくはGit内のディレクトリ構造を元に計算される．<br>
+↓みたいな．</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>24b9da6552252987aa493b52f8696cd6d3b00373</span></code></pre></td></tr></table></div></figure>
+
+<h1>4. Gitディレクトリに格納されているcommitオブジェクトとは</h1>
+
+<p>説明したこと．</p>
+
+<ul>
+<li>Gitは差分ではなく，スナップショット(ファイルまるごと)をGitディレクトリに保持している</li>
+<li>Gitディレクトリで扱う各データからは，チェックサムという一意の識別子が算出され，利用される</li>
+</ul>
+
+<p>スナップショットってどうなっているのか？チェックサムってどうやって使っているのか？について説明する．<br>
+<code>git commit</code>を実行すると，ステージングエリアの情報を元にGitディレクトリにシステムの状態が保存される．この時の具体的な処理が↓のようなかんじ．</p>
+
+<ol>
+<li>全てのディレクトリ，ファイルのチェックサムを計算する</li>
+<li>各ファイルの中身を表す<strong>blobオブジェクト</strong>，ディレクトリ構成に加え，blobオブジェクトとファイル名の対応関係を表す<strong>treeオブジェクト</strong>を作成する</li>
+<li>メタデータとtreeオブジェクトへのポインタを含んだ<strong>commitオブジェクト</strong>を作成する</li>
+</ol>
+
+<p>例えば，<code>fileA</code>，<code>fileB</code>，<code>fileC</code>をcommitしたとする．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git add fileA fileB fileC
+</span><span class='line'><span class="nv">$ </span>git commit -m <span class="s1">&#39;initial commit of my project&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>すると，以下のような5つのオブジェクトが作成される．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'> 98ca9...           92ec2..             5d1d3..
+</span><span class='line'><span class="p">|</span>commit         <span class="p">|</span>  <span class="p">|</span>tree            <span class="p">|</span>  <span class="p">|</span>blob       <span class="p">|</span>
+</span><span class='line'>-----------------  ------------------  -------------
+</span><span class='line'><span class="p">|</span>tree    <span class="p">|</span>92ec2 <span class="p">|</span>  <span class="p">|</span>blob<span class="p">|</span>5b1d3<span class="p">|</span>fileA<span class="p">|</span>  <span class="p">|</span>fileAの内容 <span class="p">|</span>
+</span><span class='line'><span class="p">|</span>author  <span class="p">|</span>tasuwo<span class="p">|</span>  <span class="p">|</span>blob<span class="p">|</span>911e7<span class="p">|</span>fileB<span class="p">|</span>
+</span><span class='line'><span class="p">|</span>comitter<span class="p">|</span>tasuwo<span class="p">|</span>  <span class="p">|</span>blob<span class="p">|</span>cda0a<span class="p">|</span>fileC<span class="p">|</span>  911e7..
+</span><span class='line'>                                       <span class="p">|</span>blob       <span class="p">|</span>
+</span><span class='line'>                                       -------------
+</span><span class='line'>                                       <span class="p">|</span>fileBの内容 <span class="p">|</span>
+</span><span class='line'>
+</span><span class='line'>                                       cda0a..
+</span><span class='line'>                                       <span class="p">|</span>blob       <span class="p">|</span>
+</span><span class='line'>                                       -------------
+</span><span class='line'>                                       <span class="p">|</span>fileCの内容 <span class="p">|</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>各テーブルの上部にある<code>98ca9..</code>とか<code>92ec2..</code>とかがチェックサム．これが各オブジェクトの一意の識別子になる．今回は3つのファイルをcommitしたので，各ファイルに対応する3つの<strong>blobオブジェクト</strong>が作成される．さらに，それをまとめた<strong>treeオブジェクト</strong>が作成され，treeオブジェクトへのポインタと，著者やコミッターといったメタデータを保持した<strong>commitオブジェクト</strong>が作成される．</p>
+
+<p>commitを重ねると，commitオブジェクトは前回のcommitオブジェクトへのポインタを保持するようになる(下図において，commitは左から時系列順)．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'> 98ca9..       34ac2..         f30ab..
+</span><span class='line'><span class="p">|</span>commit    <span class="p">|</span>  <span class="p">|</span>commit      <span class="p">|</span>  <span class="p">|</span>commit      <span class="p">|</span>
+</span><span class='line'>------------  --------------  --------------
+</span><span class='line'><span class="p">|</span>...       <span class="p">|</span>  <span class="p">|</span>parent<span class="p">|</span>98ca9<span class="p">|</span>  <span class="p">|</span>parent<span class="p">|</span>34ac2<span class="p">|</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h1>5. ブランチ</h1>
+
+<p>説明したこと．</p>
+
+<ul>
+<li><code>git commit</code>すると，その時のシステムの状態がGitディレクトリに保存される
+
+<ul>
+<li>各ファイルの内容は<strong>blobオブジェクト</strong>として保持される</li>
+<li>blobオブジェクトとファイル名の関係，ディレクトリ構成は<strong>treeオブジェクト</strong>として保持される</li>
+<li>treeオブジェクトとメタデータは<strong>commitオブジェクト</strong>として保持される
+
+<ul>
+<li>commitオブジェクトを参照すれば，1回の commit における全てのデータにアクセスできる</li>
+</ul></li>
+</ul></li>
+<li>commitオブジェクトは直前のcommitオブジェクトへのポインタを保持する
+
+<ul>
+<li>commitオブジェクトは時系列順に数珠繋ぎになっている</li>
+</ul></li>
+</ul>
+
+<p>プロジェクトが進み，commit が重なるにつれて commitオブジェクト は増えて行く．しかし，保存するだけでは意味がない．バージョン管理システムなのだから，過去・現在のcommitオブジェクト間を行ったり来たりできる必要がある．しかし，そのためには特定のcommitオブジェクトを指定する仕組みが必要になる．そのために用意されているポインタが<strong>ブランチ</strong>である．<br>
+各commitオブジェクトはチェックサムで一意に識別できる．そのため，<strong>ブランチ</strong>は特定のコミットを指すチェックサムだけを記録したシンプルなファイルである．<br>
+プロジェクトを進める上で必要不可欠なブランチが1つある．それは，自分の作業している現在位置を示すブランチである．Git 開始時のデフォルトでは，この役割を担う<code>master</code>ブランチが用意されている．<br>
+また，ブランチは複数作成できる．しかしその場合，現在位置を示すブランチがどれなのかわからなくなってしまう．そこで，自分が今現在作業しているブランチを指し示す<strong>HEAD</strong>という特別ポインタが用意されている．HEADとHEADで示されたブランチは，commitにあわせて自動的に指し示す先が変化する．</p>
+
+<p><code>master</code>ブランチを使っていて，3回ほどcommitした場合のポインタの状態は↓のようなかんじ(commitは左から時系列順)．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>                HEAD
+</span><span class='line'>                 ↓
+</span><span class='line'>               master
+</span><span class='line'>                 ↓
+</span><span class='line'><span class="p">|</span>commit<span class="p">|</span> <span class="p">|</span>commit<span class="p">|</span> <span class="p">|</span>commit<span class="p">|</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>ブランチ操作のための<code>git</code>コマンドとしては↓のようなものがある．</p>
+
+<ul>
+<li><code>git branch &lt;new_branch&gt;[&lt;start_point&gt;]</code>
+
+<ul>
+<li>ブランチを作成する</li>
+<li><strong>Gitディレクトリ</strong>では，ブランチが出来る(HEADの位置は変わらない)</li>
+<li><strong>ステージングエリア</strong>では，何も起こらない</li>
+</ul></li>
+<li><code>git checkout &lt;branch&gt;</code>
+
+<ul>
+<li>ブランチを切り替える</li>
+<li><strong>Gitディレクトリ</strong>では，HEADの位置が変わる</li>
+<li><strong>ステージングエリア</strong>では，HEADに合わせて内容が復元される</li>
+</ul></li>
+<li><code>git merge &lt;branch&gt;</code>
+
+<ul>
+<li>ブランチをマージする</li>
+<li><strong>Gitディレクトリ</strong>では，２つのブランチをマージしたcommitが発行される
+
+<ul>
+<li>新たなcommitは，マージ元の2つのcommitを親とする</li>
+</ul></li>
+<li><strong>ステージングエリア</strong>では，結合したブランチの変更内容が反映される</li>
+</ul></li>
+</ul>
+
+<h1>6. リモートでの作業</h1>
+
+<p>説明したこと．</p>
+
+<ul>
+<li>commitオブジェクトは<strong>ブランチ</strong>によって指定できる</li>
+<li>現在作業しているブランチは<strong>HEAD</strong>によって示される</li>
+</ul>
+
+<p>最後にリモートリポジトリとの操作についてまとめる．<br>
+Gitはローカルでの操作だけでなく，リモートリポジトリから作業環境をひっぱってきたり，逆にローカルの編集内容をリモートに反映させたりできる．リモートリポジトリからデータを引っ張ってくることを<strong>クローン</strong>という．一番最初に説明した，Git を導入する2つの方法の内の2つ目である．<br>
+クローンは以下のように行う．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git clone git://github.com/schacon/grit.git mygrit
+</span></code></pre></td></tr></table></div></figure>
+
+<p>上記コマンドは，<code>github.com/schacon/grit.git</code>からデータを引っ張ってきてディレクトリ<code>mygrit</code>に格納する．</p>
+
+<p>また，プロジェクトを進めていく上で，リモートサーバ(上記の例で言うなら<code>github.com/schacon/grit.git</code>)とデータのやり取りを頻繁に行う．しかし，1つのプロジェクトに対して1つのリモートサーバとは限らない．</p>
+
+<p>例えば，本ブログはその雛形として<code>Octopress</code>というプロジェクトをcloneしている．しかし，記事などのデータの送信先は自分のリポジトリである．なので，</p>
+
+<ul>
+<li>ブログの雛形を引っ張ってきたリポジトリ</li>
+<li>自分のブログを公開するためのリポジトリ</li>
+</ul>
+
+<p>の２つのリモートリポジトリとやり取りを行っている．</p>
+
+<p>だからどうなのだ，というと，つまり，</p>
+
+<ul>
+<li>プロジェクトを進めていく上では，<strong>複数のリモートリポジトリとやりとりする</strong>可能性があって，</li>
+<li>その時に各リモートリポジトリを一々<strong>URLで指定するのは面倒</strong>だ</li>
+</ul>
+
+<p>ということ．<br>
+なので，リモートリポジトリには名前をつけることができる．ちなみに，プロジェクトをクローンした場合は，クローン元のサーバには<code>origin</code>という名前がデフォルトでつけられる．</p>
+
+<p>設定されたリモートサーバはコマンド<code>git remote</code>で確認できる．<code>-v</code>オプションを指定すると，名前に対応するURLを表示する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span><span class="nb">cd </span>mygrit
+</span><span class='line'><span class="nv">$ </span>git remote
+</span><span class='line'>origin
+</span><span class='line'>
+</span><span class='line'><span class="nv">$ </span>git -v remote
+</span><span class='line'>origin  git://github.com/schacon/grit.git <span class="o">(</span>fetch<span class="o">)</span>
+</span><span class='line'>origin  git://github.com/schacon/grit.git <span class="o">(</span>push<span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>その他，よく使うコマンドは↓みたいなかんじ．</p>
+
+<ul>
+<li><code>git remote add [shortname] [url]</code>
+
+<ul>
+<li>リモートリポジトリの追加</li>
+</ul></li>
+<li><code>git fetch [remote-name]</code>
+
+<ul>
+<li>リモートプロジェクトの中から作業ディレクトリにデータを引き出す</li>
+<li>ローカルの環境でマージされたり，作業内容を書き換えることはないため，自分でマージをする必要がある．</li>
+</ul></li>
+<li><code>git push [remote-name] [branch-name]</code>
+
+<ul>
+<li>指定サーバにプロジェクトをプッシュする</li>
+<li><code>git push origin master</code></li>
+</ul></li>
+<li><code>git remote rename</code>
+
+<ul>
+<li>リモートを参照する名前を変更できる</li>
+</ul></li>
+<li><code>git remote rm</code>
+
+<ul>
+<li>リモートの山椒を削除する</li>
+<li>サーバが移動したとか，特定のミラーを使わなくなったとか，プロジェクトからメンバーが抜けたとか</li>
+</ul></li>
+</ul>
+
+<h1>7. まとめ</h1>
+
+<p>Git の基礎知識についてまとめた．</p>
+
+<ul>
+<li>作業ディレクトリで作業して，ステージングエリアに変更内容を準備(<code>add</code>)して，Gitディレクトリに保存(<code>commit</code>)する</li>
+<li>Gitディレクトリには commitオブジェクト が時系列順に保存される
+
+<ul>
+<li>特定の commitオブジェクト をブランチで指定できる</li>
+<li>デフォルトでは<code>master</code>ブランチが用意される</li>
+<li>現在作業しているブランチは<code>HEAD</code>で示される</li>
+</ul></li>
+<li>リモートリポジトリとやりとりする際，やりとり先のサーバには名前をつける
+
+<ul>
+<li>デフォルトでは<code>origin</code>という名前がつく</li>
+</ul></li>
+</ul>
+
+<p>これらの知識を踏まえれば，様々なページで説明されているgitの関連知識やコマンドが理解しやすくなる&#8230;と思う．説明がド下手なので，この記事は何回も修正することになることが予想される．</p>
+
+<blockquote>
+<p><a href="http://git-scm.com/book/ja/v1/%E4%BD%BF%E3%81%84%E5%A7%8B%E3%82%81%E3%82%8B">公式</a><br>
+<a href="http://dqn.sakusakutto.jp/2013/09/git_patch_snapshot.html">Gitレポジトリはパッチの集積ではなくてスナップショットの集積である。</a><br>
+<a href="http://d.hatena.ne.jp/zariganitosh/20080905/1220621182">アリスとボブになりきってgitをちゃんと理解したい！</a><br>
+<a href="http://qiita.com/usamik26/items/28be7d2c221a7a53c2c3">git push の反対は git pull ではない</a><br>
+<a href="http://qiita.com/osamu1203/items/cb94ef9da02e1ec3e921">git fetchの理解からgit mergeとpullの役割</a></p>
+</blockquote>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">tasuwo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-03-19T02:02:03+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:02 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/git/'>git</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2015/03/19/about-git/" data-via="" data-counturl="http://tasuwo.github.io/blog/2015/03/19/about-git/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <br />
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/03/18/biao-ji-gui-ze/" title="Previous Post: コマンド構文の表記規則についてメモ">&laquo; コマンド構文の表記規則についてメモ</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/03/19/harib-git/" title="Next Post: 自作OSの途中経過(8/30)">自作OSの途中経過(8/30) &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h2 id="toc_0">Profile</h2>
+
+  <h3 id="toc_1">ME</h3>
+
+  <ul>
+  <li>情報系の学生</li>
+  <li>プログラミング初心者でMac初心者</li>
+  </ul>
+
+  <h3 id="toc_2">SNS</h3>
+
+  <ul>
+  <li>Twitter: <a href="https://twitter.com/tasuwo_">@tasuwo_</a></li>
+  <li>GiHub: <a href="https://github.com/tasuwo">tasuwo</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/05/30/ios-02/">iOSアプリケーションの実行時の振る舞いについて</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/29/swift-func/">[Swift] 関数とクロージャについて</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/29/swift/">[Swift] Optional型まとめ</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/14/mendeley/">論文の管理に Mendeley を導入した話</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/07/model/">開発モデルの話</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - tasuwo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'tasuwoblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tasuwo.github.io/blog/2015/03/19/about-git/';
+        var disqus_url = 'http://tasuwo.github.io/blog/2015/03/19/about-git/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

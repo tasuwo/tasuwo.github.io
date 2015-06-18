@@ -1,0 +1,546 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Emacsに色々設定したメモ - tasuwo blog</title>
+  <meta name="author" content="tasuwo">
+
+  
+  <meta name="description" content="やったことは以下 タブ，全角/半角スペースを可視化(whitespaceの導入)
+タブをスペースで変換するように設定
+Markdownにおける行頭タブの自動整形の無効化
+GFMを利用する それぞれまとめていく． 1. やったこと 1.1 whitespace導入 whitespace- &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tasuwo.github.io/blog/2015/03/17/title">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="tasuwo blog" type="application/atom+xml">
+  <link href="/stylesheets/data-table.css" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-60860415-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">tasuwo blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:tasuwo.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Emacsに色々設定したメモ</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-03-17T02:14:21+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:14 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tasuwo.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>やったことは以下</p>
+
+<ol>
+<li>タブ，全角/半角スペースを可視化(whitespaceの導入)</li>
+<li>タブをスペースで変換するように設定</li>
+<li>Markdownにおける行頭タブの自動整形の無効化</li>
+<li>GFMを利用する</li>
+</ol>
+
+<p>それぞれまとめていく．</p>
+
+<!-- more -->
+
+<h1>1. やったこと</h1>
+
+<h2>1.1 whitespace導入</h2>
+
+<blockquote>
+<p><a href="http://qiita.com/itiut@github/items/4d74da2412a29ef59c3a">whitespace-modeを使って、ファイルの保存時に行末のスペースや末尾の改行を削除する</a></p>
+</blockquote>
+
+<p>上記を参考に，whitespace-modeを導入．<br>
+<code>(setq-default show-trailing-whitespace t)</code>と設定がかぶっていたので削除した．</p>
+
+<h2>1.2 タブをスペースに変換</h2>
+
+<p><code>(setq-default indent-tabs-mode nil)</code>を使っていたのだけど，タブがスペースに置換されない．<br>
+そもそもどのタイミングで置換されていたのか?</p>
+
+<blockquote>
+<p><a href="http://www.math.s.chiba-u.ac.jp/%7Ematsu/lisp/emacs-lisp-intro-jp_17.html#SEC198">16. .emacs ファイル</a></p>
+</blockquote>
+
+<p>上記サイトによれば，自動インデントをした際のインデントがスペースになる，ということらしい．<br>
+普段入力するタブをスペースに置換するにはどうすればよいかと考えたけれど，単純にキーバインドに割り当てればよいだけだということに気づく．<br>
+<code>init.el</code>内でのタブ周りの設定は以下．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="c1">;; タブ幅</span>
+</span><span class='line'><span class="p">(</span><span class="nv">custom-set-variables</span> <span class="o">&#39;</span><span class="p">(</span><span class="nv">tab-width</span> <span class="mi">4</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; インデント整形時，タブの代わりにスペースを用いる</span>
+</span><span class='line'><span class="p">(</span><span class="nv">setq-default</span> <span class="nv">indent-tabs-mode</span> <span class="no">nil</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>これとは別に，キーバインドとして以下を設定したらうまくいった．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nv">global-set-key</span> <span class="s">&quot;\C-i&quot;</span> <span class="o">&#39;</span><span class="p">(</span><span class="k">lambda</span> <span class="p">()</span>
+</span><span class='line'>                          <span class="p">(</span><span class="nv">interactive</span><span class="p">)</span>
+</span><span class='line'>                          <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">width</span> <span class="nv">tab-width</span><span class="p">)</span>
+</span><span class='line'>                                <span class="p">(</span><span class="nv">str</span>   <span class="s">&quot;&quot;</span><span class="p">))</span>
+</span><span class='line'>                            <span class="p">(</span><span class="nb">dotimes</span> <span class="p">(</span><span class="nv">i</span> <span class="nv">width</span><span class="p">)</span>
+</span><span class='line'>                              <span class="p">(</span><span class="k">setq</span> <span class="nv">str</span> <span class="p">(</span><span class="nv">concat</span> <span class="nv">str</span> <span class="s">&quot; &quot;</span><span class="p">)))</span>
+</span><span class='line'>                            <span class="p">(</span><span class="nv">insert</span> <span class="nv">str</span><span class="p">))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>タブを<code>C-i</code>で入力できるように，<code>C-i</code>を<code>\t</code>で置き換えていた．<br>
+タブ文字の挿入を割り当てているのだから，設定が反映されないのは当たり前だった．<br>
+スペース4つ分で代わりに置き換えようと思ったが，タブ幅の設定を反映できた方が良いと思ったのでこうなった．<br>
+ちょっとやり方が苦しい．もっと上手い方法があるかもしれない．</p>
+
+<h2>1.3 Markdownにおける行頭タブの自動整形の無効化</h2>
+
+<p>タブ入力した後に字句入力して改行するとタブが削除されてしまうのでなんとかしかった．<br>
+これはつまり，直前にインデントがない場合，Emacs が余分なインデントだと判断して自動整形してしまっているのだと思われる．</p>
+
+<blockquote>
+<p><a href="http://www.nofuture.tv/diary/20141114.html">emacs 24.4のmarkdown-modeでリストのインデントが行頭に揃えられてしまう(解決)</a><br><br>
+<a href="http://www.muskmelon.jp/?p=1068">Emacs 24.4 のインデントを無効化</a></p>
+</blockquote>
+
+<p>コーディングの際には自動インデントは欲しいので，Markdownの編集時のみ自動インデントを無効化したい．<br>
+Emacsはモードが設定されると，対応するモードフック変数に登録されている関数を呼び出す．<br>
+各モードのカスタマイズのためには，このモードフック変数を編集する．<br>
+今回は，以下のように設定を追記して自動インデントを無効化した．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="c1">;; markdown</span>
+</span><span class='line'><span class="p">(</span><span class="nv">autoload</span> <span class="ss">&#39;markdown-mode</span> <span class="s">&quot;markdown-mode.el&quot;</span> <span class="s">&quot;Major mode for editing Markdown files&quot;</span> <span class="no">t</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">setq</span> <span class="nv">auto-mode-alist</span> <span class="p">(</span><span class="nb">cons</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;\\.md&quot;</span> <span class="o">.</span> <span class="nv">gfm-mode</span><span class="p">)</span> <span class="nv">auto-mode-alist</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="nv">add-hook</span> <span class="ss">&#39;gfm-mode-hook</span>
+</span><span class='line'>          <span class="o">&#39;</span><span class="p">(</span><span class="k">lambda</span> <span class="p">()</span>
+</span><span class='line'>             <span class="p">(</span><span class="k">setq</span> <span class="nv">global-linum-mode</span> <span class="no">nil</span><span class="p">)</span>
+</span><span class='line'>             <span class="p">(</span><span class="nv">electric-indent-local-mode</span> <span class="mi">-1</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p><code>global-linum-mode</code>は画面外にはみ出した文章の改行指定．<br>
+コーディングでは全体の形が崩れるので無効にしておくが，Markdownは文章なので改行したほうが読みやすい．</p>
+
+<h2>1.4 GFMモードを利用する</h2>
+
+<p>行末のスペースも削除されてしまうので，どうしようと思っていたが，GFMモードというものを利用すれば良いらしい．<br>
+具体的な使い方は前項に示した．gfm-mode は markdown-mode.el 内に定義されているようだ．<br>
+GFMモードを快適に利用したいので，さらに以下を設定していく．</p>
+
+<ol>
+<li>OctopressでGFMが使用できるように設定する</li>
+<li>GFMのプレビューができるようにする</li>
+</ol>
+
+<h3>1.4.1 OctopressでGFMが使用できるように設定する</h3>
+
+<ol>
+<li><code>Gemfile</code>に<code>gem &#39;redcarpet&#39;, &#39;~&gt; 3.1</code>を追記(他のgemがこのバージョンに依存していたため，参考サイトと違うバージョンを指定)</li>
+<li>なかったので，<code>gem &#39;albino&#39;, &#39;~&gt; 1.3.3&#39;</code>も追加</li>
+<li><code>bundle install</code></li>
+<li><code>plugins</code>ディレクトリに，<code>redcarpet2_markdown.rb</code>を追加(<a href="https://github.com/nono/Jekyll-plugins">source</a>)</li>
+<li><code>_config.yml</code>の<code>markdown: rdiscount</code>を下記のように書き換え</li>
+</ol>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="nv">markdown:</span> <span class="nv">redcarpet</span>
+</span><span class='line'><span class="nv">redcarpet:</span>
+</span><span class='line'>  <span class="nv">extensions:</span> <span class="nv">[</span><span class="s">&quot;hard_wrap&quot;</span><span class="nv">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p><code>redcarpet2</code>を指定するとエラーとなった．(<a href="https://github.com/clayallsopp/rubymotion-tutorial/issues/30">参考</a>)</p>
+
+<blockquote>
+<p><a href="http://blog.tdksk.com/2013/05/06/use-gfm-in-octopress.html">Octopress で GitHub Flavored Markdown (GFM) を使う</a></p>
+</blockquote>
+
+<h3>1.4.2 emacs上からGFMのプレビューができるようにする</h3>
+
+<p>Grip は Markdown を GitHub Flavor に変換してプレビューできる．</p>
+
+<ol>
+<li>Gripをインストール</li>
+</ol>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo pip install grip
+</span></code></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p><a href="http://blog.wonderrabbitproject.net/2014/07/github-flavored-markdown-grip.html">GitHub Flavored Markdown に対応した Grip というツールが便利だったので備忘録</a><br>
+<a href="http://www.moongift.jp/2014/01/grip-github%E9%A2%A8%E3%81%ABmarkdown%E3%82%92html%E3%83%97%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC/">Grip - GitHub風にMarkdownをHTMLプレビュー</a></p>
+</blockquote>
+
+<ol>
+<li>binファイルを作成し，パスの通ったディレクトリにおく</li>
+</ol>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>which grip
+</span><span class='line'><span class="nv">$ </span>emacs /usr/local/bin/markdown
+</span><span class='line'>
+</span><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="nv">filename</span><span class="o">=</span><span class="nv">$1</span>
+</span><span class='line'>/usr/local/bin/grip --export --gfm <span class="k">${</span><span class="nv">filename</span><span class="k">}</span> &gt; /dev/null
+</span><span class='line'>cat <span class="k">${</span><span class="nv">filename</span><span class="p">%.*</span><span class="k">}</span>.html
+</span></code></pre></td></tr></table></div></figure>
+
+<p>GFMモードでプレビューするためには，<code>--gfm</code>オプションを追加する．<br>
+<code>markdown</code>ファイルについて．既にパス内に存在している場合がある(通常のプレビュー時に用いていたのかも)<br>
+なので，<code>which markdown</code>で存在するかどうか調べて，存在したならバックアップをとって新たに置き換えると良い．<br>
+また，権限を755に設定しておくこと．</p>
+
+<ol>
+<li>設定の追加</li>
+</ol>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="c1">;; markdown mode</span>
+</span><span class='line'><span class="p">(</span><span class="nv">autoload</span> <span class="ss">&#39;markdown-mode</span> <span class="s">&quot;markdown-mode&quot;</span>
+</span><span class='line'>   <span class="s">&quot;Major mode for editing Markdown files&quot;</span> <span class="no">t</span><span class="p">)</span>
+</span><span class='line'>   <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;auto-mode-alist</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;\\.text\\&#39;&quot;</span> <span class="o">.</span> <span class="nv">gfm-mode</span><span class="p">))</span>
+</span><span class='line'>   <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;auto-mode-alist</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;\\.markdown\\&#39;&quot;</span> <span class="o">.</span> <span class="nv">gfm-mode</span><span class="p">))</span>
+</span><span class='line'>   <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;auto-mode-alist</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;\\.md\\&#39;&quot;</span> <span class="o">.</span> <span class="nv">gfm-mode</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">;; ファイルパスを渡す</span>
+</span><span class='line'><span class="p">(</span><span class="nb">defun</span> <span class="nv">markdown-custom</span> <span class="p">()</span>
+</span><span class='line'>  <span class="s">&quot;markdown-mode-hook&quot;</span>
+</span><span class='line'>    <span class="p">(</span><span class="k">setq</span> <span class="nv">markdown-command-needs-filename</span> <span class="no">t</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">)</span>
+</span><span class='line'>      <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">&#39;markdown-mode-hook</span> <span class="o">&#39;</span><span class="p">(</span><span class="k">lambda</span><span class="p">()</span> <span class="p">(</span><span class="nv">markdown-custom</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<ol>
+<li><code>C-c C-c p</code>，<code>C-c C- v</code>で実行</li>
+</ol>
+
+<h3>トラブルシューティング</h3>
+
+<p>これでok&#8230;と思ったら，文字化けする上にちっともGitHub Flavor でない．</p>
+
+<p>試しに，Markdownファイルに対して直接<code>grip</code>を叩く．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>grip test.md
+</span></code></pre></td></tr></table></div></figure>
+
+<p>するとエラーがでて，プレビューできない．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>UnicodeDecodeError: <span class="s1">&#39;utf8&#39;</span> codec can<span class="err">&#39;</span>t decode byte 0xa4 in position 2: invalid start byte
+</span></code></pre></td></tr></table></div></figure>
+
+<p>文字コード関連かと思い，対象ファイルの文字コードをnkfで調べる．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>nkf --guess test.md
+</span><span class='line'>EUC-JP <span class="o">(</span>LF<span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>UTF-8に変換．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>nkf -u --overwrite test.md
+</span></code></pre></td></tr></table></div></figure>
+
+<p>再び実行．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>nkf --guess test.md
+</span><span class='line'>UTF-8 <span class="o">(</span>LF<span class="o">)</span>
+</span><span class='line'><span class="nv">$ </span>grip test.md
+</span></code></pre></td></tr></table></div></figure>
+
+<p>うまくいった．<br>
+ただ，エラーが表示されてしまう．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>/usr/local/lib/python2.7/site-packages/requests/packages/urllib3/connectionpool.py:769: InsecureRequestWarning: Unverified HTTPS request is being made. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.org/en/latest/security.html InsecureRequestWarning<span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>証明書関連のエラーだと思われる．<br>
+詳しくは後日調べることにして，プレビューもできたのでとりあえずコレでOK．<br>
+ただ，<code>#</code>で指定する見出しがなぜか変換されない．これもとりあえず後日調べることにする．</p>
+
+<blockquote>
+<p><a href="http://blog.s-amemiya.com/development/emacs%E3%81%AEmarkdown-mode%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%82%8B/">Emacsのmarkdown-modeを使ってみる</a>  </p>
+</blockquote>
+
+<h1>2. 今後やりたいことのメモ</h1>
+
+<ul>
+<li>Emacsにおける文字コードの設定</li>
+<li>認証局関連の知識ほしい&#8230;(<a href="http://qiita.com/kawaz/items/f90810b9ea823b6556a8">認証局を立ててぼろもうけしたいんですが＞無理な理由を理解しよう</a>)</li>
+<li>ブログの見た目を少し変えたい(文字が大きい&#8230;)</li>
+</ul>
+
+<p>とりあえず，MarkdownをEmacsから手軽に書いて，ブログを更新するという目標は達成できた．</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">tasuwo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-03-17T02:14:21+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:14 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/emacs/'>emacs</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2015/03/17/title/" data-via="" data-counturl="http://tasuwo.github.io/blog/2015/03/17/title/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <br />
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/03/14/title/" title="Previous Post: Emacsについて 02">&laquo; Emacsについて 02</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/03/17/title2/" title="Next Post: Rubyの基礎知識についてのメモ">Rubyの基礎知識についてのメモ &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h2 id="toc_0">Profile</h2>
+
+  <h3 id="toc_1">ME</h3>
+
+  <ul>
+  <li>情報系の学生</li>
+  <li>プログラミング初心者でMac初心者</li>
+  </ul>
+
+  <h3 id="toc_2">SNS</h3>
+
+  <ul>
+  <li>Twitter: <a href="https://twitter.com/tasuwo_">@tasuwo_</a></li>
+  <li>GiHub: <a href="https://github.com/tasuwo">tasuwo</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/05/30/ios-02/">iOSアプリケーションの実行時の振る舞いについて</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/29/swift-func/">[Swift] 関数とクロージャについて</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/29/swift/">[Swift] Optional型まとめ</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/14/mendeley/">論文の管理に Mendeley を導入した話</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/07/model/">開発モデルの話</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - tasuwo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'tasuwoblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tasuwo.github.io/blog/2015/03/17/title/';
+        var disqus_url = 'http://tasuwo.github.io/blog/2015/03/17/title/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

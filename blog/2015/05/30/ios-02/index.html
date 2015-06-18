@@ -1,0 +1,460 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>iOSアプリケーションの実行時の振る舞いについて - tasuwo blog</title>
+  <meta name="author" content="tasuwo">
+
+  
+  <meta name="description" content="iOSアプリケーションの構造がよくわからなかったので，とりあえず実行時の振る舞いから理解していくためのまとめ． 以下の初心者用ガイドを一通りやった． Start Developing iOS Apps Today: Setup - Apple Developer ちなみに，上記サイトの使用言語は &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tasuwo.github.io/blog/2015/05/30/ios-02">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="tasuwo blog" type="application/atom+xml">
+  <link href="/stylesheets/data-table.css" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-60860415-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">tasuwo blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:tasuwo.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">iOSアプリケーションの実行時の振る舞いについて</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-05-30T11:18:52+09:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>30</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>11:18 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tasuwo.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>iOSアプリケーションの構造がよくわからなかったので，とりあえず実行時の振る舞いから理解していくためのまとめ．</p>
+
+<!-- more -->
+
+<p>以下の初心者用ガイドを一通りやった．</p>
+
+<blockquote>
+<p><a href="https://developer.apple.com/library/ios/referencelibrary/GettingStarted/RoadMapiOS/">Start Developing iOS Apps Today: Setup - Apple Developer</a></p>
+</blockquote>
+
+<p>ちなみに，上記サイトの使用言語は Swift ではなく Objective-C．</p>
+
+<h2>1. アプリケーション実行時の振る舞い</h2>
+
+<p>アプリケーション起動時にはどのようなことが起きるのだろうか？Swift でも Objective-C でも，記述方法が違うだけでやってることは同じはずなので，結局何をしているのか？を公式ドキュメントから抽出してみる．</p>
+
+<h3>やっていること</h3>
+
+<p><code>UIApplicationMain</code>関数が呼び出され，以下の2つのインスタンスが生成される．</p>
+
+<ul>
+<li><code>UIApplication</code>クラスのインスタンス生成(<strong>application object</strong>)
+
+<ul>
+<li>イベントループを開始する</li>
+<li>アプリケーションの基盤となる</li>
+</ul></li>
+<li><code>AppDelegate</code>クラスのインスタンス生成(<strong>app delegate</strong>)
+
+<ul>
+<li>コンテンツ描画のためのウインドウを管理する</li>
+<li>状態遷移を管理する</li>
+</ul></li>
+</ul>
+
+<p><em>application object</em> が <em>app delegate</em> 上に定義されたメソッドを呼び出し，記述されたコードを実行する．コードを見てみると，<code>UIApplicationMain</code>関数に<code>AppDelegate</code>クラスが渡され，紐づけられているようだ．</p>
+
+<h2>2. App Delegate について</h2>
+
+<p>アプリケーションを開発する上で関わりが深いのは<code>AppDelegate</code>だろう．初心者用ガイドに書かれていたことをメモしておく．</p>
+
+<h3>window 属性</h3>
+
+<p>コンテンツが描画されるウインドウが格納される</p>
+
+<h3>重要メソッドのスケルトン</h3>
+
+<p>アプリケーションが特殊な状態に陥った場合&#8230;アプリケーションの実行時，メモリ不足時，アプリケーション終了時など&#8230;には，<em>application object</em> が <em>app delegate</em> 内の対応したメソッドが呼び出す．デフォルトでは，対応した各メソッドのスケルトンが定義されている．これらの中身が空，もしくは削除されている場合には，デフォルトの振る舞いが呼び出される．必要に応じて記述すれば良い．</p>
+
+<h2>3. Objective-C と Swift での違いについて</h2>
+
+<p>開発言語は Swift を使用する予定だけど，気になったのでメモしておく．実行時の振る舞いに関係する各ソースコードを示したのちに，その違いについて考えてみる．各ソースコードは，Xcode で Single View Application を作成した時のテンプレ．中略の部分は，スケルトンコードが書かれていた部分．</p>
+
+<h3>Objective-C</h3>
+
+<p><code>AppDelegate</code>が定義されたファイルの他に，<code>main.m</code>がある．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='Objective-C'><span class='line'><span class="c1">//////////</span>
+</span><span class='line'><span class="c1">// main.m</span>
+</span><span class='line'><span class="cp">#import &lt;UIKit/UIKit.h&gt;</span>
+</span><span class='line'><span class="cp">#import &quot;AppDelegate.h&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">@autoreleasepool</span> <span class="p">{</span>
+</span><span class='line'>        <span class="c1">// UIApplicationMain関数に，AppDelegateクラスを渡している．</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">UIApplicationMain</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="nb">nil</span><span class="p">,</span> <span class="n">NSStringFromClass</span><span class="p">([</span><span class="n">AppDelegate</span> <span class="k">class</span><span class="p">]));</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">/////////////////</span>
+</span><span class='line'><span class="c1">// AppDelegate.h</span>
+</span><span class='line'><span class="cp">#import &lt;UIKit/UIKit.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@interface</span> <span class="nc">AppDelegate</span> : <span class="bp">UIResponder</span> <span class="o">&lt;</span><span class="bp">UIApplicationDelegate</span><span class="o">&gt;</span>
+</span><span class='line'><span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="bp">UIWindow</span> <span class="o">*</span><span class="n">window</span><span class="p">;</span>
+</span><span class='line'><span class="k">@end</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">/////////////////</span>
+</span><span class='line'><span class="c1">// AppDelegate.m</span>
+</span><span class='line'><span class="cp">#import &quot;AppDelegate.h&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@interface</span> <span class="nc">AppDelegate</span> <span class="p">()</span>
+</span><span class='line'><span class="k">@end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@implementation</span> <span class="nc">AppDelegate</span>
+</span><span class='line'><span class="c1">// 中略</span>
+</span><span class='line'><span class="k">@end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h3>Swift</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='Swift'><span class='line'><span class="c1">/////////////////////</span>
+</span><span class='line'><span class="c1">// AppDelegate.swift</span>
+</span><span class='line'><span class="k">import</span> <span class="n">UIKit</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Main関数の自動実装？</span>
+</span><span class='line'><span class="p">@</span><span class="n">UIApplicationMain</span>
+</span><span class='line'><span class="k">class</span> <span class="nl">AppDelegate</span><span class="p">:</span> <span class="bp">UIResponder</span><span class="p">,</span> <span class="bp">UIApplicationDelegate</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">var</span> <span class="nl">window</span><span class="p">:</span> <span class="bp">UIWindow</span><span class="o">?</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">func</span> <span class="n">application</span><span class="p">(</span><span class="nl">application</span><span class="p">:</span> <span class="bp">UIApplication</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span> <span class="nl">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="nl">NSObject</span><span class="p">:</span> <span class="n">AnyObject</span><span class="p">]</span><span class="o">?</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bool</span> <span class="p">{</span>
+</span><span class='line'>        <span class="c1">// Override point for customization after application launch.</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">true</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// 中略</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>Objective-C では，単純に<code>UIApplicationMain</code>関数に<code>AppDelegate</code>クラスを渡しているが，Swift の<code>@UIApplicationMain</code>とはなんなのか？<br>
+探してみると，同じ疑問を抱いている人がいた．</p>
+
+<blockquote>
+<p><a href="http://stackoverflow.com/questions/24516250/what-does-uiapplicationmain-mean">swift - What does &quot;@UIApplicationMain&quot; mean? - Stackoverflow</a></p>
+</blockquote>
+
+<p>そもそも，iOSアプリケーションにおける<code>main</code>関数の主な役割は以下の2つである．</p>
+
+<ul>
+<li>C プログラムの入り口になる</li>
+<li><code>UIApplicationMain</code>関数の呼び出し</li>
+</ul>
+
+<p>要は，<code>UIApplicationMain</code>関数と<code>AppDelegate</code>クラスをひもづけられれば良いようだ．これを実現するために，Swift では <strong>Attributes</strong> が用いられている．</p>
+
+<p>Attributes とは定義や型に関して情報を補足するもので，先頭に<code>@</code>を付加して記述する．</p>
+
+<blockquote>
+<p><a href="https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Attributes.html">Attributes - iOS Developer Library</a></p>
+</blockquote>
+
+<p>公式ドキュメントでは，<code>UIApplicationMain</code> attirbute について以下のように記述されている．</p>
+
+<blockquote>
+<p>UIApplicationMain<br>
+Apply this attribute to a class to indicate that it is the application delegate. Using this attribute is equivalent to calling the UIApplicationMain function and passing this class’s name as the name of the delegate class.</p>
+</blockquote>
+
+<p>まとめると&#8230;</p>
+
+<ul>
+<li><code>UIApplicationMain</code> attributes は<code>AppDelegate</code>クラスに付加する</li>
+<li><code>UIApplicationMain</code> 関数を呼び出せる</li>
+<li>付加されたクラスのクラス名を，<code>delegate class</code> のクラス名として登録する</li>
+</ul>
+
+<p>つまり，Objective-C における Main 関数と同等に振る舞うということらしい．ちなみに，この attributes を利用する代わりに<code>main.swift</code>を作成することもできるそうだ．</p>
+
+<p>同じことをやっていることはわかっていたけど，やっぱり公式ドキュメントに記述を発見できたり，明確な理由付けができると，落ち着く．</p>
+
+<h2>参考</h2>
+
+<blockquote>
+<p><a href="http://qiita.com/shu223/items/437d9a9a3502800a891b">Objective-C で書いたアプリを Swift で書き換える5ステップ - Qiita</a><br>
+<a href="http://tomoyaonishi.hatenablog.jp/entry/2015/03/22/144246">SwiftのAttributesをまとめた。 - tomoyaonishiのブログ</a></p>
+</blockquote>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">tasuwo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-05-30T11:18:52+09:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>30</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>11:18 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/objective-c/'>objective-c</a>, <a class='category' href='/blog/categories/swift/'>swift</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2015/05/30/ios-02/" data-via="" data-counturl="http://tasuwo.github.io/blog/2015/05/30/ios-02/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <br />
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/05/29/swift-func/" title="Previous Post: [Swift] 関数とクロージャについて">&laquo; [Swift] 関数とクロージャについて</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h2 id="toc_0">Profile</h2>
+
+  <h3 id="toc_1">ME</h3>
+
+  <ul>
+  <li>情報系の学生</li>
+  <li>プログラミング初心者でMac初心者</li>
+  </ul>
+
+  <h3 id="toc_2">SNS</h3>
+
+  <ul>
+  <li>Twitter: <a href="https://twitter.com/tasuwo_">@tasuwo_</a></li>
+  <li>GiHub: <a href="https://github.com/tasuwo">tasuwo</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/05/30/ios-02/">iOSアプリケーションの実行時の振る舞いについて</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/29/swift-func/">[Swift] 関数とクロージャについて</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/29/swift/">[Swift] Optional型まとめ</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/14/mendeley/">論文の管理に Mendeley を導入した話</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/07/model/">開発モデルの話</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - tasuwo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'tasuwoblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tasuwo.github.io/blog/2015/05/30/ios-02/';
+        var disqus_url = 'http://tasuwo.github.io/blog/2015/05/30/ios-02/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

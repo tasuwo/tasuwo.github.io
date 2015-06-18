@@ -1,0 +1,1216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Emacs | tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/blog/categories/emacs/atom.xml" rel="self"/>
+  <link href="http://tasuwo.github.io/"/>
+  <updated>2015-05-30T13:10:11+09:00</updated>
+  <id>http://tasuwo.github.io/</id>
+  <author>
+    <name><![CDATA[tasuwo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Palletを導入した]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/03/21/pallet/"/>
+    <updated>2015-03-21T22:37:06+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/03/21/pallet</id>
+    <content type="html"><![CDATA[<p>EmacsにPalletを導入しました．</p>
+
+<!-- more -->
+
+<p>Cask + Pallet に移行した，みたいな話はよく聞いていたけど，cask はわかるが Pallet のうまみがわからなかったのでインストールしていなかった．</p>
+
+<blockquote>
+<p><a href="https://github.com/rdallasgray/pallet">rdallasgray/pallet</a></p>
+</blockquote>
+
+<h2>1. Pallet の目的と利点</h2>
+
+<p>Pallet の主目的は，Emacs備え付けのパッケージ管理システムを用いたパッケージのインストール，アンインストールにあわせて，Cask ファイルの記述を追加・削除すること．<br>
+すなわち，<code>M-x package-install</code>などを用いても自動で同期をとってくれるので，パッケージのインストール/アンインストールと Cask ファイルの記述内容との生合成について気を使わなくてよくなる．</p>
+
+<h2>2. 導入</h2>
+
+<p>Cask ファイルに以下を記述</p>
+<div class="highlight"><pre><code class="language-lisp" data-lang="lisp"><span class="p">(</span><span class="nv">source</span> <span class="nv">melpa</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;cask&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>インストール</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>cask
+</code></pre></div>
+<p>設定ファイル内に<code>(pallet-mode t)</code>を記述，もしくは<code>pallet-mode</code>を呼び出す(<code>M-x pallet-mode</code>)ことにより使用できる．<br>
+例えば，<code>init.el</code>に以下のように記述する．</p>
+<div class="highlight"><pre><code class="language-lisp" data-lang="lisp"><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;pallet</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">pallet-mode</span> <span class="no">t</span><span class="p">)</span>
+</code></pre></div>
+<h2>3. 使い方</h2>
+
+<ul>
+<li><p><code>M-x pallet-init</code></p>
+
+<ul>
+<li><code>package.el</code>によってインストールされたパッケージを元に Cask ファイル生成</li>
+</ul></li>
+<li><p><code>M-x pallet-install</code></p>
+
+<ul>
+<li>Cask ファイルに記述されたパッケージをインストール</li>
+</ul></li>
+<li><p><code>M-x pallet-update</code></p>
+
+<ul>
+<li>インストールされたパッケージの更新</li>
+</ul></li>
+</ul>
+
+<h2>4. おまけ</h2>
+
+<p>Cask の記述を Pallet に無視させたい場合は以下のように記述する</p>
+<div class="highlight"><pre><code class="language-lisp" data-lang="lisp"><span class="p">(</span><span class="nv">source</span> <span class="nv">melpa</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;s&quot;</span><span class="p">)</span>
+
+<span class="c1">;;;pallet-ignore</span>
+<span class="c1">;;;これ以降が無視される</span>
+<span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;newlisp&quot;</span> <span class="ss">:git</span>
+<span class="s">&quot;https://github.com/coldnew/newlisp-mode.git&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h2>5. 参考</h2>
+
+<blockquote>
+<p><a href="http://gongo.hatenablog.com/entry/2014/05/09/230836">Emacs のパッケージ管理を package.el + el-get から Cask + pallet に乗り換えました</a></p>
+</blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Emacsに色々設定したメモ]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/03/17/title/"/>
+    <updated>2015-03-17T02:14:21+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/03/17/title</id>
+    <content type="html"><![CDATA[<p>やったことは以下</p>
+
+<ol>
+<li>タブ，全角/半角スペースを可視化(whitespaceの導入)</li>
+<li>タブをスペースで変換するように設定</li>
+<li>Markdownにおける行頭タブの自動整形の無効化</li>
+<li>GFMを利用する</li>
+</ol>
+
+<p>それぞれまとめていく．</p>
+
+<!-- more -->
+
+<h1>1. やったこと</h1>
+
+<h2>1.1 whitespace導入</h2>
+
+<blockquote>
+<p><a href="http://qiita.com/itiut@github/items/4d74da2412a29ef59c3a">whitespace-modeを使って、ファイルの保存時に行末のスペースや末尾の改行を削除する</a></p>
+</blockquote>
+
+<p>上記を参考に，whitespace-modeを導入．<br>
+<code>(setq-default show-trailing-whitespace t)</code>と設定がかぶっていたので削除した．</p>
+
+<h2>1.2 タブをスペースに変換</h2>
+
+<p><code>(setq-default indent-tabs-mode nil)</code>を使っていたのだけど，タブがスペースに置換されない．<br>
+そもそもどのタイミングで置換されていたのか?</p>
+
+<blockquote>
+<p><a href="http://www.math.s.chiba-u.ac.jp/%7Ematsu/lisp/emacs-lisp-intro-jp_17.html#SEC198">16. .emacs ファイル</a></p>
+</blockquote>
+
+<p>上記サイトによれば，自動インデントをした際のインデントがスペースになる，ということらしい．<br>
+普段入力するタブをスペースに置換するにはどうすればよいかと考えたけれど，単純にキーバインドに割り当てればよいだけだということに気づく．<br>
+<code>init.el</code>内でのタブ周りの設定は以下．</p>
+<div class="highlight"><pre><code class="language-lisp" data-lang="lisp"><span class="c1">;; タブ幅</span>
+<span class="p">(</span><span class="nv">custom-set-variables</span> <span class="o">&#39;</span><span class="p">(</span><span class="nv">tab-width</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="c1">;; インデント整形時，タブの代わりにスペースを用いる</span>
+<span class="p">(</span><span class="nv">setq-default</span> <span class="nv">indent-tabs-mode</span> <span class="no">nil</span><span class="p">)</span>
+</code></pre></div>
+<p>これとは別に，キーバインドとして以下を設定したらうまくいった．</p>
+<div class="highlight"><pre><code class="language-lisp" data-lang="lisp"><span class="p">(</span><span class="nv">global-set-key</span> <span class="s">&quot;\C-i&quot;</span> <span class="o">&#39;</span><span class="p">(</span><span class="k">lambda</span> <span class="p">()</span>
+                          <span class="p">(</span><span class="nv">interactive</span><span class="p">)</span>
+                          <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">width</span> <span class="nv">tab-width</span><span class="p">)</span>
+                                <span class="p">(</span><span class="nv">str</span>   <span class="s">&quot;&quot;</span><span class="p">))</span>
+                            <span class="p">(</span><span class="nb">dotimes</span> <span class="p">(</span><span class="nv">i</span> <span class="nv">width</span><span class="p">)</span>
+                              <span class="p">(</span><span class="k">setq</span> <span class="nv">str</span> <span class="p">(</span><span class="nv">concat</span> <span class="nv">str</span> <span class="s">&quot; &quot;</span><span class="p">)))</span>
+                            <span class="p">(</span><span class="nv">insert</span> <span class="nv">str</span><span class="p">))))</span>
+</code></pre></div>
+<p>タブを<code>C-i</code>で入力できるように，<code>C-i</code>を<code>\t</code>で置き換えていた．<br>
+タブ文字の挿入を割り当てているのだから，設定が反映されないのは当たり前だった．<br>
+スペース4つ分で代わりに置き換えようと思ったが，タブ幅の設定を反映できた方が良いと思ったのでこうなった．<br>
+ちょっとやり方が苦しい．もっと上手い方法があるかもしれない．</p>
+
+<h2>1.3 Markdownにおける行頭タブの自動整形の無効化</h2>
+
+<p>タブ入力した後に字句入力して改行するとタブが削除されてしまうのでなんとかしかった．<br>
+これはつまり，直前にインデントがない場合，Emacs が余分なインデントだと判断して自動整形してしまっているのだと思われる．</p>
+
+<blockquote>
+<p><a href="http://www.nofuture.tv/diary/20141114.html">emacs 24.4のmarkdown-modeでリストのインデントが行頭に揃えられてしまう(解決)</a><br><br>
+<a href="http://www.muskmelon.jp/?p=1068">Emacs 24.4 のインデントを無効化</a></p>
+</blockquote>
+
+<p>コーディングの際には自動インデントは欲しいので，Markdownの編集時のみ自動インデントを無効化したい．<br>
+Emacsはモードが設定されると，対応するモードフック変数に登録されている関数を呼び出す．<br>
+各モードのカスタマイズのためには，このモードフック変数を編集する．<br>
+今回は，以下のように設定を追記して自動インデントを無効化した．</p>
+<div class="highlight"><pre><code class="language-lisp" data-lang="lisp"><span class="c1">;; markdown</span>
+<span class="p">(</span><span class="nv">autoload</span> <span class="ss">&#39;markdown-mode</span> <span class="s">&quot;markdown-mode.el&quot;</span> <span class="s">&quot;Major mode for editing Markdown files&quot;</span> <span class="no">t</span><span class="p">)</span>
+<span class="p">(</span><span class="k">setq</span> <span class="nv">auto-mode-alist</span> <span class="p">(</span><span class="nb">cons</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;\\.md&quot;</span> <span class="o">.</span> <span class="nv">gfm-mode</span><span class="p">)</span> <span class="nv">auto-mode-alist</span><span class="p">))</span>
+
+<span class="p">(</span><span class="nv">add-hook</span> <span class="ss">&#39;gfm-mode-hook</span>
+          <span class="o">&#39;</span><span class="p">(</span><span class="k">lambda</span> <span class="p">()</span>
+             <span class="p">(</span><span class="k">setq</span> <span class="nv">global-linum-mode</span> <span class="no">nil</span><span class="p">)</span>
+             <span class="p">(</span><span class="nv">electric-indent-local-mode</span> <span class="mi">-1</span><span class="p">)))</span>
+</code></pre></div>
+<p><code>global-linum-mode</code>は画面外にはみ出した文章の改行指定．<br>
+コーディングでは全体の形が崩れるので無効にしておくが，Markdownは文章なので改行したほうが読みやすい．</p>
+
+<h2>1.4 GFMモードを利用する</h2>
+
+<p>行末のスペースも削除されてしまうので，どうしようと思っていたが，GFMモードというものを利用すれば良いらしい．<br>
+具体的な使い方は前項に示した．gfm-mode は markdown-mode.el 内に定義されているようだ．<br>
+GFMモードを快適に利用したいので，さらに以下を設定していく．</p>
+
+<ol>
+<li>OctopressでGFMが使用できるように設定する</li>
+<li>GFMのプレビューができるようにする</li>
+</ol>
+
+<h3>1.4.1 OctopressでGFMが使用できるように設定する</h3>
+
+<ol>
+<li><code>Gemfile</code>に<code>gem &#39;redcarpet&#39;, &#39;~&gt; 3.1</code>を追記(他のgemがこのバージョンに依存していたため，参考サイトと違うバージョンを指定)</li>
+<li>なかったので，<code>gem &#39;albino&#39;, &#39;~&gt; 1.3.3&#39;</code>も追加</li>
+<li><code>bundle install</code></li>
+<li><code>plugins</code>ディレクトリに，<code>redcarpet2_markdown.rb</code>を追加(<a href="https://github.com/nono/Jekyll-plugins">source</a>)</li>
+<li><code>_config.yml</code>の<code>markdown: rdiscount</code>を下記のように書き換え</li>
+</ol>
+<div class="highlight"><pre><code class="language-text" data-lang="text">markdown: redcarpet
+redcarpet:
+  extensions: [&quot;hard_wrap&quot;]
+</code></pre></div>
+<p><code>redcarpet2</code>を指定するとエラーとなった．(<a href="https://github.com/clayallsopp/rubymotion-tutorial/issues/30">参考</a>)</p>
+
+<blockquote>
+<p><a href="http://blog.tdksk.com/2013/05/06/use-gfm-in-octopress.html">Octopress で GitHub Flavored Markdown (GFM) を使う</a></p>
+</blockquote>
+
+<h3>1.4.2 emacs上からGFMのプレビューができるようにする</h3>
+
+<p>Grip は Markdown を GitHub Flavor に変換してプレビューできる．</p>
+
+<ol>
+<li>Gripをインストール</li>
+</ol>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>sudo pip install grip
+</code></pre></div>
+<blockquote>
+<p><a href="http://blog.wonderrabbitproject.net/2014/07/github-flavored-markdown-grip.html">GitHub Flavored Markdown に対応した Grip というツールが便利だったので備忘録</a><br>
+<a href="http://www.moongift.jp/2014/01/grip-github%E9%A2%A8%E3%81%ABmarkdown%E3%82%92html%E3%83%97%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC/">Grip - GitHub風にMarkdownをHTMLプレビュー</a></p>
+</blockquote>
+
+<ol>
+<li>binファイルを作成し，パスの通ったディレクトリにおく</li>
+</ol>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>which grip
+<span class="nv">$ </span>emacs /usr/local/bin/markdown
+
+<span class="c">#!/bin/sh</span>
+<span class="nv">filename</span><span class="o">=</span><span class="nv">$1</span>
+/usr/local/bin/grip --export --gfm <span class="k">${</span><span class="nv">filename</span><span class="k">}</span> &gt; /dev/null
+cat <span class="k">${</span><span class="nv">filename</span><span class="p">%.*</span><span class="k">}</span>.html
+</code></pre></div>
+<p>GFMモードでプレビューするためには，<code>--gfm</code>オプションを追加する．<br>
+<code>markdown</code>ファイルについて．既にパス内に存在している場合がある(通常のプレビュー時に用いていたのかも)<br>
+なので，<code>which markdown</code>で存在するかどうか調べて，存在したならバックアップをとって新たに置き換えると良い．<br>
+また，権限を755に設定しておくこと．</p>
+
+<ol>
+<li>設定の追加</li>
+</ol>
+<div class="highlight"><pre><code class="language-lisp" data-lang="lisp"><span class="c1">;; markdown mode</span>
+<span class="p">(</span><span class="nv">autoload</span> <span class="ss">&#39;markdown-mode</span> <span class="s">&quot;markdown-mode&quot;</span>
+   <span class="s">&quot;Major mode for editing Markdown files&quot;</span> <span class="no">t</span><span class="p">)</span>
+   <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;auto-mode-alist</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;\\.text\\&#39;&quot;</span> <span class="o">.</span> <span class="nv">gfm-mode</span><span class="p">))</span>
+   <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;auto-mode-alist</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;\\.markdown\\&#39;&quot;</span> <span class="o">.</span> <span class="nv">gfm-mode</span><span class="p">))</span>
+   <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;auto-mode-alist</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;\\.md\\&#39;&quot;</span> <span class="o">.</span> <span class="nv">gfm-mode</span><span class="p">))</span>
+
+<span class="c1">;; ファイルパスを渡す</span>
+<span class="p">(</span><span class="nb">defun</span> <span class="nv">markdown-custom</span> <span class="p">()</span>
+  <span class="s">&quot;markdown-mode-hook&quot;</span>
+    <span class="p">(</span><span class="k">setq</span> <span class="nv">markdown-command-needs-filename</span> <span class="no">t</span><span class="p">)</span>
+      <span class="p">)</span>
+      <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">&#39;markdown-mode-hook</span> <span class="o">&#39;</span><span class="p">(</span><span class="k">lambda</span><span class="p">()</span> <span class="p">(</span><span class="nv">markdown-custom</span><span class="p">)))</span>
+</code></pre></div>
+<ol>
+<li><code>C-c C-c p</code>，<code>C-c C- v</code>で実行</li>
+</ol>
+
+<h3>トラブルシューティング</h3>
+
+<p>これでok&#8230;と思ったら，文字化けする上にちっともGitHub Flavor でない．</p>
+
+<p>試しに，Markdownファイルに対して直接<code>grip</code>を叩く．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>grip test.md
+</code></pre></div>
+<p>するとエラーがでて，プレビューできない．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">UnicodeDecodeError: &#39;utf8&#39; codec can&#39;t decode byte 0xa4 in position 2: invalid start byte
+</code></pre></div>
+<p>文字コード関連かと思い，対象ファイルの文字コードをnkfで調べる．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>nkf --guess test.md
+EUC-JP <span class="o">(</span>LF<span class="o">)</span>
+</code></pre></div>
+<p>UTF-8に変換．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>nkf -u --overwrite test.md
+</code></pre></div>
+<p>再び実行．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>nkf --guess test.md
+UTF-8 <span class="o">(</span>LF<span class="o">)</span>
+<span class="nv">$ </span>grip test.md
+</code></pre></div>
+<p>うまくいった．<br>
+ただ，エラーが表示されてしまう．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">/usr/local/lib/python2.7/site-packages/requests/packages/urllib3/connectionpool.py:769: InsecureRequestWarning: Unverified HTTPS request is being made. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.org/en/latest/security.html InsecureRequestWarning<span class="o">)</span>
+</code></pre></div>
+<p>証明書関連のエラーだと思われる．<br>
+詳しくは後日調べることにして，プレビューもできたのでとりあえずコレでOK．<br>
+ただ，<code>#</code>で指定する見出しがなぜか変換されない．これもとりあえず後日調べることにする．</p>
+
+<blockquote>
+<p><a href="http://blog.s-amemiya.com/development/emacs%E3%81%AEmarkdown-mode%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%82%8B/">Emacsのmarkdown-modeを使ってみる</a>  </p>
+</blockquote>
+
+<h1>2. 今後やりたいことのメモ</h1>
+
+<ul>
+<li>Emacsにおける文字コードの設定</li>
+<li>認証局関連の知識ほしい&#8230;(<a href="http://qiita.com/kawaz/items/f90810b9ea823b6556a8">認証局を立ててぼろもうけしたいんですが＞無理な理由を理解しよう</a>)</li>
+<li>ブログの見た目を少し変えたい(文字が大きい&#8230;)</li>
+</ul>
+
+<p>とりあえず，MarkdownをEmacsから手軽に書いて，ブログを更新するという目標は達成できた．</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Emacsについて 02]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/03/14/title/"/>
+    <updated>2015-03-14T21:30:29+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/03/14/title</id>
+    <content type="html"><![CDATA[<p>研究会とか諸々で忙しかったため，久しぶりの更新．Emacsの設定をしたので自分用にメモ．<br>
+やったことは&#8230;</p>
+
+<ul>
+<li>基本設定</li>
+<li>Caskを導入してのパッケージ管理</li>
+</ul>
+
+<!-- more -->
+
+<h1>1. インストール</h1>
+
+<p>emacsのインストール．前回やった．<br>
+homebrewでemacsをインストールしたため，インストール先は<code>/usr/local/Cellar</code>にある．<code>Emacs.app</code>をAppフォルダに移動しておく．</p>
+
+<h1>2. ディレクトリ構成</h1>
+
+<p>まず，ホームディレクトリがどこか確認する．Emacsを立ち上げて<code>C-x C-f</code>で<code>~/</code>を指定すれば分かる．</p>
+
+<p>ホームディレクトリに，設定を保存するための<code>.emacs.d</code>フォルダを作成する(自動生成されている場合もある)．下記のサイトを参考にすると．</p>
+
+<blockquote>
+<p><a href="http://www.gfd-dennou.org/member/uwabami/cc-env/EmacsBasic.html">Emacs の基本設定</a></p>
+</blockquote>
+
+<p>Emacs22以降は，<code>~/.emacs.d/</code>以下に設定ファイル群をまとめておくと便利だそう．このサイトはいろいろ作っているけど，よくわからないので最低限のものだけ作成する．とりあえず，<code>inits</code>フォルダと<code>init.el</code>ファイルを作成する．それぞれの役割は以下．</p>
+
+<ul>
+<li>init.el
+
+<ul>
+<li>Emacsの初期化ファイル</li>
+<li>ウインドウの大きさ，フォントの種類とか</li>
+<li>elispパッケージの読み込みとか</li>
+</ul></li>
+<li>inits
+
+<ul>
+<li>各種設定ファイルをおく</li>
+<li>init-loaderの項で説明する</li>
+</ul></li>
+</ul>
+
+<h1>3. 設定を書く</h1>
+
+<p>下記サイトをとりあえず参考に．</p>
+
+<blockquote>
+<p><a href="http://d.hatena.ne.jp/sandai/20120304/p2">うわっ&#8230;私のEmacs、使いにくすぎ？だったら&#8230;ｶｽﾀﾏｲｽﾞｼﾔｯｾｰ!!ﾀﾞｧﾀﾞｧｼｴﾘｲｪｯｽｯｼｪｰｼｮｰﾍｲﾍｲ!!!</a></p>
+</blockquote>
+
+<h2>3.1 load-pathの設定</h2>
+
+<p>いろいろなライブラリを利用できた方が便利だ．EmacsのライブラリはEmacs Lispで記述されており，拡張子は<code>.el</code>である．<code>M-x load-library</code>を実行すると，<code>load-path</code>に存在するライブラリが読み込まれる．<br>
+よって，この<code>load parh</code>を設定しておく必要がある．<code>load path</code>は変数<code>load-path</code>として定義されているため，これを書き換えればよい．<br>
+初期化ファイルである<code>init.el</code>に，以下を追記する．</p>
+<div class="highlight"><pre><code class="language-lisp" data-lang="lisp"><span class="c1">;; load-pathの追加関数</span>
+<span class="p">(</span><span class="nb">defun</span> <span class="nv">add-to-load-path</span> <span class="p">(</span><span class="k">&amp;rest</span> <span class="nv">paths</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">let</span> <span class="p">(</span><span class="nv">path</span><span class="p">)</span>
+    <span class="p">(</span><span class="nb">dolist</span> <span class="p">(</span><span class="nv">path</span> <span class="nv">paths</span> <span class="nv">paths</span><span class="p">)</span>
+      <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">default-directory</span> <span class="p">(</span><span class="nv">expand-file-name</span> <span class="p">(</span><span class="nv">concat</span> <span class="nv">user-emacs-directory</span> <span class="nv">path</span><span class="p">))))</span>
+        <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;load-path</span> <span class="nv">default-directory</span><span class="p">)</span>
+        <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">fboundp</span> <span class="ss">&#39;normal-top-level-add-subdirs-to-load-path</span><span class="p">)</span>
+            <span class="p">(</span><span class="nv">normal-top-level-add-subdirs-to-load-path</span><span class="p">))))))</span>
+
+<span class="c1">;; load-pathに追加するフォルダ</span>
+<span class="c1">;; 2つ以上フォルダを指定する場合の引数 =&gt; (add-to-load-path &quot;elisp&quot; &quot;xxx&quot; &quot;xxx&quot;)</span>
+<span class="p">(</span><span class="nv">add-to-load-path</span> <span class="s">&quot;elisp&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>やり方はいろいろあると思うけど，関数として定義しておけば，追加が楽だ．</p>
+
+<h2>3.2 全体的な設定</h2>
+
+<p>途中フォントの設定があるが，Emacsで使用可能なフォント一覧は<code>(font-family-list)</code>をscratchバッファ実行すれば良い．</p>
+<div class="highlight"><pre><code class="language-lisp" data-lang="lisp"><span class="c1">;; 文字コード</span>
+<span class="c1">;; WindowsとMacでわける</span>
+<span class="p">(</span><span class="nv">set-language-environment</span> <span class="s">&quot;Japanese&quot;</span><span class="p">)</span>
+<span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">ws</span> <span class="nv">window-system</span><span class="p">))</span>
+  <span class="p">(</span><span class="nb">cond</span> <span class="p">((</span><span class="nb">eq</span> <span class="nv">ws</span> <span class="ss">&#39;w32</span><span class="p">)</span>
+         <span class="p">(</span><span class="nv">prefer-coding-system</span> <span class="ss">&#39;utf-8-unix</span><span class="p">)</span>
+         <span class="p">(</span><span class="nv">set-default-coding-systems</span> <span class="ss">&#39;utf-8-unix</span><span class="p">)</span>
+         <span class="p">(</span><span class="k">setq</span> <span class="nv">file-name-coding-system</span> <span class="ss">&#39;sjis</span><span class="p">)</span>
+         <span class="p">(</span><span class="k">setq</span> <span class="nv">locale-coding-system</span> <span class="ss">&#39;utf-8</span><span class="p">))</span>
+        <span class="p">((</span><span class="nb">eq</span> <span class="nv">ws</span> <span class="ss">&#39;ns</span><span class="p">)</span>
+         <span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;ucs-normalize</span><span class="p">)</span>
+         <span class="p">(</span><span class="nv">prefer-coding-system</span> <span class="ss">&#39;utf-8-hfs</span><span class="p">)</span>
+         <span class="p">(</span><span class="k">setq</span> <span class="nv">file-name-coding-system</span> <span class="ss">&#39;utf-8-hfs</span><span class="p">)</span>
+         <span class="p">(</span><span class="k">setq</span> <span class="nv">locale-coding-system</span> <span class="ss">&#39;utf-8-hfs</span><span class="p">))))</span>
+
+<span class="c1">;; Windowsで英数と日本語にMeiryoを指定</span>
+<span class="c1">;; Macで英数と日本語にRictyを指定</span>
+<span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">ws</span> <span class="nv">window-system</span><span class="p">))</span>
+  <span class="p">(</span><span class="nb">cond</span> <span class="p">((</span><span class="nb">eq</span> <span class="nv">ws</span> <span class="ss">&#39;w32</span><span class="p">)</span>
+         <span class="p">(</span><span class="nv">set-face-attribute</span> <span class="ss">&#39;default</span> <span class="no">nil</span>
+                             <span class="ss">:family</span> <span class="s">&quot;Meiryo&quot;</span>  <span class="c1">;; 英数</span>
+                             <span class="ss">:height</span> <span class="mi">100</span><span class="p">)</span>
+         <span class="p">(</span><span class="nv">set-fontset-font</span> <span class="no">nil</span> <span class="ss">&#39;japanese-jisx0208</span> <span class="p">(</span><span class="nv">font-spec</span> <span class="ss">:family</span> <span class="s">&quot;Meiryo&quot;</span><span class="p">)))</span>  <span class="c1">;; 日本語</span>
+        <span class="p">((</span><span class="nb">eq</span> <span class="nv">ws</span> <span class="ss">&#39;ns</span><span class="p">)</span>
+         <span class="p">(</span><span class="nv">set-face-attribute</span> <span class="ss">&#39;default</span> <span class="no">nil</span>
+                             <span class="ss">:family</span> <span class="s">&quot;Ricty&quot;</span>  <span class="c1">;; 英数</span>
+                             <span class="ss">:height</span> <span class="mi">140</span><span class="p">)</span>
+         <span class="p">(</span><span class="nv">set-fontset-font</span> <span class="no">nil</span> <span class="ss">&#39;japanese-jisx0208</span> <span class="p">(</span><span class="nv">font-spec</span> <span class="ss">:family</span> <span class="s">&quot;Ricty&quot;</span><span class="p">)))))</span>  <span class="c1">;; 日本語</span>
+
+<span class="c1">;; スタートアップ非表示</span>
+<span class="p">(</span><span class="k">setq</span> <span class="nv">inhibit-startup-screen</span> <span class="no">t</span><span class="p">)</span>
+
+<span class="c1">;; scratchの初期メッセージ消去</span>
+<span class="p">(</span><span class="k">setq</span> <span class="nv">initial-scratch-message</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
+
+<span class="c1">;; ツールバー非表示</span>
+<span class="p">(</span><span class="nv">tool-bar-mode</span> <span class="mi">-1</span><span class="p">)</span>
+
+<span class="c1">;; メニューバーを非表示</span>
+<span class="p">(</span><span class="nv">menu-bar-mode</span> <span class="mi">-1</span><span class="p">)</span>
+
+<span class="c1">;; スクロールバー非表示</span>
+<span class="p">(</span><span class="nv">set-scroll-bar-mode</span> <span class="no">nil</span><span class="p">)</span>
+
+<span class="c1">;; 行番号表示</span>
+<span class="p">(</span><span class="nv">global-linum-mode</span> <span class="no">t</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">set-face-attribute</span> <span class="ss">&#39;linum</span> <span class="no">nil</span>
+                    <span class="ss">:foreground</span> <span class="s">&quot;#800&quot;</span>
+                    <span class="ss">:height</span> <span class="mf">0.9</span><span class="p">)</span>
+
+<span class="c1">;; タイトルバーにファイルのフルパス表示</span>
+<span class="p">(</span><span class="k">setq</span> <span class="nv">frame-title-format</span>
+      <span class="p">(</span><span class="nb">format</span> <span class="s">&quot;%%f - Emacs@%s&quot;</span> <span class="p">(</span><span class="nv">system-name</span><span class="p">)))</span>
+
+<span class="c1">;; 選択領域の色</span>
+<span class="p">(</span><span class="nv">set-face-background</span> <span class="ss">&#39;region</span> <span class="s">&quot;#555&quot;</span><span class="p">)</span>
+
+<span class="c1">;; 行末の空白を強調表示</span>
+<span class="p">(</span><span class="nv">setq-default</span> <span class="nv">show-trailing-whitespace</span> <span class="no">t</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">set-face-background</span> <span class="ss">&#39;trailing-whitespace</span> <span class="s">&quot;#b14770&quot;</span><span class="p">)</span>
+
+<span class="c1">;; タブをスペースで扱う</span>
+<span class="p">(</span><span class="nv">setq-default</span> <span class="nv">indent-tabs-mode</span> <span class="no">nil</span><span class="p">)</span>
+
+<span class="c1">;; タブ幅</span>
+<span class="p">(</span><span class="nv">custom-set-variables</span> <span class="o">&#39;</span><span class="p">(</span><span class="nv">tab-width</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="c1">;; 行間</span>
+<span class="p">(</span><span class="nv">setq-default</span> <span class="nv">line-spacing</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1">;; 1行ずつスクロール</span>
+<span class="p">(</span><span class="k">setq</span> <span class="nv">scroll-conservatively</span> <span class="mi">35</span>
+      <span class="nv">scroll-margin</span> <span class="mi">0</span>
+      <span class="nv">scroll-step</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">(</span><span class="k">setq</span> <span class="nv">comint-scroll-show-maximum-output</span> <span class="no">t</span><span class="p">)</span> <span class="c1">;; shell-mode</span>
+
+<span class="c1">;; フレームの透明度</span>
+<span class="p">(</span><span class="nv">set-frame-parameter</span> <span class="p">(</span><span class="nv">selected-frame</span><span class="p">)</span> <span class="ss">&#39;alpha</span> <span class="o">&#39;</span><span class="p">(</span><span class="mf">0.85</span><span class="p">))</span>
+
+<span class="c1">;; モードラインに行番号表示</span>
+<span class="p">(</span><span class="nv">line-number-mode</span> <span class="no">t</span><span class="p">)</span>
+
+<span class="c1">;; モードラインに列番号表示</span>
+<span class="p">(</span><span class="nv">column-number-mode</span> <span class="no">t</span><span class="p">)</span>
+
+<span class="c1">;; yes or noをy or n</span>
+<span class="p">(</span><span class="nv">fset</span> <span class="ss">&#39;yes-or-no-p</span> <span class="ss">&#39;y-or-n-p</span><span class="p">)</span>
+</code></pre></div>
+<h2>3.3 追記</h2>
+
+<p>上記のような設定を<code>init.el</code>にだらだらと書いたら，<code>init-loader</code>なるものを見つけたので，後述する．また，<code>init.el</code>に設定を追記したものの，ちゃんと機能しているかが不安というときは，式の後ろで<code>C-x C-e</code>を実行するとlisp式を評価できるので，これで確認すると良い．</p>
+
+<h1>4. パッケージ管理</h1>
+
+<p>Emacsのパッケージ管理が必要となるが，どうやらいろいろあるようだ．</p>
+
+<ul>
+<li>package.elを使う</li>
+<li>Cask,Palletを使う</li>
+</ul>
+
+<p>後者の方が便利らしい．よくわからないのでとりあえずどちらも見ておく．</p>
+
+<h2>4.1 package.el</h2>
+
+<p>Emacsのパッケージは，リポジトリにまとまって公開されている．</p>
+
+<ul>
+<li>GNU ELPA
+
+<ul>
+<li>公式のリポジトリ</li>
+<li>デフォルトではこれのみ利用可能</li>
+</ul></li>
+<li>MELPA
+
+<ul>
+<li>非公式のリポジトリ</li>
+<li>リポジトリに変更があるたびに更新されるため，最新版をインストール可能</li>
+</ul></li>
+</ul>
+
+<p>上記のようなリポジトリを登録したのちに，インストールしたいパッケージを指定する，という流れになる．リポジトリ情報は<code>package-archives</code>変数に格納されているので，新規に追加する場合はこれをいじる．以下が設定例．</p>
+<div class="highlight"><pre><code class="language-lisp" data-lang="lisp"><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;package</span><span class="p">)</span>
+
+<span class="c1">;; MELPAを追加</span>
+<span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;package-archives</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;melpa&quot;</span> <span class="o">.</span> <span class="s">&quot;http://melpa.milkbox.net/packages/&quot;</span><span class="p">))</span>
+
+<span class="c1">;; 初期化</span>
+<span class="p">(</span><span class="nv">package-initialize</span><span class="p">)</span>
+</code></pre></div>
+<p>指定したパッケージをインストールするには，<code>M-x package-install</code>を実行する．更新は<code>M-x package-refresh-contents</code>．</p>
+
+<p>以上がパッケージをインストールする流れになるが，環境が変わった際にいちいちパッケージをインストールしなおすのは面倒．そこで，<code>package.el</code>にインストールすべきパッケージを記載しておき，これを実行すれば同様の環境が構築できるようにしておく．</p>
+
+<p><code>(package-installed-p package-name)</code>で<code>package-name</code>がインストール済みかどうか確認できるため，これが<code>nil</code>を返すようなパッケージについてインストールすれば，同様の環境が構築できる．<code>package.el</code>に必要なパッケージを記述し(例は省略)，<code>M-x eval-buffer</code>を実行することでパッケージ群をインストールできる．便利．</p>
+
+<blockquote>
+<p><a href="http://emacs-jp.github.io/packages/package-management/package-el.html">package.el - Emacs JP</a></p>
+</blockquote>
+
+<h2>4.2 Cask</h2>
+
+<p><code>package.el</code>は便利だなーと思ったけれど，最近だと<code>Cask</code>なるものを使うらしい．<code>Cask</code>は，ざっくりいうとパッケージ管理システム．パッケージの依存関係をみながらライブラリを管理してくれる，のかな？</p>
+
+<p><code>package.el</code>もライブラリの依存関係を考慮して必要ライブラリを一括でダウンロードできるが，個人の設定であるため<code>~./emacs.d</code>にダウンロードするのが前提．<br>
+よって，ライブラリ開発で利用するのには向かない．<code>Cask</code>は Cask ファイルに依存しているライブラリを記述することで，一括ダウンロードや<code>PATH</code>，<code>load-path</code>の調整をしてくれる．</p>
+
+<h3>4.2.1 Caskのインストール</h3>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>brew install cask
+</code></pre></div>
+<h3>4.2.2 Caskファイルの初期化</h3>
+
+<p><code>~/.emacs.d</code>(設定ファイルが置かれた場所)で<code>cask init</code>．<br>
+<code>Cask</code>というファイルができるため，今後このファイルでパッケージを管理する．<br>
+本ファイルには，すでにCaskオススメのパッケージが依存関係として記述されているので，これを好みに記述し直していけば良い．</p>
+
+<h3>4.2.3 Caskファイルの記述</h3>
+
+<h4>source</h4>
+
+<p>パッケージリポジトリを指定する．<br>
+現状，gnu, melpa, marmalade, SC, orgが指定可能．</p>
+<div class="highlight"><pre><code class="language-lisp" data-lang="lisp"><span class="p">(</span><span class="nv">source</span> <span class="nv">gnu</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">source</span> <span class="nv">melpa</span><span class="p">)</span>
+</code></pre></div>
+<h4>depends-on</h4>
+
+<p>インストールするパッケージをいろいろ書いていく．指定方法は以下が可能．</p>
+<div class="highlight"><pre><code class="language-lisp" data-lang="lisp"><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span> <span class="s">&quot;0.8.1&quot;</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span> <span class="ss">:git</span> <span class="s">&quot;https://github.com/magit/magit.git&quot;</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span> <span class="ss">:git</span> <span class="s">&quot;https://github.com/magit/magit.git&quot;</span> <span class="ss">:ref</span> <span class="s">&quot;7j3bj4d&quot;</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span> <span class="ss">:git</span> <span class="s">&quot;https://github.com/magit/magit.git&quot;</span> <span class="ss">:branch</span> <span class="s">&quot;next&quot;</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span> <span class="ss">:git</span> <span class="s">&quot;https://github.com/magit/magit.git&quot;</span> <span class="ss">:files</span> <span class="p">(</span><span class="s">&quot;*.el&quot;</span> <span class="p">(</span><span class="ss">:exclude</span> <span class="s">&quot;magit-svn.el&quot;</span><span class="p">)))</span>
+</code></pre></div>
+<h3>4.2.4 ライブラリのインストール</h3>
+
+<p><code>Cask</code>に記述されたライブラリがインストールされる．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>cask install
+</code></pre></div>
+<h3>4.2.5 インストールされたパッケージにパスを通す</h3>
+
+<p>cask.elをロードし，cask-initializeを呼ぶ．こうすることで，load-path，autoloadの設定を読み込んでくれる．<br>
+<code>init.el</code>に以下を記述．</p>
+<div class="highlight"><pre><code class="language-lisp" data-lang="lisp"><span class="c1">;; homebrewで導入したtool用のpathを追加</span>
+<span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;load-path</span> <span class="s">&quot;/usr/local/share/emacs/site-lisp&quot;</span><span class="p">)</span>
+
+<span class="c1">;; ------------------------------------------------------------------------</span>
+<span class="c1">;; @ Cask設定</span>
+<span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;cask</span> <span class="s">&quot;cask.el&quot;</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">cask-initialize</span><span class="p">)</span>
+</code></pre></div>
+<h3>4.2.6 おまけ</h3>
+
+<p>とりあえず初期設定のままでパッケージをインストールした．暇なときに以下のサイトを見たりしておく．</p>
+
+<blockquote>
+<p><a href="http://posaune.hatenablog.com/entry/2014/06/17/221041">Cask init して入ってくるライブラリ一覧 - 亀岡的プログラマ日記</a></p>
+
+<p><a href="https://github.com/cask/cask">Cask</a><br>
+<a href="http://kiririmode.hatenablog.jp/entry/20141228/1419762171">Cask とは何であるのか、および init.el が非常にシンプルになった件</a><br>
+<a href="http://www.kaichan.info/blog/2014-02-23-emacs-cask.html">Emacs Lispのテスト、依存性管理、CI</a><br>
+<a href="http://d.hatena.ne.jp/syohex/20140424/1398310931">package.elから Caskに切り替えました</a></p>
+</blockquote>
+
+<h1>5. init-loaderによる設定ファイルの分割</h1>
+
+<p><code>init-loader</code>は，指定したディレクトリ内のelファイルを読み込んでくれるelisp．それだけではなく，ファイル名を見て環境に合わせて読み込んでくれたり，エラーのあるファイルをスルーしてくれたりする．他にも，環境依存な設定を分離できたりするので便利．</p>
+
+<h2>5.1 init-loaderインストール</h2>
+
+<p>Caskを導入したので，利用してパッケージをいれる．Caskファイルにinit-loaderを追加．</p>
+<div class="highlight"><pre><code class="language-lisp" data-lang="lisp"><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;init-loader&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>インストール</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>cask install
+</code></pre></div>
+<p>アップデート</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>cask update
+</code></pre></div>
+<h2>5.2 設定ファイル記述</h2>
+
+<p><code>inits</code>フォルダの中に設定ファイルを書いていく．ファイルは以下の設定に従って作成していく．</p>
+
+<ul>
+<li>環境に依存しない設定はファイル名の最初に2けたの数字をつける
+
+<ul>
+<li>番号は優先度．00が最初，99が最後に読み込まれる</li>
+<li>同じ数字も可</li>
+</ul></li>
+<li>環境依存な設定は各環境のプレフィックスをファイル名の最初につける</li>
+</ul>
+
+<p>プレフィックスは以下</p>
+
+<table><thead>
+<tr>
+<th>環境</th>
+<th>prefix</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Meadow</td>
+<td>meadow</td>
+</tr>
+<tr>
+<td>Carbon Emacs</td>
+<td>carbon-emacs</td>
+</tr>
+<tr>
+<td>Cocoa Emacs</td>
+<td>cocoa-emacs</td>
+</tr>
+<tr>
+<td>emacs -nw</td>
+<td>nw</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>windows</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>linux</td>
+</tr>
+</tbody></table>
+
+<h2>5.3 設定の反映</h2>
+
+<p><code>inits.el</code>に設定追記</p>
+<div class="highlight"><pre><code class="language-lisp" data-lang="lisp"><span class="c1">;;; init-loader 設定</span>
+<span class="c1">;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;</span>
+<span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;init-loader</span><span class="p">)</span>
+<span class="p">(</span><span class="k">setq</span> <span class="nv">init-loader-show-lod-after-init</span> <span class="s">&quot;error-only&quot;</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">init-loader-load</span> <span class="s">&quot;~/.emacs.d/inits&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p><code>C-x C-e</code>で評価してエラーがないか確かめたら，一度終了して<code>emacs</code>コマンドでemacsを再起動．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">------- error log -------
+
+
+
+------- init log -------
+
+loaded /Users/hogehoge/.emacs.d/inits/00_hoge. 0.002511
+loaded /Users/hogehoge/.emacs.d/inits/01_hoge. 0.00703
+...
+
+------- load path -------
+
+/Users/hogehoge/.emacs.d/inits
+...
+</code></pre></div>
+<p>エラーがなく，inits内のファイルが呼び出されていることが確認できる．設定ファイルの分け方はまた考える．</p>
+
+<blockquote>
+<p><a href="http://tech.kayac.com/archive/divide-dot-emacs.html">.emacs分割のすゝめ</a><br>
+<a href="https://github.com/emacs-jp/init-loader">emacs-jp/init-loader</a><br>
+<a href="http://block-given.hatenablog.com/entry/2014/11/09/134725">モダンなEmacsを求めて (3) init-loaderで設定ファイルを分割する</a><br>
+<a href="http://qiita.com/catatsuy/items/5f1cd86e2522fd3384a0">init-loader.el と package.el を導入して快適 Emacs ライフ</a><br>
+<a href="http://blog.shibayu36.org/entry/2013/12/03/213942">自分流の .emacs管理</a></p>
+</blockquote>
+
+<h2>6. 最終的に</h2>
+
+<p>Caskとinit-loaderを導入した．<br>
+ので，次はどのパッケージを導入するか？設定(と，その分割)をどうするか？を考える．</p>
+
+<p>設定については，どんなものがあるのかわからないし，いろんな人の.emacs.dを参考にする．</p>
+
+<blockquote>
+<p><a href="https://github.com/shibayu36/emacs/tree/master/emacs.d">shibayu36/emacs</a><br>
+<a href="https://github.com/shomah4a/.emacs.d">shomah4a/.emacs.d</a><br>
+<a href="https://github.com/catatsuy/dot.emacs.d">catatsuy/dot.emacs.d</a><br>
+<a href="https://github.com/gongo/elfactory">gongo/elfactory</a></p>
+</blockquote>
+
+<h2>6.1 導入パッケージ</h2>
+
+<p>下記サイトを参考にいくつか</p>
+
+<blockquote>
+<p><a href="http://qiita.com/hottestseason/items/1e8a46ad1ebcf7d0e11c#2-3">Emacsパッケージ特集</a></p>
+</blockquote>
+
+<ul>
+<li>init-loader
+
+<ul>
+<li>いわずもがな</li>
+</ul></li>
+<li>auto-complete
+
+<ul>
+<li>字句保管機能</li>
+<li>バッファ内にある文字列を自動的に保管対象にする</li>
+<li>tabを押して選択</li>
+</ul></li>
+<li>popup
+
+<ul>
+<li>emacsでpopupメニューを使う．auto-completeで使われている．<br>
+<code>lisp
+(require &#39;auto-complete)
+(require &#39;auto-complete-config)    ; 必須ではないですが一応
+(global-auto-complete-mode t)
+</code></li>
+</ul></li>
+<li>smartparens
+
+<ul>
+<li>括弧やクォート等の自動挿入・管理<br>
+<code>lisp
+(require &#39;smartparens-config)
+(smartparens-global-mode t)
+</code></li>
+</ul></li>
+<li>rainbow-delimiters
+
+<ul>
+<li>括弧の対応を色付けする<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="nv">&amp;#39</span><span class="c1">;rainbow-delimiters)&lt;/li&gt;</span>
+</span><span class='line'><span class="nv">&lt;/ul&gt;&lt;/li&gt;</span>
+</span><span class='line'><span class="nv">&lt;/ul&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span><span class="c1">;(add-hook &amp;#39;clojure-mode-hook &amp;#39;rainbow-delimiters-mode)&lt;br&gt;</span>
+</span><span class='line'><span class="p">(</span><span class="nv">add-hook</span> <span class="nv">&amp;#39</span><span class="c1">;prog-mode-hook &amp;#39;rainbow-delimiters-mode)&lt;br&gt;</span>
+</span><span class='line'><span class="c1">;(global-rainbow-delimiters-mode)&lt;br&gt;</span>
+</span></code></pre></td></tr></table></div></figure><br>
+* helm<br>
+    * 超絶便利らしいので勉強してみる<br>
+* ace-jump-mode<br>
+    * 特定語句にジャンプする<br>
+    * 練習が必要そう</p>
+
+<blockquote>
+<p><a href="http://kiririmode.hatenablog.jp/entry/20131231/p1">smartparens.el での括弧処理</a><br>
+<a href="http://d.hatena.ne.jp/murase_syuka/20140815/1408061850">rainbow-delimiters.elの括弧色付けをデフォルトより強調する方法</a><br>
+<a href="http://dev.ariel-networks.com/wp/documents/aritcles/emacs/part9">「Emacsのトラノマキ」連載第09回「auto-completeを使おう」(松山智大)</a></p>
+</blockquote>
+
+<h1>7. おわりに</h1>
+
+<p>設定は奥が深いようだ．使いながら欲しい機能を探すのがいいだろう．あとは今回設定した中でも，気に入らない設定が出てくるかもしれない．落ち着いたら，設定はgithubで公開したい．<br>
+自作OSの方は8日目くらいまで進んでいるのだけど，まとめが終わっていない．明日はそちらをまとめることを目標にする．</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Emacsについて 01]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/02/08/title/"/>
+    <updated>2015-02-08T19:36:18+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/02/08/title</id>
+    <content type="html"><![CDATA[<p>Emacsを使おうと思うので，調べたこととやったことをメモする．</p>
+
+<!-- more -->
+
+<h1>1. 環境</h1>
+
+<p>使用環境は以下．</p>
+
+<ul>
+<li>Mac OS X Yosemite 10.10.1</li>
+</ul>
+
+<h1>2. 関連知識</h1>
+
+<h2>2.1 基本コマンド</h2>
+
+<p>使いそうなコマンドをメモしておく<a href="#emacs_keybind_01">1</a> <a href="#emacs_keybind_02">2</a>．何か不便に感じた時はそれを実現するコマンドがないかその都度調べる．</p>
+
+<ul>
+<li>C-：コントロールキー(Ctrl)</li>
+<li>M-：メタキー(Alt，Esc．Altは長押し．Escは1回押し．)</li>
+</ul>
+
+<h3>2.1.1 とりあえず</h3>
+
+<table><thead>
+<tr>
+<th>key</th>
+<th>desc</th>
+<th>notes</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>C-g</td>
+<td>コマンド中断</td>
+<td>困った時に</td>
+</tr>
+</tbody></table>
+
+<h3>2.1.2 移動</h3>
+
+<table><thead>
+<tr>
+<th>key</th>
+<th>desc</th>
+<th>notes</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>C-u</td>
+<td>上</td>
+<td></td>
+</tr>
+<tr>
+<td>C-n</td>
+<td>下</td>
+<td></td>
+</tr>
+<tr>
+<td>C-u</td>
+<td>上</td>
+<td></td>
+</tr>
+<tr>
+<td>C-f</td>
+<td>次</td>
+<td>Forward</td>
+</tr>
+<tr>
+<td>C-b</td>
+<td>前</td>
+<td>Back</td>
+</tr>
+<tr>
+<td>M-f</td>
+<td>1単語次</td>
+<td></td>
+</tr>
+<tr>
+<td>M-b</td>
+<td>1単語前</td>
+<td></td>
+</tr>
+<tr>
+<td>C-e</td>
+<td>行末</td>
+<td>Endのe</td>
+</tr>
+<tr>
+<td>C-a</td>
+<td>行頭</td>
+<td>ABC&#8230;のa</td>
+</tr>
+<tr>
+<td>C-v</td>
+<td>次ページ</td>
+<td></td>
+</tr>
+<tr>
+<td>M-v</td>
+<td>前ページ</td>
+<td></td>
+</tr>
+<tr>
+<td>M-&lt;</td>
+<td>ファイル先頭</td>
+<td></td>
+</tr>
+<tr>
+<td>M-&gt;</td>
+<td>ファイル末尾</td>
+<td></td>
+</tr>
+<tr>
+<td>M-g g</td>
+<td>任意の行へ移動</td>
+<td></td>
+</tr>
+</tbody></table>
+
+<h3>2.1.3 操作</h3>
+
+<table><thead>
+<tr>
+<th>key</th>
+<th>desc</th>
+<th>notes</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>C-d</td>
+<td>delete</td>
+<td></td>
+</tr>
+<tr>
+<td>C-h</td>
+<td>back space</td>
+<td></td>
+</tr>
+<tr>
+<td>M-d</td>
+<td>1単語delete</td>
+<td></td>
+</tr>
+<tr>
+<td>M-BS</td>
+<td>1単語back space</td>
+<td></td>
+</tr>
+<tr>
+<td>C-k</td>
+<td>行末まで削除</td>
+<td></td>
+</tr>
+<tr>
+<td>C-d</td>
+<td>カーソル位置の文字を削除</td>
+<td></td>
+</tr>
+<tr>
+<td>C-space</td>
+<td>領域始点</td>
+<td></td>
+</tr>
+<tr>
+<td>M-w</td>
+<td>領域コピー</td>
+<td></td>
+</tr>
+<tr>
+<td>C-w</td>
+<td>領域カット</td>
+<td></td>
+</tr>
+<tr>
+<td>C-y</td>
+<td>貼り付け</td>
+<td></td>
+</tr>
+</tbody></table>
+
+<h3>2.1.4 その他</h3>
+
+<table><thead>
+<tr>
+<th>key</th>
+<th>desc</th>
+<th>notes</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>C-s</td>
+<td>前方検索</td>
+<td></td>
+</tr>
+<tr>
+<td>C-r</td>
+<td>後方検索</td>
+<td></td>
+</tr>
+<tr>
+<td>C-x num</td>
+<td>ウインドウ分割</td>
+<td></td>
+</tr>
+<tr>
+<td>C-x o</td>
+<td>ウインドウ移動</td>
+<td></td>
+</tr>
+</tbody></table>
+
+<h2>2.2 初期化</h2>
+
+<p>初期化について．<br>
+Emacsの起動時に設定等の初期化が行われるはずなので，どういう仕組みで行われているのかを調べてメモしておく．とりあえず，Emacsの公式ドキュメント<a href="#emacs_doc">3</a>を読む．</p>
+
+<h3>初期化に用いられるファイル</h3>
+
+<p>Emacsは，最初にLispプログラムを読み込んで初期化する<a href="#init_01">4</a> <a href="#init_02">5</a>．</p>
+
+<ul>
+<li>個人用
+
+<ul>
+<li>~/.emacs( ~/.emacs.el )</li>
+<li>~/.emacs.d/init.el</li>
+</ul></li>
+<li>サイト用(PC毎，全ユーザ共通)
+
+<ul>
+<li>default.el</li>
+<li>site-start.el</li>
+</ul></li>
+</ul>
+
+<h3>初期化の順序</h3>
+
+<ol>
+<li>サイト設定(<code>site-start.el</code>)</li>
+<li>個人設定(<code>.emacs</code>等)
+
+<ol>
+<li><code>$HOME</code>から<code>~/.emacs(~/.emacs.el)</code>を探索
+
+<ol>
+<li>見つけた場合，読み込む</li>
+<li>見つからなかった場合，<code>~/.emacs.d/init.el</code>を探索し，読み込む</li>
+</ol></li>
+</ol></li>
+<li>デフォルト設定(<code>default.el</code>)</li>
+</ol>
+
+<p>読みこみたくない場合は<code>-p</code>，他のユーザの初期化ファイルを読み込みたい場合は<code>-u</code>をオプションとして指定する．また，個人設定で<code>inhibit-default-init nil</code>と指定すると，<code>default.el</code>は読み込まれない．<code>-no-site-file</code>オプションを指定すると，<code>site-start.el</code>は読み込まれない．<br>
+サイト設定とデフォルト設定は，Emacsがライブラリを読み込みに行くパス内(<code>load-path</code>)に存在すれば読み込まれる．</p>
+
+<h3>各初期化ファイルの記述目的</h3>
+
+<p>参考サイト<a href="init_how_to_use">6</a>より．</p>
+
+<table><thead>
+<tr>
+<th>設定</th>
+<th>記述目的</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>サイト設定</td>
+<td>Emacs環境を用意した担当者が，標準的なものを設定</td>
+</tr>
+<tr>
+<td>個人設定</td>
+<td>個人用の設定</td>
+</tr>
+<tr>
+<td>デフォルト設定</td>
+<td>個人設定がない場合，あるいは使うとしたらコレ，という設定</td>
+</tr>
+</tbody></table>
+
+<p>設定の記述方法は別項で説明する．</p>
+
+<blockquote>
+<p><a href="http://www.gfd-dennou.org/member/uwabami/cc-env/EmacsBasic.html#fn.1">Emacs の基本設定</a></p>
+</blockquote>
+
+<h2>2.3 ライブラリ</h2>
+
+<p>Emacsが読み込むライブラリについて触れる<a href="#emacs_library_01">7</a> <a href="#emacs_library_02">8</a>．Lispコードを含むファイルをライブラリ(Library)と呼ぶ．基本的にEmacs Lispで書く(拡張子は<code>.el</code>)．<br>
+Emacs Lispファイルはバイトコード(拡張子は<code>.elc</code>)にコンパイルされる．バイトコードはEmacs Lispファイルと比較してロードも実行も早く，容量も小さい．</p>
+
+<h3>ライブラリのロード</h3>
+
+<p>ロードを行うと，対象ファイル内の全ての式が評価され，設定が反映される．ロードはEmacs起動後に以下のコマンドで実行可能．</p>
+<div class="highlight"><pre><code class="language-emacs" data-lang="emacs"><span class="nv">M-x</span> <span class="nv">load-file</span> <span class="nv">filename</span>
+</code></pre></div>
+<h3>ライブラリの探索</h3>
+
+<ol>
+<li><em>filename.elc</em>を探す．</li>
+<li><em>filename.el</em>を探す．</li>
+<li><em>filename</em>を探す．</li>
+</ol>
+
+<p>対象ファイルを見つけた時点でロードし，見つからなかった場合はエラーとなる．</p>
+
+<h2>2.4 load path</h2>
+
+<h3>load path を用いたライブラリのロード</h3>
+
+<p><code>load path</code>が定義されており，以下のコマンドを実行すれば<code>load path</code>内のディレクトリが全て探索される．同名の<code>.el</code>と<code>.elc</code>があった場合，<code>.elc</code>が実行される．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">M-x load-library
+</code></pre></div>
+<h3>load path のデフォルト値</h3>
+
+<p><code>load path</code>は変数<code>load-path</code>として定義されている．探索対象のディレクトリがリスト構造で格納されている．<br>
+環境変数<code>EMACSLOADPATH</code>が設定されていれば，その値で初期化される．もしくは，<code>emacs/src/paths.h</code>に指定されたデフォルト値になる．</p>
+
+<h3>load path へのパスの追加</h3>
+
+<p>自作ライブラリ等が別のフォルダにある場合は，<code>load path</code>に追加する．パスを追加する方法をいくつかあげる．</p>
+
+<ol>
+<li>cshの場合，<code>.login</code>ファイルに設定する</li>
+</ol>
+<div class="highlight"><pre><code class="language-text" data-lang="text">setenv EMACSLOADPATH .:/user/bil/emacs:/usr/lib/emacs/lisp
+</code></pre></div>
+<ol>
+<li>shの場合</li>
+</ol>
+<div class="highlight"><pre><code class="language-text" data-lang="text">export EMACSLOADPATH
+EMACSLOADPATH=.:/user/bil/emacs:/usr/local/lib/emacs/lisp
+</code></pre></div>
+<ol>
+<li><code>.emacs</code>ファイルに設定する</li>
+</ol>
+<div class="highlight"><pre><code class="language-text" data-lang="text">;; これとか
+(setq load-path
+      (append (list nil &quot;/user/bil/emacs&quot;
+                    &quot;/usr/local/lisplib&quot;
+                    &quot;~/emacs&quot;)
+              load-path))
+
+;; これとか
+(add-to-list &#39;load-path &quot;/path/to/my/lisp/library&quot;)
+</code></pre></div>
+<h2>2.5 scratchバッファ</h2>
+
+<p>scratchバッファは，Emacs Lisp の実行環境であり，Emacs の設定を試し書きできる場所．以下で起動できる<a href="#emacs_scratch">9</a>．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">C-x b *scratch*
+</code></pre></div>
+<p><code>C-j</code>で式を評価できる．<br>
+<code>C-h f</code>で関数のヘルプが見れる．<br>
+<code>C-h v</code>で変数の値が見れる．</p>
+
+<h1>3. やったこと</h1>
+
+<p>満を持して，色々やっていく．<br>
+まずは，とりあえずやりたいことをまとめる．</p>
+
+<ul>
+<li>Markdownをかけるようにして，さくっとブログを更新したい．</li>
+<li>カラースキームの設定をしたい．</li>
+</ul>
+
+<p>満を持してといいつつ，今回は何もしていない．<br>
+次回に持ち越し．</p>
+
+<h3>3.1 最新版インストール</h3>
+
+<p>MacにはEmacsがデフォルトで入っている．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>emacs version
+GNU Emacs 22.1.1
+Copyright <span class="o">(</span>C<span class="o">)</span> <span class="m">2007</span> Free Software Foundation, Inc.
+GNU Emacs comes with ABSOLUTELY NO WARRANTY.
+You may redistribute copies of Emacs
+under the terms of the GNU General Public License.
+For more information about these matters, see the file named COPYING.
+</code></pre></div>
+<p>最新ではないので，最新版をいれる<a href="#emacs_inst_01">10</a> <a href="#emacs_inst_02">11</a> <a href="#emacs_inst_03">12</a>．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>brew install emacs --cocoa
+</code></pre></div>
+<p><code>/Applications/</code>にシンボリックリンクを貼る．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>brew linkapps
+</code></pre></div>
+<p>確認．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>emacs version
+GNU Emacs 24.4.1
+Copyright <span class="o">(</span>C<span class="o">)</span> <span class="m">2014</span> Free Software Foundation, Inc.
+GNU Emacs comes with ABSOLUTELY NO WARRANTY.
+You may redistribute copies of Emacs
+under the terms of the GNU General Public License.
+For more information about these matters, see the file named COPYING.
+</code></pre></div>
+<p>インストールできた．</p>
+
+<h2>4. 次回やること</h2>
+
+<p>感想．Lispの勉強になりそう．エディターは使いこなすまでやってなんぼだと思っているので積極的に使っていく．<br>
+今回はほぼ何もしてないので，次回はパッケージ管理辺りを調べながら，具体的に色々設定していきたいと思う．</p>
+
+<!--
+次回の参考
+http://totem3.hatenablog.jp/entry/2014/11/13/090715
+http://e-arrows.sakura.ne.jp/2010/02/vim-to-emacs.html
+http://gongo.hatenablog.com/entry/2014/05/09/230836
+http://d.hatena.ne.jp/rubikitch/20100201/elispsyntax
+http://totem3.hatenablog.jp/entry/2014/11/12/083115
+http://moonstruckdrops.github.io/blog/2013/03/24/markdown-mode/
+-->
+
+<h2>参考文献</h2>
+
+<blockquote>
+<ol>
+<li><a name="emacs_keybint_01"></a><a href="http://www.hpcs.cs.tsukuba.ac.jp/%7Eyonemoto/pukiwiki/index.php?Emacs%2F%A5%B7%A5%E7%A1%BC%A5%C8%A5%AB%A5%C3%A5%C8">Emacsのキーボードショートカット一覧</a></li>
+<li><a name="emacs_keybind_02"></a><a href="http://www.geocities.co.jp/SiliconValley-Bay/1553/linux/emacs.html">GNUEmacs の学習</a></li>
+<li><a name="emacs_doc"></a><a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/">The Emacs Editor</a></li>
+<li><a name="init_01"></a><a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Find-Init.html#Find-Init">49.4.4 How Emacs Finds Your Init File</a></li>
+<li><a name="init_02"></a><a href="http://www.math.s.chiba-u.ac.jp/%7Ematsu/lisp/emacs-lisp-intro-jp_17.html">16. `.emacs&#39; ファイル</a></li>
+<li><a name="init_how_to_use"></a><a href="http://www.ki.nu/%7Emakoto/diary/2009/10/05/1.html">Ubuntu の site-start.el</a></li>
+<li><a name="emacs_library_01"></a><a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Lisp-Libraries.html#Lisp-Libraries">27.8 Libraries of Lisp Code for Emacs</a></li>
+<li><a name="emacs_library_02"></a><a href="http://www.fan.gr.jp/%7Ering/doc/elisp_19/elisp-jp_15.html">13.1 プログラムでロードする方法</a></li>
+<li><a name="emacs_scratch"></a><a href="http://d.hatena.ne.jp/sandai/20120304/p2">うわっ&#8230;私のEmacs、使いにくすぎ？だったら&#8230;ｶｽﾀﾏｲｽﾞｼﾔｯｾｰ!!ﾀﾞｧﾀﾞｧｼｴﾘｲｪｯｽｯｼｪｰｼｮｰﾍｲﾍｲ!!!</a></li>
+<li><a name="emacs_inst_01"></a><a href="http://blog.yug1224.com/2013/10/29/emacs/">HomebrewでEmacsをインストール。</a></li>
+<li><a name="emacs_inst_02"></a><a href="http://tb-lab.hatenablog.jp/entry/2013/10/22/225853">Macでemacsを設定しよう</a></li>
+<li><a name="emacs_inst_03"></a><a href="http://www.sevencredit.com/2014/07/02/580/">Macで本家EmacsとHomebrew IMEパッチ版とEmacs Mac PortとAquamacsを比べてみる。</a></li>
+</ol>
+</blockquote>
+]]></content>
+  </entry>
+  
+</feed>

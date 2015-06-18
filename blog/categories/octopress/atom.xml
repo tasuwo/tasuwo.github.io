@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Octopress | tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/blog/categories/octopress/atom.xml" rel="self"/>
+  <link href="http://tasuwo.github.io/"/>
+  <updated>2015-05-30T13:10:11+09:00</updated>
+  <id>http://tasuwo.github.io/</id>
+  <author>
+    <name><![CDATA[tasuwo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[OctopressのCSSをいじる]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/03/17/title01/"/>
+    <updated>2015-03-17T15:01:37+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/03/17/title01</id>
+    <content type="html"><![CDATA[<p>やったこと．</p>
+
+<ol>
+<li>CSSを変更</li>
+<li>テーブル表記を修正・変更</li>
+</ol>
+
+<!-- more -->
+
+<h1>1. やったこと</h1>
+
+<h2>1.1 CSSを変更</h2>
+
+<p><code>sass/custom/_styles.scss</code>の末尾に追記すれば反映される．</p>
+<div class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span> <span class="err">追記</span>
+<span class="nt">h1</span><span class="nc">.entry-title</span> <span class="nt">a</span> <span class="p">{</span> <span class="k">font-size</span><span class="o">:</span> <span class="m">0.8em</span><span class="p">;</span> <span class="p">}</span>
+<span class="nt">h1</span> <span class="p">{</span> <span class="k">font-size</span><span class="o">:</span> <span class="m">1.6em</span><span class="p">;</span> <span class="p">}</span>
+<span class="nt">h2</span> <span class="p">{</span> <span class="k">font-size</span><span class="o">:</span> <span class="m">1.3em</span><span class="p">;</span> <span class="p">}</span>
+<span class="nt">h3</span> <span class="p">{</span> <span class="k">font-size</span><span class="o">:</span> <span class="m">1em</span><span class="p">;</span> <span class="p">}</span>
+<span class="nt">h4</span> <span class="p">{</span> <span class="k">font-size</span><span class="o">:</span> <span class="m">0.9em</span><span class="p">;</span> <span class="p">}</span>
+
+<span class="nt">ul</span><span class="p">{</span><span class="k">margin</span><span class="o">:</span><span class="m">1em</span> <span class="m">0</span> <span class="m">1em</span> <span class="m">2em</span><span class="p">;}</span>
+<span class="nt">ol</span><span class="p">{</span><span class="k">margin</span><span class="o">:</span><span class="m">1em</span> <span class="m">0</span> <span class="m">1em</span> <span class="m">2em</span><span class="p">;}</span>
+<span class="nt">ul</span> <span class="nt">li</span><span class="o">,</span><span class="nt">ol</span> <span class="nt">li</span><span class="p">{</span><span class="k">margin-top</span><span class="o">:.</span><span class="m">5em</span><span class="p">;</span><span class="k">margin-bottom</span><span class="o">:.</span><span class="m">5em</span><span class="p">;}</span>
+<span class="nt">ul</span> <span class="nt">ul</span><span class="o">,</span><span class="nt">ul</span> <span class="nt">ol</span><span class="o">,</span><span class="nt">ol</span> <span class="nt">ol</span><span class="o">,</span><span class="nt">ol</span> <span class="nt">ul</span><span class="p">{</span><span class="k">margin-top</span><span class="o">:</span><span class="m">0</span><span class="p">;</span><span class="k">margin-bottom</span><span class="o">:</span><span class="m">0</span><span class="p">;}</span>
+</code></pre></div>
+<blockquote>
+<p><a href="http://blog.textfile.org/20140920/font/">Octopressでフォントサイズを変える&lt;</a></p>
+</blockquote>
+
+<h2>1.2 テーブル表記を修正・変更</h2>
+
+<p>テーブルがちゃんと表示されていないことに気づく．extensionが足りなかったらしい．<code>config.yml</code>を以下のように編集．</p>
+<div class="highlight"><pre><code class="language-basic" data-lang="basic"><span class="err">#</span><span class="w"> </span><span class="vg">markdown</span>
+<span class="nl">markdown:</span><span class="w"> </span><span class="vg">redcarpet</span>
+<span class="nl">redcarpet:</span>
+<span class="w">  </span><span class="nl">extensions:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">&quot;hard_wrap&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;no_intra_emphasis&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;fenced_code_blocks&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;autolink&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;tables&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;footnotes&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;strikethrough&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;lax_html_blocks&quot;</span>
+<span class="w">      </span><span class="p">]</span>
+</code></pre></div>
+<p>ついでに，テーブルをいい感じのレイアウトに変更する．以下のような<code>source/stylesheets/data-table.css</code>を追加．</p>
+<div class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="p">{</span>
+    <span class="k">border-style</span><span class="o">:</span><span class="k">solid</span><span class="p">;</span>
+    <span class="k">border-width</span><span class="o">:</span><span class="m">1px</span><span class="p">;</span>
+    <span class="k">border-color</span><span class="o">:</span><span class="m">#e7e3e7</span><span class="p">;</span>
+    <span class="k">margin</span><span class="o">:</span> <span class="m">10px</span> <span class="m">0</span> <span class="m">30px</span> <span class="m">0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">th</span><span class="o">,</span> <span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">td</span> <span class="p">{</span>
+    <span class="k">border-style</span><span class="o">:</span><span class="k">dashed</span><span class="p">;</span>
+    <span class="k">border-width</span><span class="o">:</span><span class="m">1px</span><span class="p">;</span>
+    <span class="k">border-color</span><span class="o">:</span><span class="m">#e7e3e7</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">th</span> <span class="p">{</span>
+    <span class="k">border-style</span><span class="o">:</span><span class="k">solid</span><span class="p">;</span>
+    <span class="k">font-weight</span><span class="o">:</span><span class="k">bold</span><span class="p">;</span>
+    <span class="k">background</span><span class="o">:</span> <span class="sx">url(&quot;/images/noise.png?1330434582&quot;)</span> <span class="k">repeat</span> <span class="k">scroll</span> <span class="k">left</span> <span class="k">top</span> <span class="m">#F7F3F7</span><span class="p">;</span>
+    <span class="k">padding</span><span class="o">:</span> <span class="m">2px</span> <span class="m">9px</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">td</span> <span class="p">{</span>
+    <span class="k">padding</span><span class="o">:</span> <span class="m">2px</span> <span class="m">9px</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">th</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="o">],</span> <span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">td</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="o">]</span> <span class="p">{</span>
+    <span class="k">text-align</span><span class="o">:</span><span class="k">left</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">th</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="o">],</span> <span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">td</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="o">]</span> <span class="p">{</span>
+    <span class="k">text-align</span><span class="o">:</span><span class="k">right</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">th</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="o">],</span> <span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">td</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="o">]</span> <span class="p">{</span>
+    <span class="k">text-align</span><span class="o">:</span><span class="k">center</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="nt">tr</span><span class="nd">:nth-child</span><span class="o">(</span><span class="nt">even</span><span class="o">)</span><span class="p">{</span>
+    <span class="k">background</span><span class="o">:</span> <span class="sx">url(&quot;/images/noise.png?1330434582&quot;)</span> <span class="k">repeat</span> <span class="k">scroll</span> <span class="k">left</span> <span class="k">top</span> <span class="m">#F7F3F7</span><span class="p">;</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p><code>source/_includes/head.html</code>に以下を追記して反映させる．</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;link</span> <span class="na">href=</span><span class="s">&quot;/stylesheets/data-table.css&quot;</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">type=</span><span class="s">&quot;text/css&quot;</span><span class="nt">&gt;</span>
+</code></pre></div>
+<blockquote>
+<p><a href="http://whiskers.nukos.kitchen/2014/08/02/markdown.html">Redcarpetを使ったmarkdown記法サンプル</a><br>
+<a href="http://morizyun.github.io/blog/octopress-table-tag-css/">Octopressでテーブルをmarkdownで編集できるようにする</a></p>
+</blockquote>
+
+<h1>2. 関連知識</h1>
+
+<p>CSSを修正するときに参考になりそうなサイトをメモ．</p>
+
+<blockquote>
+<p><a href="http://tokkonopapa.github.io/blog/2012/01/03/customizing-octopress-styles/">Octopressのスタイル設定とカスタマイズ</a></p>
+</blockquote>
+
+<h1>3. 雑記</h1>
+
+<p>前回の記事でプレビューを表示できるように四苦八苦していたけど，<code>rake preview</code>しながらファイル内容を変更しても動的に編集結果が反映されることに気づいた．これは便利だ．<br>
+ただし，動的に変更を反映しているため，一度プレビューを終了すると次回プレビュー/デプロイ時に変更は反映されない．<code>rake generate</code>してから各操作を行うこと．</p>
+
+<p>ブログが少し見やすくなった気がする．ひとまずemacsとブログに関する諸々はこれでOKかな．</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[GitHub + Octopress でブログ作成]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/02/09/title/"/>
+    <updated>2015-02-09T03:19:59+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/02/09/title</id>
+    <content type="html"><![CDATA[<p>octopress + GitHubでのブログの立ち上げ方法をまとめました．</p>
+
+<!-- more -->
+
+<h1>1. はじめに</h1>
+
+<h2>1.1 今日の目的</h2>
+
+<ul>
+<li>octopress + github の基礎知識</li>
+<li>記事をdeployした際に自動的にツイート</li>
+</ul>
+
+<h2>1.2 あとまわし</h2>
+
+<ul>
+<li>emacsについて その2</li>
+</ul>
+
+<h1>2. GitHub + Octopressでブログを立ち上げる</h1>
+
+<p>調べれば簡単にできるけど，自分用にまとめる．<br>
+ページ見つつ思い出しつつ書くので，記述が足りない部分があるかもしれない．</p>
+
+<p>自分の環境</p>
+
+<ul>
+<li>PC：MacBook Air, Core i5 1.8GHz, Mem 4GB</li>
+<li>OS：OS X Yosemite 10.10.1</li>
+</ul>
+
+<p>必要なもの</p>
+
+<ul>
+<li>Ruby</li>
+<li>Octopress</li>
+<li>Github</li>
+</ul>
+
+<h2>2.1 Octopressの導入と準備(2015/2/12追記：Rubyについて)</h2>
+
+<p>記事の投稿ができるまで．<br>
+以下，簡略手順<a href="#oct_tejun">2</a>．</p>
+
+<ol>
+<li>Rubyとbundleのインストール(<a href="http://salinger.github.io/blog/2013/01/14/1/">Mac + Ruby + Octopress + Github でブログの作成</a>)</li>
+<li>GitHubに登録する(メールアドレスの認証も済ませておく<a href="#github_account">3</a>)．</li>
+<li>GitHubリポジトリを作成する(リポジトリ名は「<em>username</em>.github.io」)．</li>
+<li><a href="http://octopress.org/docs/setup/">公式サイト</a>を参考にセットアップを行う．
+
+<ol>
+<li>octopressをGitHubからクローン<br>
+<code>git clone git://github.com/imathis/octopress.git octopress</code></li>
+<li><code>cd octopress</code></li>
+<li><code>gem install bundler</code></li>
+<li><code>bundle install</code></li>
+<li>デフォルトのテーマインストール<br>
+<code>rake install</code></li>
+</ol></li>
+<li>動作確認．<code>http://localhost:4000/</code>にアクセスして，ブログのプレビューが表示されればOK．<br>
+<code>rake preview</code></li>
+<li><code>rake setup_github_pages</code>(<a href="http://octopress.org/docs/deploying/github/">公式サイト</a>)</li>
+<li>ブログのタイトルなどの初期設定(<code>_config.yml</code>)</li>
+</ol>
+
+<h3>2.1.1 手順4の補足</h3>
+
+<p>GitHubにデプロイするファイルを生成する．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>rake setup_github_pages
+
+Enter the <span class="nb">read</span>/write url <span class="k">for</span> your repository
+<span class="o">(</span>For example, <span class="s1">&#39;git@github.com:your_username/your_username.github.io.git)</span>
+<span class="s1">           or &#39;</span>https://github.com/your_username/your_username.github.io<span class="s1">&#39;)</span>
+<span class="s1">Repository url: git@github.com:srym/srym.github.io.git</span>
+<span class="s1">Added remote git@github.com:srym/srym.github.io.git as origin</span>
+<span class="s1">Set origin as default remote</span>
+<span class="s1">Master branch renamed to &#39;</span><span class="nb">source</span><span class="err">&#39;</span> <span class="k">for</span> committing your blog <span class="nb">source </span>files
+rm -rf _deploy
+mkdir _deploy
+<span class="nb">cd </span>_deploy
+Initialized empty Git repository in /Users/shiroyama/playGround/octopress/_deploy/.git/
+<span class="o">[</span>master <span class="o">(</span>root-commit<span class="o">)</span> dacfaa2<span class="o">]</span> Octopress init
+ <span class="m">1</span> file changed, <span class="m">1</span> insertion<span class="o">(</span>+<span class="o">)</span>
+ create mode <span class="m">100644</span> index.html
+<span class="nb">cd</span> -
+</code></pre></div>
+<p>GitHub Pagesのリポジトリが自動的にoriginに指定される．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>git remote -v
+octopress       git://github.com/imathis/octopress.git <span class="o">(</span>fetch<span class="o">)</span>
+octopress       git://github.com/imathis/octopress.git <span class="o">(</span>push<span class="o">)</span>
+origin          git@github.com:srym/srym.github.io.git <span class="o">(</span>fetch<span class="o">)</span>
+origin          git@github.com:srym/srym.github.io.git <span class="o">(</span>push<span class="o">)</span>
+</code></pre></div>
+<h3>2.1.2 手順5の補足</h3>
+
+<p><a href="http://octopress.org/docs/configuring/">公式サイト</a>を参考に．<br>
+config.ymlの記述は以下のようになっている．<br>
+好みに編集する．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"># _config.yml
+
+url: http://blog.shiroyama.us
+title: 白山軟件有限公司
+subtitle: 東洋太平洋ブログ三日坊主チャンピオンのブログ
+author: Fumihiko Shiroyama
+simple_search: http://google.com/search
+description:
+</code></pre></div>
+<h2>2.2 記事の作成/投稿</h2>
+
+<p><a href="http://octopress.org/docs/blogging/">公式サイト</a>を参考に手順をまとめる．</p>
+
+<ol>
+<li>記事のテンプレートを作成(<code>title</code>は任意のタイトルで)<br>
+<code>rake new_post\[title\]</code></li>
+<li>生成された<code>source/_posts/20XX-XX-XX-title.markdown</code>を編集して保存．</li>
+<li>静的ページの生成<br>
+<code>rake generate</code></li>
+<li>記事の確認．<code>localhost:4000</code>にアクセスしてみる．<br>
+<code>rake preview</code></li>
+<li>投稿する．デプロイ一発．楽．<br>
+<code>rake deploy</code></li>
+<li>ソースもpush<br>
+<code>git add .</code><br>
+<code>git commit -m &#39;comment&#39;</code><br>
+<code>git push origin source</code><br></li>
+</ol>
+
+<p>_config.ymlに記述されていたurlにアクセスすれば確認できる．<br>
+投稿の反映に10分ほどかかる場合があるので，あせらないで待つ．</p>
+
+<h2>2.3 その他</h2>
+
+<h3>2.3.1 ブログテーマ</h3>
+
+<p><a href="https://github.com/imathis/octopress/wiki/3rd-Party-Octopress-Themes">ここ</a>から選ぶと良い．</p>
+
+<h3>2.3.2 「つづきをよむ」ボタンを追加</h3>
+<div class="highlight"><pre><code class="language-text" data-lang="text">&lt;!-- more --&gt;
+</code></pre></div>
+<h3>2.3.3 タグ</h3>
+<div class="highlight"><pre><code class="language-text" data-lang="text"># One category
+categories: Sass
+
+# Multiple categories example 1
+categories: [CSS3, Sass, Media Queries]
+
+# Multiple categories example 2
+categories:
+- CSS3
+- Sass
+- Media Queries
+</code></pre></div>
+<h3>2.3.4 コメント欄の追加(2015/2/12追記)</h3>
+
+<p>Disqusに登録する必要がある．<br>
+登録時，サイトの登録を行うはず．<br>
+ここでshortnameを設定するので，これを設定ファイル(<code>_config.yml</code>)に追記する．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"># Disqus Comments
+disqus_short_name: your_short_name
+disqus_show_comment_count: true
+</code></pre></div>
+<p>shortnameを後から確認したい場合．<br>
+サイトにログインし，右上の歯車をクリックし，<code>Admin &gt; Settings</code>の，<code>Site Identity</code>にある．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">Your website&#39;s shortname is *******.
+This is used to uniquely identify your website on Disqus. It cannot be changed.
+</code></pre></div>
+<blockquote>
+<p><a href="http://blog.morizotter.com/2012/07/01/octopress%E3%81%AB%E3%82%B3%E3%83%A1%E3%83%B3%E3%83%88%E3%82%92%E8%BF%BD%E5%8A%A0%E3%81%99%E3%82%8B/">Octopressにコメントを追加する</a><br>
+<a href="http://salinger.github.io/blog/2013/01/14/1/">Mac + Ruby + Octopress + Github でブログの作成</a></p>
+</blockquote>
+
+<h3>2.4.5 プロフィールをサイドバーに表示(2015/2/12追記)</h3>
+
+<ol>
+<li><code>source/_includes/custom/asides/about.html</code>を編集する．</li>
+<li><code>_config.yml</code>において，サイドバーに<code>custom/asides/about.html</code>を追加する．</li>
+</ol>
+<div class="highlight"><pre><code class="language-text" data-lang="text"># list each of the sidebar modules you want to include, in the order you want them to appear.
+# To add custom asides, create files in /source/_includes/custom/asides/ and add them to the list like &#39;custom/asides/custom_aside_name.html&#39;
+# ↓ここにパスを追加
+default_asides: [custom/asides/about.html, asides/recent_posts.html, custom/asides/category_list.html, custom/asides/tag_cloud.html, asides/github.html, asides/twitter.html, asides/delicious.html, asides/pinboard.html, asides/googleplus.html]
+</code></pre></div>
+<blockquote>
+<p><a href="http://www.mk-mode.com/octopress/2012/12/17/octopress-add-profile/">Octopress - プロフィール表示を追加！</a></p>
+</blockquote>
+
+<h1>3. 記事をdeployした際に自動的にツイート</h1>
+
+<p>ありました<a href="#auto_tweet">1</a>．<br>
+octopressの設定で簡単に連携もできるらしいので調べておく．<br>
+夜が遅いので今日はここまで．</p>
+
+<h1>4. 次回への持ち越し</h1>
+
+<ul>
+<li>各コマンドがやっていること
+
+<ul>
+<li>少し理解が足りない部分がある</li>
+<li>この記事に説明を追記するかもしれない</li>
+</ul></li>
+<li>自動ツイート
+
+<ul>
+<li>調べてみる</li>
+</ul></li>
+<li>emacsのパッケージ管理について
+
+<ul>
+<li>上記が終わったら</li>
+</ul></li>
+</ul>
+
+<h1>参考文献</h1>
+
+<blockquote>
+<ol>
+<li><a name="auto_tweet"></a><a href="https://github.com/kawaken/kawaken.github.io/blob/master/_posts/2013-09-17-drone.io%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6github-pages%E3%81%AE%E6%9B%B4%E6%96%B0%E6%83%85%E5%A0%B1%E3%82%92twitter%E3%81%AB%E8%87%AA%E5%8B%95%E6%8A%95%E7%A8%BF%E3%81%99%E3%82%8B.md">最新記事があるか判別する</a></li>
+<li><a name="oct_tejun"></a><a href="http://qiita.com/syui/items/07365ed24eef63602233">GitHub Pages + Octopress カスタマイズ</a></li>
+<li><a name="github_account"></a><a href="http://ounziw.com/2012/08/10/github-create/">github アカウント作成方法</a></li>
+<li><a name="sankou_01"></a><a href="http://www.miukoba.net/blog/2013/01/05/start-octopress/">Octopressはじめました</a></li>
+<li><a name="sankou_03"></a><a href="http://moonstruckdrops.github.io/blog/2013/03/21/start-octpress/">Octpress始めました</a></li>
+<li><a name="sankou_04"></a><a href="http://blog.shiroyama.us/blog/2014/02/26/octopress/">エンジニアのブログは Octopress が最適</a></li>
+</ol>
+</blockquote>
+]]></content>
+  </entry>
+  
+</feed>

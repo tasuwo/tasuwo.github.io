@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Swift | tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/blog/categories/swift/atom.xml" rel="self"/>
+  <link href="http://tasuwo.github.io/"/>
+  <updated>2015-05-30T13:10:11+09:00</updated>
+  <id>http://tasuwo.github.io/</id>
+  <author>
+    <name><![CDATA[tasuwo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[iOSアプリケーションの実行時の振る舞いについて]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/05/30/ios-02/"/>
+    <updated>2015-05-30T11:18:52+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/05/30/ios-02</id>
+    <content type="html"><![CDATA[<p>iOSアプリケーションの構造がよくわからなかったので，とりあえず実行時の振る舞いから理解していくためのまとめ．</p>
+
+<!-- more -->
+
+<p>以下の初心者用ガイドを一通りやった．</p>
+
+<blockquote>
+<p><a href="https://developer.apple.com/library/ios/referencelibrary/GettingStarted/RoadMapiOS/">Start Developing iOS Apps Today: Setup - Apple Developer</a></p>
+</blockquote>
+
+<p>ちなみに，上記サイトの使用言語は Swift ではなく Objective-C．</p>
+
+<h2>1. アプリケーション実行時の振る舞い</h2>
+
+<p>アプリケーション起動時にはどのようなことが起きるのだろうか？Swift でも Objective-C でも，記述方法が違うだけでやってることは同じはずなので，結局何をしているのか？を公式ドキュメントから抽出してみる．</p>
+
+<h3>やっていること</h3>
+
+<p><code>UIApplicationMain</code>関数が呼び出され，以下の2つのインスタンスが生成される．</p>
+
+<ul>
+<li><code>UIApplication</code>クラスのインスタンス生成(<strong>application object</strong>)
+
+<ul>
+<li>イベントループを開始する</li>
+<li>アプリケーションの基盤となる</li>
+</ul></li>
+<li><code>AppDelegate</code>クラスのインスタンス生成(<strong>app delegate</strong>)
+
+<ul>
+<li>コンテンツ描画のためのウインドウを管理する</li>
+<li>状態遷移を管理する</li>
+</ul></li>
+</ul>
+
+<p><em>application object</em> が <em>app delegate</em> 上に定義されたメソッドを呼び出し，記述されたコードを実行する．コードを見てみると，<code>UIApplicationMain</code>関数に<code>AppDelegate</code>クラスが渡され，紐づけられているようだ．</p>
+
+<h2>2. App Delegate について</h2>
+
+<p>アプリケーションを開発する上で関わりが深いのは<code>AppDelegate</code>だろう．初心者用ガイドに書かれていたことをメモしておく．</p>
+
+<h3>window 属性</h3>
+
+<p>コンテンツが描画されるウインドウが格納される</p>
+
+<h3>重要メソッドのスケルトン</h3>
+
+<p>アプリケーションが特殊な状態に陥った場合&#8230;アプリケーションの実行時，メモリ不足時，アプリケーション終了時など&#8230;には，<em>application object</em> が <em>app delegate</em> 内の対応したメソッドが呼び出す．デフォルトでは，対応した各メソッドのスケルトンが定義されている．これらの中身が空，もしくは削除されている場合には，デフォルトの振る舞いが呼び出される．必要に応じて記述すれば良い．</p>
+
+<h2>3. Objective-C と Swift での違いについて</h2>
+
+<p>開発言語は Swift を使用する予定だけど，気になったのでメモしておく．実行時の振る舞いに関係する各ソースコードを示したのちに，その違いについて考えてみる．各ソースコードは，Xcode で Single View Application を作成した時のテンプレ．中略の部分は，スケルトンコードが書かれていた部分．</p>
+
+<h3>Objective-C</h3>
+
+<p><code>AppDelegate</code>が定義されたファイルの他に，<code>main.m</code>がある．</p>
+<div class="highlight"><pre><code class="language-Objective-C" data-lang="Objective-C"><span class="c1">//////////</span>
+<span class="c1">// main.m</span>
+<span class="cp">#import &lt;UIKit/UIKit.h&gt;</span>
+<span class="cp">#import &quot;AppDelegate.h&quot;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+    <span class="k">@autoreleasepool</span> <span class="p">{</span>
+        <span class="c1">// UIApplicationMain関数に，AppDelegateクラスを渡している．</span>
+        <span class="k">return</span> <span class="n">UIApplicationMain</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="nb">nil</span><span class="p">,</span> <span class="n">NSStringFromClass</span><span class="p">([</span><span class="n">AppDelegate</span> <span class="k">class</span><span class="p">]));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">/////////////////</span>
+<span class="c1">// AppDelegate.h</span>
+<span class="cp">#import &lt;UIKit/UIKit.h&gt;</span>
+
+<span class="k">@interface</span> <span class="nc">AppDelegate</span> : <span class="bp">UIResponder</span> <span class="o">&lt;</span><span class="bp">UIApplicationDelegate</span><span class="o">&gt;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="bp">UIWindow</span> <span class="o">*</span><span class="n">window</span><span class="p">;</span>
+<span class="k">@end</span>
+
+<span class="c1">/////////////////</span>
+<span class="c1">// AppDelegate.m</span>
+<span class="cp">#import &quot;AppDelegate.h&quot;</span>
+
+<span class="k">@interface</span> <span class="nc">AppDelegate</span> <span class="p">()</span>
+<span class="k">@end</span>
+
+<span class="k">@implementation</span> <span class="nc">AppDelegate</span>
+<span class="c1">// 中略</span>
+<span class="k">@end</span>
+</code></pre></div>
+<h3>Swift</h3>
+<div class="highlight"><pre><code class="language-Swift" data-lang="Swift"><span class="c1">/////////////////////</span>
+<span class="c1">// AppDelegate.swift</span>
+<span class="k">import</span> <span class="n">UIKit</span>
+
+<span class="c1">// Main関数の自動実装？</span>
+<span class="p">@</span><span class="n">UIApplicationMain</span>
+<span class="k">class</span> <span class="nl">AppDelegate</span><span class="p">:</span> <span class="bp">UIResponder</span><span class="p">,</span> <span class="bp">UIApplicationDelegate</span> <span class="p">{</span>
+
+    <span class="k">var</span> <span class="nl">window</span><span class="p">:</span> <span class="bp">UIWindow</span><span class="o">?</span>
+
+    <span class="k">func</span> <span class="n">application</span><span class="p">(</span><span class="nl">application</span><span class="p">:</span> <span class="bp">UIApplication</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span> <span class="nl">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="nl">NSObject</span><span class="p">:</span> <span class="n">AnyObject</span><span class="p">]</span><span class="o">?</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bool</span> <span class="p">{</span>
+        <span class="c1">// Override point for customization after application launch.</span>
+        <span class="k">return</span> <span class="nb">true</span>
+    <span class="p">}</span>
+
+    <span class="c1">// 中略</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Objective-C では，単純に<code>UIApplicationMain</code>関数に<code>AppDelegate</code>クラスを渡しているが，Swift の<code>@UIApplicationMain</code>とはなんなのか？<br>
+探してみると，同じ疑問を抱いている人がいた．</p>
+
+<blockquote>
+<p><a href="http://stackoverflow.com/questions/24516250/what-does-uiapplicationmain-mean">swift - What does &quot;@UIApplicationMain&quot; mean? - Stackoverflow</a></p>
+</blockquote>
+
+<p>そもそも，iOSアプリケーションにおける<code>main</code>関数の主な役割は以下の2つである．</p>
+
+<ul>
+<li>C プログラムの入り口になる</li>
+<li><code>UIApplicationMain</code>関数の呼び出し</li>
+</ul>
+
+<p>要は，<code>UIApplicationMain</code>関数と<code>AppDelegate</code>クラスをひもづけられれば良いようだ．これを実現するために，Swift では <strong>Attributes</strong> が用いられている．</p>
+
+<p>Attributes とは定義や型に関して情報を補足するもので，先頭に<code>@</code>を付加して記述する．</p>
+
+<blockquote>
+<p><a href="https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Attributes.html">Attributes - iOS Developer Library</a></p>
+</blockquote>
+
+<p>公式ドキュメントでは，<code>UIApplicationMain</code> attirbute について以下のように記述されている．</p>
+
+<blockquote>
+<p>UIApplicationMain<br>
+Apply this attribute to a class to indicate that it is the application delegate. Using this attribute is equivalent to calling the UIApplicationMain function and passing this class’s name as the name of the delegate class.</p>
+</blockquote>
+
+<p>まとめると&#8230;</p>
+
+<ul>
+<li><code>UIApplicationMain</code> attributes は<code>AppDelegate</code>クラスに付加する</li>
+<li><code>UIApplicationMain</code> 関数を呼び出せる</li>
+<li>付加されたクラスのクラス名を，<code>delegate class</code> のクラス名として登録する</li>
+</ul>
+
+<p>つまり，Objective-C における Main 関数と同等に振る舞うということらしい．ちなみに，この attributes を利用する代わりに<code>main.swift</code>を作成することもできるそうだ．</p>
+
+<p>同じことをやっていることはわかっていたけど，やっぱり公式ドキュメントに記述を発見できたり，明確な理由付けができると，落ち着く．</p>
+
+<h2>参考</h2>
+
+<blockquote>
+<p><a href="http://qiita.com/shu223/items/437d9a9a3502800a891b">Objective-C で書いたアプリを Swift で書き換える5ステップ - Qiita</a><br>
+<a href="http://tomoyaonishi.hatenablog.jp/entry/2015/03/22/144246">SwiftのAttributesをまとめた。 - tomoyaonishiのブログ</a></p>
+</blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[Swift] 関数とクロージャについて]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/05/29/swift-func/"/>
+    <updated>2015-05-29T15:46:10+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/05/29/swift-func</id>
+    <content type="html"><![CDATA[<p>クロージャって何？？？と思ったので．</p>
+
+<!-- more -->
+
+<h2>関数</h2>
+
+<p>クロージャについてまとめる前に，まず関数について理解する．</p>
+
+<h3>定義</h3>
+
+<p><code>func</code>で宣言し，返り値は<code>-&gt;</code>を用いる．<br>
+返り値は複数指定可能．<br>
+<code>swift<br>
+func testFunc() -&gt; (first:Int, second:Int) {<br>
+    return (10, 20)<br>
+}<br>
+</code></p>
+
+<h3>特徴</h3>
+
+<p>Swiftの関数には以下の特徴がある．</p>
+
+<ol>
+<li>可変数の引数を指定可能</li>
+<li>ネストして宣言可能</li>
+<li>引数に指定可能</li>
+<li>返り値に指定可能</li>
+</ol>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="c1">///////////////////////////</span>
+<span class="c1">// 1. 可変数の引数を指定可能</span>
+<span class="c1">//    引数を配列で指定できる．</span>
+<span class="k">func</span> <span class="nf">sumOf</span><span class="p">(</span><span class="nl">numbers</span><span class="p">:</span> <span class="n">Int</span><span class="p">...)</span> <span class="o">-&gt;</span> <span class="n">Int</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">number</span> <span class="k">in</span> <span class="n">numbers</span> <span class="p">{</span>
+        <span class="n">sum</span> <span class="o">+=</span> <span class="n">number</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">sum</span>
+<span class="p">}</span>
+<span class="n">sumOf</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>        <span class="c1">// 21</span>
+<span class="n">sumOf</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="mi">597</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>   <span class="c1">// 651</span>
+
+<span class="c1">///////////////////////////</span>
+<span class="c1">// 2. ネストして宣言可能</span>
+<span class="c1">//    ネストした関数は，外の関数の変数にアクセス可能</span>
+<span class="k">func</span> <span class="n">returnFifteen</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Int</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="k">func</span> <span class="n">add</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">y</span> <span class="o">+=</span> <span class="mi">5</span>
+    <span class="p">}</span>
+    <span class="n">add</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">y</span>
+<span class="p">}</span>
+<span class="n">returnFifteen</span><span class="p">()</span>     <span class="c1">// 15</span>
+
+<span class="c1">///////////////////////////</span>
+<span class="c1">// 3. 引数に指定可能</span>
+<span class="c1">// 数値のリストと条件となる関数を与えると，</span>
+<span class="c1">// 条件にマッチした数値がリスト内に存在するか調べる関数．</span>
+<span class="k">func</span> <span class="n">hasAnyMatches</span><span class="p">(</span><span class="nl">list</span><span class="p">:</span> <span class="p">[</span><span class="n">Int</span><span class="p">],</span> <span class="nl">condition</span><span class="p">:</span> <span class="n">Int</span> <span class="o">-&gt;</span> <span class="n">Bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bool</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="k">in</span> <span class="n">list</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="n">conition</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nb">true</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nb">false</span>
+<span class="p">}</span>
+<span class="c1">// 10より小さい値ならば true</span>
+<span class="k">func</span> <span class="n">lessThanTen</span><span class="p">(</span><span class="nl">number</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bool</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">number</span> <span class="o">&lt;</span> <span class="mi">10</span>
+<span class="p">}</span>
+<span class="k">var</span> <span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">12</span><span class="p">]</span>
+<span class="n">hasAnyMathces</span><span class="p">(</span><span class="n">numbers</span><span class="p">,</span> <span class="n">lessThanTen</span><span class="p">)</span>    <span class="c1">// true</span>
+<span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">12</span><span class="p">]</span>
+<span class="n">hasAnyMathces</span><span class="p">(</span><span class="n">numbers</span><span class="p">,</span> <span class="n">lessThanTen</span><span class="p">)</span>    <span class="c1">// false</span>
+
+<span class="c1">///////////////////////////</span>
+<span class="c1">// 4. 返り値に指定可能</span>
+<span class="k">func</span> <span class="n">makeIncrementer</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">Int</span> <span class="o">-&gt;</span> <span class="n">Int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// ネストした関数</span>
+    <span class="k">func</span> <span class="n">addOne</span><span class="p">(</span><span class="nl">number</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Int</span><span class="p">{</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">number</span>
+    <span class="p">}</span>
+    <span class="c1">// ネストして宣言された関数をそのまま返す</span>
+    <span class="k">return</span> <span class="n">addOne</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2>クロージャとは？</h2>
+
+<p>実行可能なコードブロックのこと&#8230;?<br>
+一言で言い表そうとすると難しい．公式では，<code>関数は再利用が可能な特別なクロージャである．</code>と言われている．</p>
+
+<h3>宣言</h3>
+
+<p>とりあえず，書き方を見てみる．<br>
+名前が省略可能で，<code>{}</code>で囲んで記述する．引数と返り値の後に<code>in</code>を記述してから本体を記述する．</p>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="c1">// クロージャ</span>
+<span class="k">var</span> <span class="nl">greetClosure</span><span class="p">:</span> <span class="p">(</span><span class="n">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">String</span>
+<span class="n">paramClosure</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">name</span> <span class="o">-&gt;</span> <span class="n">String</span> <span class="k">in</span>
+    <span class="k">return</span> <span class="s">&quot;Hello &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span>
+<span class="p">}</span>
+<span class="c1">// 関数でも同様の振る舞いを定義をしてみる</span>
+<span class="k">func</span> <span class="n">greetFunc</span><span class="p">(</span><span class="nl">name</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">String</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="s">&quot;Hello &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span>
+<span class="p">}</span>
+
+<span class="c1">// 実行結果はどちらも変わらない．</span>
+<span class="n">println</span><span class="p">(</span><span class="n">greetClosure</span><span class="p">(</span><span class="s">&quot;tasuwo&quot;</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="n">greetFunc</span><span class="p">(</span><span class="s">&quot;tasuwo&quot;</span><span class="p">))</span>
+</code></pre></div>
+<p>これだけだと，クロージャの意味がイマイチわからない．つまり，なぜ関数じゃダメなのか？<br>
+自分なりの解釈だが，クロージャの良い点は<strong>複数の処理の記述をコンパクトにまとめられること</strong>なのではと思う．<br>
+例えば，<code>map</code>を例にとって考える．<br>
+<code>map</code>はクロージャを引数にとり(つまり，関数を与えても問題はない)，配列の各値にその関数を適用・変換する．</p>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="k">var</span> <span class="n">numArray</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="c1">// 配列の各値を三倍にする</span>
+<span class="n">numArray</span><span class="p">.</span><span class="n">map</span><span class="p">({</span>
+    <span class="p">(</span><span class="nl">number</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Int</span> <span class="k">in</span>
+    <span class="k">let</span> <span class="n">result</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">number</span>
+    <span class="k">return</span> <span class="n">result</span>
+<span class="p">})</span>
+</code></pre></div>
+<p>クロージャは，引数や返り値の型が自明である時，その指定を省略可能である．また，返り値が1つに減退されている場合には，<code>return</code>も記述しなくて良い．<br>
+よって，以下のように記述を省略できる</p>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="n">numArray</span><span class="p">.</span><span class="n">map</span><span class="p">({</span>
+    <span class="n">number</span> <span class="k">in</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">number</span>
+<span class="p">})</span>
+</code></pre></div>
+<p>記述がかなりコンパクトになったし，何をしているのかも一目見れば大体わかる．<br>
+また，第二引数を以下のように外に出す書き方もできるそうだ．自分はこれを知らなくて，以下のような記述を見るたびに(なんだこれは&#8230;?)と頭をひねっていた．</p>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="n">numArray</span><span class="p">.</span><span class="n">map</span><span class="p">(){</span>
+    <span class="n">number</span> <span class="k">in</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">number</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>もう一つの例を見てみる．<br>
+<code>sorted</code>は，与えられた配列を並び替える．クロージャを引数にとると，その内容に従って並び替える．</p>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="k">var</span> <span class="n">numArray</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="k">let</span> <span class="n">sortedNum</span> <span class="o">=</span> <span class="n">sorted</span><span class="p">(</span><span class="n">numArray</span><span class="p">){</span>
+    <span class="p">(</span><span class="nl">str1</span><span class="p">:</span> <span class="n">Int</span><span class="p">,</span> <span class="nl">str2</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bool</span> <span class="k">in</span>
+    <span class="k">return</span> <span class="n">str1</span> <span class="o">&gt;</span> <span class="n">str2</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>引数，返り値の型と，<code>return</code>を省略する．</p>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="k">let</span> <span class="n">sortedNum</span> <span class="o">=</span> <span class="n">sorted</span><span class="p">(</span><span class="n">numArray</span><span class="p">){</span>
+    <span class="n">str1</span><span class="p">,</span> <span class="n">str2</span> <span class="k">in</span> <span class="n">str1</span> <span class="o">&gt;</span> <span class="n">str2</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>さらに，自分自身が引数となっている時，自身の引数を<code>$0,$1...</code>で記述可能．</p>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="k">let</span> <span class="n">sortedNum</span> <span class="o">=</span> <span class="n">sorted</span><span class="p">(</span><span class="n">numArray</span><span class="p">){</span><span class="err">$</span><span class="mi">0</span> <span class="o">&gt;</span> <span class="err">$</span><span class="mi">1</span><span class="p">}</span>
+</code></pre></div>
+<p>これでかなり省略できる．</p>
+
+<h1>参考文献</h1>
+
+<blockquote>
+<p><a href="http://qiita.com/yuinchirn/items/2ebb6fed6de0c9c1c3c9">Swift さくっと確認したい基礎文法 クロージャ(closure)<br>
+</a><br>
+<a href="http://qiita.com/mst/items/b18e9531ac0cbdf2f3c3">swift Sort関数とClosure</a><br>
+<a href="https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/GuidedTour.html">A Swift Tour</a><br>
+<a href="http://chicketen.blog.jp/archives/14886216.html">iOS Swiftのクロージャを使う</a></p>
+</blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[Swift] Optional型まとめ]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/05/29/swift/"/>
+    <updated>2015-05-29T14:22:24+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/05/29/swift</id>
+    <content type="html"><![CDATA[<p>Optional型がよくわからなかったのでまとめておく．<br>
+定義のメモだけなので，使い方とかもそのうち追記していきたい．</p>
+
+<!-- more -->
+
+<h2>Optional型とは？</h2>
+
+<p><strong>nil を許す型</strong>のこと．</p>
+
+<h2>宣言</h2>
+
+<p>型に<code>?</code>を付加すると，Optional型を宣言できる．<br>
+ちなみに<code>T?</code>は<code>Optional&lt;T&gt;</code>のシンタックスシュガー．</p>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="k">var</span> <span class="nl">optionalSuger</span><span class="p">:</span> <span class="n">Int</span><span class="o">?</span>           <span class="c1">// Optional型の宣言．初期値はnil．</span>
+<span class="k">var</span> <span class="nl">optional</span><span class="p">:</span>      <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Int</span><span class="o">&gt;</span>  <span class="c1">// Int? と同じ意味</span>
+<span class="k">var</span> <span class="nl">notOptional</span><span class="p">:</span>   <span class="n">Int</span>            <span class="c1">// 非Optional型．初期値は空(nilですらない)</span>
+</code></pre></div>
+<h2>wrap と unwrap</h2>
+
+<p><code>T</code>と<code>T?</code>は違う型．<br>
+同様に扱うためには<strong>unwrap</strong>する必要がある．</p>
+
+<ul>
+<li><strong>unwrap</strong>とは？
+
+<ul>
+<li>Optional<T>型から<code>T</code>型の変数を取り出すこと．</li>
+</ul></li>
+</ul>
+
+<p><strong>unwrap</strong>の方法には以下の4種類がある．</p>
+
+<ol>
+<li>Forced unwrapping</li>
+<li>Optional Chaining</li>
+<li>Optional Binding</li>
+<li>比較演算子</li>
+</ol>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="c1">////////////////////////////////////////////</span>
+<span class="c1">// Optional型の宣言</span>
+<span class="k">class</span> <span class="n">Dog</span> <span class="p">{</span>
+    <span class="k">func</span> <span class="n">bark</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">String</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="s">&quot;BowWow!&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">var</span> <span class="nl">wrappedDog</span><span class="p">:</span> <span class="n">Dog</span><span class="o">?</span> <span class="o">=</span> <span class="n">Dog</span><span class="p">()</span>
+
+<span class="c1">////////////////////////////////////////////</span>
+<span class="c1">// 1. Forced Unwrapping</span>
+<span class="c1">//    「!」を付加する．</span>
+<span class="c1">//    値が nil だった場合はランタイムエラー．</span>
+<span class="n">println</span><span class="p">(</span><span class="n">wrappedDog</span><span class="o">!</span><span class="p">.</span><span class="n">bark</span><span class="p">)</span>           <span class="c1">// &quot;BowWow!&quot;</span>
+
+<span class="c1">////////////////////////////////////////////</span>
+<span class="c1">// 2. Optional Chaining</span>
+<span class="c1">//    「?」を付加する</span>
+<span class="c1">//    値が nil だった場合は nil を返す．</span>
+<span class="c1">//    最終的な戻り値は Optional型 となる．</span>
+<span class="n">println</span><span class="p">(</span><span class="n">wrappedDog</span><span class="o">?</span><span class="p">.</span><span class="n">bark</span><span class="p">())</span>         <span class="c1">// Optional(&quot;BowWow!&quot;)</span>
+
+<span class="c1">////////////////////////////////////////////</span>
+<span class="c1">// 3. Optional Binding</span>
+<span class="c1">//    if，while 等の条件式内で宣言，代入されると unwrap される．</span>
+<span class="c1">//    値が nil の場合は条件式が false となる．</span>
+<span class="k">if</span> <span class="k">var</span> <span class="n">unwrappedDog</span> <span class="o">=</span> <span class="n">wrappedDog</span> <span class="p">{</span>
+    <span class="n">println</span><span class="p">(</span><span class="n">unwrappedDog</span><span class="p">.</span><span class="n">bark</span><span class="p">())</span>    <span class="c1">// &quot;BowWow!&quot;</span>
+<span class="p">}</span>
+
+<span class="c1">////////////////////////////////////////////</span>
+<span class="c1">// 4. 比較演算子</span>
+<span class="c1">//    比較演算子を使うと unwrap される．</span>
+<span class="k">var</span> <span class="nl">wrappedInt</span><span class="p">:</span> <span class="n">Int</span><span class="o">?</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">println</span><span class="p">(</span><span class="n">wrappedInt</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>            <span class="c1">// &quot;true&quot;</span>
+</code></pre></div>
+<h2>Implicitly Unwrapped Optional型とは？</h2>
+
+<p>型に<code>!</code>を付加すると，Implicitly Unwrapped Optional型を宣言できる．<br>
+ちなみに<code>T!</code>は<code>ImplicitlyUnwrappedOptional&lt;T&gt;</code>のシンタックスシュガー．</p>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="k">var</span> <span class="nl">iuOptionalSuger</span><span class="p">:</span> <span class="n">Int</span><span class="o">!</span>                              <span class="c1">// Implicitly Unwrapped Optional型の宣言．初期値はnil．</span>
+<span class="k">var</span> <span class="nl">iuOptional</span><span class="p">:</span>      <span class="n">ImplicitlyUnwrappedOptional</span><span class="o">&lt;</span><span class="n">Int</span><span class="o">&gt;</span>  <span class="c1">// Int! と同じ意味</span>
+<span class="k">var</span> <span class="nl">Optional</span><span class="p">:</span>        <span class="n">Int</span><span class="o">?</span>                              <span class="c1">// Optional型</span>
+
+<span class="n">iuOptional</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">Optional</span>   <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1">// 自動的に unwrap される．</span>
+<span class="n">println</span><span class="p">(</span><span class="n">iuOptional</span><span class="p">)</span>    <span class="c1">// &quot;1&quot;</span>
+<span class="n">println</span><span class="p">(</span><span class="n">Optional</span><span class="p">)</span>      <span class="c1">// &quot;Optional(1)&quot;</span>
+</code></pre></div>
+<h2>比較演算子：??</h2>
+
+<p>nil かどうか判定する比較演算子．<br>
+<code>a ?? b</code>は<code>a != nil ? a! : b</code>のシンタックスシュガー．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">var wrappedInt: Int?
+ptinrln(wrappedInt ?? 2)    // &quot;2&quot;
+wrappedInt = 1
+println(wrappedInt ?? 2)    // &quot;1&quot;
+</code></pre></div>
+<h1>参考サイト</h1>
+
+<blockquote>
+<p><a href="http://qiita.com/cotrpepe/items/518c4476ca957a42f5f1">Swift Optional 型についてのまとめ Ver2</a><br>
+<a href="http://qiita.com/koher/items/c6f446bad54442a28bf4">SwiftのOptional型を極める</a></p>
+</blockquote>
+]]></content>
+  </entry>
+  
+</feed>
