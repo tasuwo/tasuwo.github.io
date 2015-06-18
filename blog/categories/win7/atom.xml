@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Win7 | tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/blog/categories/win7/atom.xml" rel="self"/>
+  <link href="http://tasuwo.github.io/"/>
+  <updated>2015-06-18T19:33:55+09:00</updated>
+  <id>http://tasuwo.github.io/</id>
+  <author>
+    <name><![CDATA[tasuwo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Mac使ってた人がWin使ってみたときのメモ]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/06/18/win/"/>
+    <updated>2015-06-18T19:21:44+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/06/18/win</id>
+    <content type="html"><![CDATA[<p>普段使いは OS X だったんだけど，Winを利用しなきゃならない場面があったので，使いやすくするためにやったことをメモしておく．<br>
+ちなみに Windows 7, 8 の話．</p>
+
+<!-- more -->
+
+<h1>つまりどうするのか</h1>
+
+<ul>
+<li>zsh つかいたい</li>
+<li>Emacs つかいたい</li>
+<li>ブラウザでも Emacs ライクなキーバインドつかいたい</li>
+</ul>
+
+<p>あまり大したことはしない．</p>
+
+<h2>キーバインド</h2>
+
+<p>Caps lock を Ctrl にするために，Ctrl2capを利用した．<br>
+Ctrl は Capslock にはならないので注意．</p>
+
+<ul>
+<li>つかいかた
+
+<ul>
+<li>インストール
+
+<ul>
+<li><code>ctrl2cap /install</code></li>
+</ul></li>
+<li>アンインストール
+
+<ul>
+<li><code>ctrl2cap /uninstall</code></li>
+</ul></li>
+</ul></li>
+</ul>
+
+<p>インストールしたらインストール．</p>
+
+<blockquote>
+<p><a href="https://technet.microsoft.com/ja-jp/sysinternals/bb897578.aspx">Ctrl2cap - TechNet - Microsoft</a></p>
+</blockquote>
+
+<h2>Webブラウザ</h2>
+
+<h3>Chrome？</h3>
+
+<p>とりあえず，拡張機能をいくつかいれてみる．</p>
+
+<ul>
+<li>keyconfig</li>
+<li>gleeBox</li>
+</ul>
+
+<p>Ctrl と command が同じ意味合いになっていて使いづらいので，<br>
+keyconfigをいれてみた．なかなかいいぞこれは&#8230;</p>
+
+<ul>
+<li>ちなみにgleeBox のいろは
+
+<ul>
+<li>g : gleeBoxの起動</li>
+<li>Alt-g : フォーカスがテキストにある場合の gleeBox の起動</li>
+<li>. : タブマネージャの起動(chrome限定)</li>
+<li>?img : イメージ要素選択</li>
+<li>?? : 入力フィールド選択</li>
+</ul></li>
+</ul>
+
+<p>しかし，行頭にもってくる<code>Ctrl+a</code>や前方削除の<code>Ctrl+h</code>のキーバインドが，全選択や履歴へのキーバインドになってしまう．Mac では Ctrl と Command でそこらへんの使い分けができていたけど，Win だとどちらも Ctrl だからだね．</p>
+
+<h3>Firefox + keySnail</h3>
+
+<p>emacs 使いには Firefox + keySnail が良いとの噂を聞きつけ，導入してみることにした．<br>
+gleeBox が利用できないのが残念だ．</p>
+
+<ul>
+<li>keySnail
+
+<ul>
+<li>FireFox のアドオン</li>
+<li>F1 + b でショートカット一覧が見れる</li>
+</ul></li>
+<li>プラグイン
+
+<ul>
+<li>bmany</li>
+<li>Tanything</li>
+<li>HoK</li>
+</ul></li>
+</ul>
+
+<p>少し使ってみた感じ，HoK はなかなか気に入った．</p>
+
+<blockquote>
+<p><a href="http://nenono.hatenablog.com/entry/2015/04/02/160721">FireFox + KeySnail でEmacsキーバインドなWebブラウジング環境を作った話</a></p>
+</blockquote>
+
+<h2>ランチャー</h2>
+
+<p>Executer というのをいれる．<br>
+<code>Alt + Space</code>で起動できるようにすればおｋかな．ショートカットも追加できるのがgood．</p>
+
+<blockquote>
+<p><a href="http://executor.dk/">Welcome to Executor</a></p>
+</blockquote>
+
+<h2>アプリケーション切り替え</h2>
+
+<p><code>Alt + Tab</code> で Mac の <code>Command + Tab</code> ができます．</p>
+
+<h2>画面分割</h2>
+
+<p>Mac では Spectable を利用していたけど，Win はデフォルトのキーバインドでできる．いいね．</p>
+
+<ul>
+<li><code>Win + →</code> : 右半分</li>
+<li><code>Win + ←</code> : 左半分</li>
+<li><code>Win + ↑</code> : 最大化</li>
+<li><code>Win + ↓</code> : 最小化</li>
+</ul>
+
+<h2>シェル環境を整える</h2>
+
+<p>ここが貧弱というのがよく聞く話なので，色々調べてみる．</p>
+
+<p>Babun というものが良いという噂をすこし耳にする．</p>
+
+<blockquote>
+<p><a href="https://github.com/babun/babun">babun/babun</a><br>
+<a href="http://qiita.com/syui/items/2c51a33a3ca82999bea2">Windowsのターミナル環境を整える vol.1</a><br>
+<a href="http://blog.drikin.com/2015/01/windows-2.html">Windowsはターミナルがダメだから使えないってのは過去の話?</a></p>
+</blockquote>
+
+<p>以下の公式からダウンロードし，<code>install.bat</code> を実行すると，ホームディレクトリの <code>.babun</code> 以下にインストールされる．アンインストールの際にはこれを削除すればよいらしい．</p>
+
+<blockquote>
+<p><a href="http://babun.github.io/">Babun - a windows shell you will love!</a></p>
+</blockquote>
+
+<h3>emacs</h3>
+
+<p>Babun では，<code>pact</code>と呼ばれるパッケージマネージャが利用されているらしい．<code>apt-get</code>や<code>yum</code>と同じような役割だ．とりあえず，Emacs がほしいのでインストールしておく．<br>
+babun を立ち上げて，以下を実行．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">pact install emacs
+</code></pre></div>
+<h3>Chocolatey</h3>
+
+<p>Mac で利用していた Homebrew のようなもの．<br>
+ただし，アンインストールはインストールした各アプリケーションに従って主導で行う必要がある．</p>
+
+<p><a href="http://yuukiar.co/blog/2015/04/04/windows-chocolatey/">ここ</a>を参考に，コマンドプロンプトを管理者権限で実行し，以下を実行すると，インストールされると共にパスが通る．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">@powershell -NoProfile -ExecutionPolicy unrestricted -Command &quot;(iex ((new-object net.webclient).DownloadString(&#39;https://chocolatey.org/install.ps1&#39;))) &gt;$null 2&gt;&amp;1&quot; &amp;&amp; SET PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin
+</code></pre></div>
+<p>バージョンの確認ができればOK．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">&gt;clist -lo
+Chocolatey v0.9.9.6
+0 packages installed.
+</code></pre></div>
+<blockquote>
+<p><a href="http://yuukiar.co/blog/2015/04/04/windows-chocolatey/">Windows 7でパッケージ管理システム「Chocolatey」を導入する</a></p>
+</blockquote>
+
+<h3>Cask</h3>
+
+<p>自分はGithubに<code>.emacs.d</code>をあげているので，こちらもダウンロードする．Cask を利用しているので，まずは動作のために Python2 をいれる．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">choco install python2
+</code></pre></div>
+<p><code>chocolateyInstall.ps1</code> スクリプトを実行するか？聞かれるので <code>yes</code> を選択．</p>
+
+<p>また，Caskインストールのために<code>curl</code>をインストール．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">choco install curl
+</code></pre></div>
+<p>そして，<strong>管理者権限として実行した</strong> babun上から Cask をインストール．<a href="http://cask.readthedocs.org/en/latest/guide/installation.html#manual-installation">公式サイト</a>より．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
+</code></pre></div>
+<p>ホームディレクトリ下にダウンロードされる．<br>
+zsh を利用するので，<code>.zprofile</code>に以下を追加．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">export PATH=$PATH:/home/ユーザ名/.cask/bin
+</code></pre></div>
+<p>あとは，<code>cask install</code> でOK．</p>
+
+<blockquote>
+<p><a href="http://knjname.hateblo.jp/entry/2014/12/08/035828">WindowsでEmacsのClojure開発環境を立ち上げる</a></p>
+</blockquote>
+
+<h3>シンボリックリンク</h3>
+
+<p>Win のコマンドプロンプトを管理者権限で実行し，<code>mklink</code>を利用することでシンボリックリンクを張れる．babunのホームディレクトリは<code>C:\Users\ユーザ名\.babun\cygwin\home\ユーザ名\</code>になっているはず(なんだそれは&#8230;)．Cドライブ以下にアクセスするためには，<code>/cygdrive/c</code>以下にアクセスする必要があるそうだ．よくわからないので，勉強したほうがいいかも&#8230;<br>
+とりあえずは快適な利用のために，利用したいディレクトリのシンボリックリンクをCygwinのホーム直下に張っておきたい．使い方は以下．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">mklink リンク ターゲット
+</code></pre></div>
+<p>ディレクトリのシンボリックリンクを作成したい場合は<code>\D</code>オプションをつける．また，フルパスで指定しないとうまくいかない．<br>
+自分は，マイドキュメントとDropboxのシンボリックリンクを張っておいた．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">mklink /D C:/Users/ユーザ名/.babun/cygwin/home/ユーザ名/Dropbox C:/Users/ユーザ名/dropbox
+</code></pre></div>
+<p>好きなものを張っておく．</p>
+
+<blockquote>
+<p><a href="http://qiita.com/opengl-8080/items/c2b6a93dfca5b61f9e6a">Windowsでハードリンクやシンボリックリンクを作成する</a><br>
+<a href="https://sites.google.com/site/hymd3a/cygwin#TOC-2011-11-24-">cygwin - ひゃまだのブログ</a></p>
+</blockquote>
+
+<h3>.zshrc</h3>
+
+<p>babun はデフォルトで oh-my-zsh がインストール済だけど，自分は個人用設定を共有したかったので，これは使わない．<br>
+<code>.zshrc</code>をMac/Win間で共有するために，ホーム直下に<code>.dotfiles</code>というディレクトリを置き，Gitの管理下に置いたうえで，中身の<code>.zshrc</code>からシンボリックリンクを張っておいた．</p>
+
+<p>ここで，<code>.zshrc</code>を置き換えると，以下のようなエラーが発生．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">Ignore insecure directories and continue [ny]?
+</code></pre></div>
+<p>どうやら，パーミッション関係の問題らしい．<a href="http://www.wezm.net/technical/2008/09/zsh-cygwin-and-insecure-directories/">こちら</a>を参考にパーミッションの設定をし直す．babun を管理者権限で立ち上げ，以下を実行した．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">$ chmod g-w /usr/share/zsh/site-functions /usr/share/zsh/5.0.6/functions /usr/share/zsh /usr/share/zsh/5.0.6
+$ compaudit
+</code></pre></div>
+<h3>フォント</h3>
+
+<p>Rictyフォントがお気に入りなんだけど，合成だのなんだのは面倒なので，<code>Ricty Diminished</code>を利用する．<a href="https://github.com/yascentur/RictyDiminished">yascentur/RictyDiminished</a>からZIPをダウンロードし，フォントをインストールする．</p>
+
+<p>その後，Babunに設定する．Babun は Mintty というコンソールを利用しています．なので，Mintty の設定をいじろう．設定ファイルの場所は<code>~/home/ユーザ名/.minttyrc</code>にある．ここでフォントの種類やサイズを設定する．ウインドウの透過度も決められます．</p>
+
+<p>設定のための<a href="http://mintty.googlecode.com/svn-history/r1065/trunk/docs/mintty.1.html">マニュアル</a>を参考にするとよい．</p>
+
+<blockquote>
+<p><a href="http://qiita.com/d9magai@github/items/b988f4c881cfa1261512">Cygwinのターミナルエミュレータminttyの導入</a><br>
+<a href="https://121ware.com/qasearch/1007/app/servlet/relatedqa?QID=012622">Windows 7でインストール済みのフォント一覧を表示する方法</a><br>
+<a href="http://nelog.jp/how-to-use-ricty-diminished-font">見やすいプログラミング用フォント「Ricty Diminished」をWindowsにインストールしてSublime Textで利用する方法</a></p>
+</blockquote>
+
+<h2>その他</h2>
+
+<p><code>sudo</code> したいんだけど，なんとかならないかなぁ，とか．</p>
+
+<blockquote>
+<p><a href="http://unavoidablereset.blog.fc2.com/blog-entry-15.html">cygwinでsudo解決編 - バグ#予想不可能回避不可能</a></p>
+</blockquote>
+]]></content>
+  </entry>
+  
+</feed>
