@@ -1,0 +1,226 @@
+---
+layout: post
+title: "Mac使ってた人がWin使ってみたときのメモ"
+date: 2015-06-18 19:21:44 +0900
+comments: true
+categories:
+- mac
+- win7
+- win8
+---
+
+普段使いは OS X だったんだけど，Winを利用しなきゃならない場面があったので，使いやすくするためにやったことをメモしておく．
+ちなみに Windows 7, 8 の話．
+
+<!-- more -->
+
+#つまりどうするのか
+
+* zsh つかいたい
+* Emacs つかいたい
+* ブラウザでも Emacs ライクなキーバインドつかいたい
+
+あまり大したことはしない．
+
+##キーバインド
+Caps lock を Ctrl にするために，Ctrl2capを利用した．
+Ctrl は Capslock にはならないので注意．
+
+* つかいかた
+    * インストール
+        * `ctrl2cap /install`
+    * アンインストール
+        * `ctrl2cap /uninstall`
+
+インストールしたらインストール．
+
+>[Ctrl2cap - TechNet - Microsoft](https://technet.microsoft.com/ja-jp/sysinternals/bb897578.aspx)
+
+##Webブラウザ
+
+###Chrome？
+とりあえず，拡張機能をいくつかいれてみる．
+
+* keyconfig
+* gleeBox
+
+Ctrl と command が同じ意味合いになっていて使いづらいので，
+keyconfigをいれてみた．なかなかいいぞこれは...
+
+* ちなみにgleeBox のいろは
+    * g : gleeBoxの起動
+    * Alt-g : フォーカスがテキストにある場合の gleeBox の起動
+    * . : タブマネージャの起動(chrome限定)
+    * ?img : イメージ要素選択
+    * ?? : 入力フィールド選択
+
+しかし，行頭にもってくる`Ctrl+a`や前方削除の`Ctrl+h`のキーバインドが，全選択や履歴へのキーバインドになってしまう．Mac では Ctrl と Command でそこらへんの使い分けができていたけど，Win だとどちらも Ctrl だからだね．
+
+###Firefox + keySnail
+emacs 使いには Firefox + keySnail が良いとの噂を聞きつけ，導入してみることにした．
+gleeBox が利用できないのが残念だ．
+
+* keySnail
+    * FireFox のアドオン
+    * F1 + b でショートカット一覧が見れる
+* プラグイン
+    * bmany
+    * Tanything
+    * HoK
+
+少し使ってみた感じ，HoK はなかなか気に入った．
+
+>[FireFox + KeySnail でEmacsキーバインドなWebブラウジング環境を作った話](http://nenono.hatenablog.com/entry/2015/04/02/160721)
+
+##ランチャー
+Executer というのをいれる．
+`Alt + Space`で起動できるようにすればおｋかな．ショートカットも追加できるのがgood．
+
+>[Welcome to Executor](http://executor.dk/)
+
+##アプリケーション切り替え
+`Alt + Tab` で Mac の `Command + Tab` ができます．
+
+
+##画面分割
+Mac では Spectable を利用していたけど，Win はデフォルトのキーバインドでできる．いいね．
+
+* `Win + →` : 右半分
+* `Win + ←` : 左半分
+* `Win + ↑` : 最大化
+* `Win + ↓` : 最小化
+
+
+##シェル環境を整える
+ここが貧弱というのがよく聞く話なので，色々調べてみる．
+
+Babun というものが良いという噂をすこし耳にする．
+
+>[babun/babun](https://github.com/babun/babun)
+>[Windowsのターミナル環境を整える vol.1](http://qiita.com/syui/items/2c51a33a3ca82999bea2)
+>[Windowsはターミナルがダメだから使えないってのは過去の話?](http://blog.drikin.com/2015/01/windows-2.html)
+
+以下の公式からダウンロードし，`install.bat` を実行すると，ホームディレクトリの `.babun` 以下にインストールされる．アンインストールの際にはこれを削除すればよいらしい．
+
+>[Babun - a windows shell you will love!](http://babun.github.io/)
+
+
+###emacs
+
+Babun では，`pact`と呼ばれるパッケージマネージャが利用されているらしい．`apt-get`や`yum`と同じような役割だ．とりあえず，Emacs がほしいのでインストールしておく．
+babun を立ち上げて，以下を実行．
+
+```
+pact install emacs
+```
+
+###Chocolatey
+
+Mac で利用していた Homebrew のようなもの．
+ただし，アンインストールはインストールした各アプリケーションに従って主導で行う必要がある．
+
+[ここ](http://yuukiar.co/blog/2015/04/04/windows-chocolatey/)を参考に，コマンドプロンプトを管理者権限で実行し，以下を実行すると，インストールされると共にパスが通る．
+
+```
+@powershell -NoProfile -ExecutionPolicy unrestricted -Command "(iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))) >$null 2>&1" && SET PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin
+```
+
+バージョンの確認ができればOK．
+
+```
+>clist -lo
+Chocolatey v0.9.9.6
+0 packages installed.
+```
+
+>[Windows 7でパッケージ管理システム「Chocolatey」を導入する](http://yuukiar.co/blog/2015/04/04/windows-chocolatey/)
+
+###Cask
+
+自分はGithubに`.emacs.d`をあげているので，こちらもダウンロードする．Cask を利用しているので，まずは動作のために Python2 をいれる．
+
+```
+choco install python2
+```
+
+`chocolateyInstall.ps1` スクリプトを実行するか？聞かれるので `yes` を選択．
+
+また，Caskインストールのために`curl`をインストール．
+
+```
+choco install curl
+```
+
+そして，**管理者権限として実行した** babun上から Cask をインストール．[公式サイト](http://cask.readthedocs.org/en/latest/guide/installation.html#manual-installation)より．
+
+```
+curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
+```
+
+ホームディレクトリ下にダウンロードされる．
+zsh を利用するので，`.zprofile`に以下を追加．
+
+```
+export PATH=$PATH:/home/ユーザ名/.cask/bin
+```
+
+あとは，`cask install` でOK．
+
+>[WindowsでEmacsのClojure開発環境を立ち上げる](http://knjname.hateblo.jp/entry/2014/12/08/035828)
+
+###シンボリックリンク
+
+Win のコマンドプロンプトを管理者権限で実行し，`mklink`を利用することでシンボリックリンクを張れる．babunのホームディレクトリは`C:\Users\ユーザ名\.babun\cygwin\home\ユーザ名\`になっているはず(なんだそれは...)．Cドライブ以下にアクセスするためには，`/cygdrive/c`以下にアクセスする必要があるそうだ．よくわからないので，勉強したほうがいいかも...
+とりあえずは快適な利用のために，利用したいディレクトリのシンボリックリンクをCygwinのホーム直下に張っておきたい．使い方は以下．
+
+```
+mklink リンク ターゲット
+```
+
+ディレクトリのシンボリックリンクを作成したい場合は`\D`オプションをつける．また，フルパスで指定しないとうまくいかない．
+自分は，マイドキュメントとDropboxのシンボリックリンクを張っておいた．
+
+```
+mklink /D C:/Users/ユーザ名/.babun/cygwin/home/ユーザ名/Dropbox C:/Users/ユーザ名/dropbox
+```
+
+好きなものを張っておく．
+
+>[Windowsでハードリンクやシンボリックリンクを作成する](http://qiita.com/opengl-8080/items/c2b6a93dfca5b61f9e6a)
+>[cygwin - ひゃまだのブログ](https://sites.google.com/site/hymd3a/cygwin#TOC-2011-11-24-)
+
+###.zshrc
+
+babun はデフォルトで oh-my-zsh がインストール済だけど，自分は個人用設定を共有したかったので，これは使わない．
+`.zshrc`をMac/Win間で共有するために，ホーム直下に`.dotfiles`というディレクトリを置き，Gitの管理下に置いたうえで，中身の`.zshrc`からシンボリックリンクを張っておいた．
+
+ここで，`.zshrc`を置き換えると，以下のようなエラーが発生．
+
+```
+Ignore insecure directories and continue [ny]?
+```
+
+どうやら，パーミッション関係の問題らしい．[こちら](http://www.wezm.net/technical/2008/09/zsh-cygwin-and-insecure-directories/)を参考にパーミッションの設定をし直す．babun を管理者権限で立ち上げ，以下を実行した．
+
+```
+$ chmod g-w /usr/share/zsh/site-functions /usr/share/zsh/5.0.6/functions /usr/share/zsh /usr/share/zsh/5.0.6
+$ compaudit
+```
+
+###フォント
+
+Rictyフォントがお気に入りなんだけど，合成だのなんだのは面倒なので，`Ricty Diminished`を利用する．[yascentur/RictyDiminished](https://github.com/yascentur/RictyDiminished)からZIPをダウンロードし，フォントをインストールする．
+
+その後，Babunに設定する．Babun は Mintty というコンソールを利用しています．なので，Mintty の設定をいじろう．設定ファイルの場所は`~/home/ユーザ名/.minttyrc`にある．ここでフォントの種類やサイズを設定する．ウインドウの透過度も決められます．
+
+設定のための[マニュアル](http://mintty.googlecode.com/svn-history/r1065/trunk/docs/mintty.1.html)を参考にするとよい．
+
+>[Cygwinのターミナルエミュレータminttyの導入](http://qiita.com/d9magai@github/items/b988f4c881cfa1261512)
+>[Windows 7でインストール済みのフォント一覧を表示する方法](https://121ware.com/qasearch/1007/app/servlet/relatedqa?QID=012622)
+>[見やすいプログラミング用フォント「Ricty Diminished」をWindowsにインストールしてSublime Textで利用する方法](http://nelog.jp/how-to-use-ricty-diminished-font)
+
+##その他
+
+`sudo` したいんだけど，なんとかならないかなぁ，とか．
+
+>[cygwinでsudo解決編 - バグ#予想不可能回避不可能](http://unavoidablereset.blog.fc2.com/blog-entry-15.html)
