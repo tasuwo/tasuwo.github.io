@@ -5,13 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Lispメモ - tasuwo blog</title>
+  <title>Vim をさわってみた感想 - tasuwo blog</title>
   <meta name="author" content="tasuwo">
 
   
-  <meta name="description" content="Land of Lisp を読んでいるのでメモ．
-本ブログは自己啓発の意味合いもあるため，定期的に何かしらはブログにアップすることを目標にする．
-そのうち綺麗にまとめます． 関数型プログラミング 関数は，引数か関数内で宣言された変数しか参照せず，また値を返す以外の動作をしない． &hellip;">
+  <meta name="description" content="雑記です． 案外予定がつまっていて忙しい．充実しているともいう． さて，近頃ずっと Emacs の設定をしては悦にいるという暇のつぶし方をしていた．
+anything とか yasnippet とか...(設定ファイルは tasuwo/.emacs.d にあげてある) Emacs &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://tasuwo.github.io/blog/2015/03/24/land-of-lisp">
+  <link rel="canonical" href="http://tasuwo.github.io/blog/2015/06/26/title">
   <link href="/favicon.ico" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="tasuwo blog" type="application/atom+xml">
@@ -81,7 +80,7 @@
   
   <header>
     
-      <h1 class="entry-title">Lispメモ</h1>
+      <h1 class="entry-title">Vim をさわってみた感想</h1>
     
     
       <p class="meta">
@@ -90,7 +89,7 @@
 
 
 
-<time class='entry-date' datetime='2015-03-24T12:49:43+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:49 pm</span></time>
+<time class='entry-date' datetime='2015-06-26T22:39:00+09:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:39 pm</span></time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://tasuwo.github.io">Comments</a>
@@ -100,77 +99,31 @@
   </header>
 
 
-<div class="entry-content"><p>Land of Lisp を読んでいるのでメモ．<br>
-本ブログは自己啓発の意味合いもあるため，定期的に何かしらはブログにアップすることを目標にする．<br>
-そのうち綺麗にまとめます．</p>
+<div class="entry-content"><p>雑記です．</p>
 
 <!-- more -->
 
-<ul>
-<li><p>関数型プログラミング</p>
+<p>案外予定がつまっていて忙しい．充実しているともいう．</p>
 
-<ul>
-<li>関数は，引数か関数内で宣言された変数しか参照せず，また値を返す以外の動作をしない．</li>
-</ul></li>
-<li><p>比較についてのルール</p>
+<p>さて，近頃ずっと Emacs の設定をしては悦にいるという暇のつぶし方をしていた．<br>
+anything とか yasnippet とか&#8230;(設定ファイルは <a href="https://github.com/tasuwo/.emacs.d">tasuwo/.emacs.d</a> にあげてある)</p>
 
-<ul>
-<li>シンボル同士は<strong>EQ</strong>で比較する</li>
-<li>それ以外は<strong>EQUAL</strong>で比較する</li>
-</ul></li>
-<li><p>Common Lispでは，空リスト( &#39;(),(),&#39;nil,nil )が<strong>唯一の</strong>偽値</p></li>
-<li><p>リストはコンスセルがつながってできている</p></li>
-<li><p>コンスセルは<code>cons</code>コマンドで作られる</p></li>
-<li><p><code>car</code>と<code>cdr</code>でリストの中身を調べることができる</p></li>
-<li><p>Lispには<strong>コードモード</strong>と<strong>データモード</strong>がある</p>
+<p>Emacs を使い始めて数ヶ月がたった．<br>
+  前の記事で説明したように，ブラウザも FireFox + keysnail で Emacs ライクなキーバインドにして楽しんでいたけれど，正直なところ，メタキーが押下しづらいし，小指を Ctrl に置いておくのが地味にキツい時がある．ちなみに，keysnail を利用している所感としては，トラックパッドを使わなくていい(Macbookのトラックパッドは十分に素晴らしいものだけど)のが楽だ．手首に優しい．</p>
 
-<ul>
-<li>デフォルトではコードモード</li>
-<li>REPLへの入力は<strong>フォーム</strong>の形式でなくてはならない
+<p>ネットではよく，Emacs vs Vim みたいな話を聞く．<br>
+  自分が Emacs を使い始めたのは，大学で先輩に影響されたかのが大きく，Vim については触ったことすらなかった．軽量で，操作も(慣れれば)かなり快適だと聞く．Emacs から Vim に乗り換えてよかったという人もよく目にする．小指が疲れてきたこの機会に，少し触ってみることにした．</p>
 
-<ul>
-<li><code>(command bla bla bla bla ...)</code></li>
-</ul></li>
-<li><code>&#39;</code>(シングルクオート)を式に付加すると，データモードで扱われる(<strong>クオートする</strong>)</li>
-<li>準クオート
+<p>Vim にはデフォルトでチュートリアルが用意されていて，下記のように呼び出すことができる．</p>
 
-<ul>
-<li><strong>`</strong>(バッククオート)を付加した式の中で<code>,</code>(コンマ)を使用すると，一部分だけコードモードに戻すことができる(<strong>アンクオートする</strong>)</li>
-</ul></li>
-</ul></li>
-<li><p>関数</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>vimtutor js
+</span></code></pre></td></tr></table></div></figure>
 
-<ul>
-<li><code>assoc</code>：キーをもとに要素を抜き出す</li>
-<li><code>mapcar</code>：関数とリストを引数とする．リストの要素1つ1つに対し，関数を実行する</li>
-<li><code>append</code>：リストをつなげて1つのリストにする</li>
-<li><code>apply</code>：関数とリストを引数とする．リストの各要素を引数として関数を呼び出したかのように動作する</li>
-<li><code>remove-if-not</code>：関数とリストを受け取る．リストの各要素に関数を適用し，真でなかったものを除いたリストを返す</li>
-</ul></li>
-<li><p>高階関数：他の関数を引数として受け取る関数</p>
+<p>これをちょこちょこ触ってみた．</p>
 
-<ul>
-<li><code>#&#39;</code>：functionオペレータの略記．関数を値として扱う場合にそれを明示する必要がある(Common Lispでは)</li>
-</ul></li>
-<li><p>典型的なLispコードスタイル</p>
-
-<ul>
-<li><code>(apply #&#39;append (mapcar #&#39;describe-path (cdr (assoc location edges))))</code></li>
-<li>複雑なデータの塊を幾つかのステップで受け渡しながら処理を進める</li>
-<li>高階関数も頻繁に使われる</li>
-</ul></li>
-<li><p>関数末尾のp</p>
-
-<ul>
-<li>nilか真を返す場合，Common Lisp では関数名の最後に<strong>p</strong>をつける</li>
-<li>真偽値を確かめる関数は<strong>述語(predicate)</strong>と呼ばれるため</li>
-</ul></li>
-</ul>
-
-<h3>雑記</h3>
-
-<p>一週間ほど海外なので，更新はないです．<br>
-自作OSは飛行機の中やホテルでの夜にも進める予定だけど，リモートにpushするのは帰国してからかも．</p>
+<p>感想．<br>
+文書編集能力は Vim が圧倒的に勝っているように感じた(ただ，日本語編集等なるとどうなんだろう&#8230;)．Emacs における単語移動の M-f や M-b は押下しづらすぎた．モード変換は慣れるまでが大変そうでなんともいえない．Emacs から Vim に乗り換えるかといわれると，おそらく Emacs と Vim では根底にある思想が異なる気がする(Emacs は良き OS ，Vim は良き Editor，みたいな)し，どうだろう．いろいろ言っているけど，別に Emacs が嫌いになったわけではないので，本格的に乗り換えるのは(今の所は)ないかな．</p>
 </div>
 
 
@@ -186,12 +139,12 @@
 
 
 
-<time class='entry-date' datetime='2015-03-24T12:49:43+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:49 pm</span></time>
+<time class='entry-date' datetime='2015-06-26T22:39:00+09:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:39 pm</span></time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/lisp/'>lisp</a>
+    <a class='category' href='/blog/categories/emacs/'>emacs</a>, <a class='category' href='/blog/categories/vim/'>vim</a>, <a class='category' href='/blog/categories/za-ji/'>雑記</a>
   
 </span>
 
@@ -200,7 +153,7 @@
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2015/03/24/land-of-lisp/" data-via="" data-counturl="http://tasuwo.github.io/blog/2015/03/24/land-of-lisp/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2015/06/26/title/" data-via="" data-counturl="http://tasuwo.github.io/blog/2015/06/26/title/" >Tweet</a>
   
   
   
@@ -210,10 +163,8 @@
     <br />
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2015/03/21/pallet/" title="Previous Post: Palletを導入した">&laquo; Palletを導入した</a>
+        <a class="basic-alignment left" href="/blog/2015/06/18/win/" title="Previous Post: Mac使ってた人がWin使ってみたときのメモ">&laquo; Mac使ってた人がWin使ってみたときのメモ</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2015/04/12/title/" title="Next Post: iOSアプリ開発初心者がTwitterクライアントを作成する その1">iOSアプリ開発初心者がTwitterクライアントを作成する その1 &raquo;</a>
       
     </p>
   </footer>
@@ -296,8 +247,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://tasuwo.github.io/blog/2015/03/24/land-of-lisp/';
-        var disqus_url = 'http://tasuwo.github.io/blog/2015/03/24/land-of-lisp/';
+        var disqus_identifier = 'http://tasuwo.github.io/blog/2015/06/26/title/';
+        var disqus_url = 'http://tasuwo.github.io/blog/2015/06/26/title/';
         var disqus_script = 'embed.js';
       
     (function () {

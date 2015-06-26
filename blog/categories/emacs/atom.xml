@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Emacs | tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/blog/categories/emacs/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2015-06-18T19:33:55+09:00</updated>
+  <updated>2015-06-26T23:18:26+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -12,6 +12,36 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Vim をさわってみた感想]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/06/26/title/"/>
+    <updated>2015-06-26T22:39:00+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/06/26/title</id>
+    <content type="html"><![CDATA[<p>雑記です．</p>
+
+<!-- more -->
+
+<p>案外予定がつまっていて忙しい．充実しているともいう．</p>
+
+<p>さて，近頃ずっと Emacs の設定をしては悦にいるという暇のつぶし方をしていた．<br>
+anything とか yasnippet とか&#8230;(設定ファイルは <a href="https://github.com/tasuwo/.emacs.d">tasuwo/.emacs.d</a> にあげてある)</p>
+
+<p>Emacs を使い始めて数ヶ月がたった．<br>
+  前の記事で説明したように，ブラウザも FireFox + keysnail で Emacs ライクなキーバインドにして楽しんでいたけれど，正直なところ，メタキーが押下しづらいし，小指を Ctrl に置いておくのが地味にキツい時がある．ちなみに，keysnail を利用している所感としては，トラックパッドを使わなくていい(Macbookのトラックパッドは十分に素晴らしいものだけど)のが楽だ．手首に優しい．</p>
+
+<p>ネットではよく，Emacs vs Vim みたいな話を聞く．<br>
+  自分が Emacs を使い始めたのは，大学で先輩に影響されたかのが大きく，Vim については触ったことすらなかった．軽量で，操作も(慣れれば)かなり快適だと聞く．Emacs から Vim に乗り換えてよかったという人もよく目にする．小指が疲れてきたこの機会に，少し触ってみることにした．</p>
+
+<p>Vim にはデフォルトでチュートリアルが用意されていて，下記のように呼び出すことができる．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>vimtutor js
+</code></pre></div>
+<p>これをちょこちょこ触ってみた．</p>
+
+<p>感想．<br>
+文書編集能力は Vim が圧倒的に勝っているように感じた(ただ，日本語編集等なるとどうなんだろう&#8230;)．Emacs における単語移動の M-f や M-b は押下しづらすぎた．モード変換は慣れるまでが大変そうでなんともいえない．Emacs から Vim に乗り換えるかといわれると，おそらく Emacs と Vim では根底にある思想が異なる気がする(Emacs は良き OS ，Vim は良き Editor，みたいな)し，どうだろう．いろいろ言っているけど，別に Emacs が嫌いになったわけではないので，本格的に乗り換えるのは(今の所は)ないかな．</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Palletを導入した]]></title>
@@ -742,21 +772,15 @@ loaded /Users/hogehoge/.emacs.d/inits/01_hoge. 0.00703
 
 <ul>
 <li>括弧の対応を色付けする<br>
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="nv">&amp;#39</span><span class="c1">;rainbow-delimiters)&lt;/li&gt;</span>
-</span><span class='line'><span class="nv">&lt;/ul&gt;&lt;/li&gt;</span>
-</span><span class='line'><span class="nv">&lt;/ul&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span><span class="c1">;(add-hook &amp;#39;clojure-mode-hook &amp;#39;rainbow-delimiters-mode)&lt;br&gt;</span>
-</span><span class='line'><span class="p">(</span><span class="nv">add-hook</span> <span class="nv">&amp;#39</span><span class="c1">;prog-mode-hook &amp;#39;rainbow-delimiters-mode)&lt;br&gt;</span>
-</span><span class='line'><span class="c1">;(global-rainbow-delimiters-mode)&lt;br&gt;</span>
-</span></code></pre></td></tr></table></div></figure><br>
+&#8220;`lisp
+(require &#39;rainbow-delimiters)</li>
+</ul></li>
+</ul>
+
+<p>;(add-hook &#39;clojure-mode-hook &#39;rainbow-delimiters-mode)<br>
+(add-hook &#39;prog-mode-hook &#39;rainbow-delimiters-mode)<br>
+;(global-rainbow-delimiters-mode)<br>
+&#8220;`<br>
 * helm<br>
     * 超絶便利らしいので勉強してみる<br>
 * ace-jump-mode<br>
