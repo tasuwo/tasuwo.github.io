@@ -4,7 +4,7 @@
   <title><![CDATA[tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2015-06-26T23:18:02+09:00</updated>
+  <updated>2015-08-16T15:44:28+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -12,6 +12,63 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Emacs の色表示がおかしかったのでなおした]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/08/16/title/"/>
+    <updated>2015-08-16T15:25:56+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/08/16/title</id>
+    <content type="html"><![CDATA[<p>結論から言うと，悪いのは emacs ではなく， screen が 256 色表示に対応していなかったせいだった．</p>
+
+<!-- more -->
+
+<p>256色表示できているか確かめる(参考サイト参照)</p>
+
+<ul>
+<li>ターミナル上</li>
+</ul>
+
+<p><img src="http://tasuwo.github.io/images/terminal_color.png" alt="terminal_color"></p>
+
+<ul>
+<li>screen上</li>
+</ul>
+
+<p><img src="http://tasuwo.github.io/images/screen_color.png" alt="screen_color"></p>
+
+<p>screen のバージョン確認</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>screen -v
+</span><span class='line'>Screen version 4.00.03 <span class="o">(</span>FAU<span class="o">)</span> 23-Oct-06
+</span></code></pre></td></tr></table></div></figure>
+
+<p>homebrew で最新版を導入する</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew tap homebrew/dupes
+</span><span class='line'><span class="nv">$ </span>brew install screen
+</span><span class='line'>...
+</span><span class='line'><span class="nv">$ </span>screen -v
+</span><span class='line'>Screen version 4.03.00 <span class="o">(</span>GNU<span class="o">)</span> 27-May-15
+</span></code></pre></td></tr></table></div></figure>
+
+<p>これでおk．</p>
+
+<h2>参考</h2>
+
+<blockquote>
+<p><a href="http://qiita.com/trapple/items/8ad1b0a7c4fa5b8341b0">OSXに256color対応Screenをインストールする - Qiita</a><br>
+<a href="http://kiyotakagoto.hatenablog.com/entry/2013/02/17/210834">Mac OS X + iTerm2 + tmux + emacs で256色表示 - 人生ずっと勉強</a><br>
+<a href="http://qiita.com/sesame/items/e752b53ebf478d0d081f">emacsclientを使用するとテーマのmode-lineが効かない - Qiita</a></p>
+</blockquote>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Vim をさわってみた感想]]></title>
@@ -4013,82 +4070,6 @@ IPLにはフロッピーディスクの全情報を読み込ませる(実際に�
 </ul>
 
 <p>の2点がこの本から発展した個人的な課題になりそう．とりあえず，見れるものを作っておきたい．</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[自作OS2日目]]></title>
-    <link href="http://tasuwo.github.io/blog/2015/02/24/title/"/>
-    <updated>2015-02-24T16:48:16+09:00</updated>
-    <id>http://tasuwo.github.io/blog/2015/02/24/title</id>
-    <content type="html"><![CDATA[<p>間が空いて2日目です．</p>
-
-<!-- more -->
-
-<p>わからないことについて調べながらだと，膨大な時間がかかるなぁと気づいてしまった．4月までに終わるといいな，くらいの認識．また，こういう風に本を使った学習だと，たまに，自分は今一体何をしようとしているのか？見失ってしまうことがある．整理の意味も込めて，前回と今回でやったことを簡単にまとめておく．</p>
-
-<h1>1日目</h1>
-
-<ul>
-<li>目標：ブートセクタを作る
-
-<ul>
-<li>ブートセクタって？
-
-<ul>
-<li>OSを呼び出すためのプログラムが格納された，ハードディスク上の一部分(セクタ)のこと</li>
-</ul></li>
-</ul></li>
-</ul>
-
-<ol>
-<li><p>まずは，バイナリエディタでディスクイメージファイルを書く</p>
-
-<ul>
-<li>バイナリエディタって？
-
-<ul>
-<li>2進数をかくやつ</li>
-</ul></li>
-<li>ディスクイメージファイルって？
-
-<ul>
-<li>仮想イメージファイルとも</li>
-<li>ファイルシステムの完全な内容と構造を1つのファイルに格納したデータのこと</li>
-</ul></li>
-<li>なぜバイナリエディタで？
-
-<ul>
-<li>コンピュータの心臓はCPU</li>
-<li>CPUは機械語の通りに電気信号を他の回路とやりとりする</li>
-<li>電気信号はON/OFFの2通りしかない</li>
-<li>なので，機械語も1/0の2通りしかない</li>
-<li>つまり，バイナリエディタで書ける</li>
-</ul></li>
-</ul></li>
-<li><p>バイナリエディタで開発は無理があったので，アセンブリ言語で書く</p>
-
-<ul>
-<li>DB命令，RESB命令等ですっきりしたコードがかける</li>
-<li>アセンブラは<code>nask</code>を使う</li>
-<li><code>nasm(netwide assembler)</code>というフリーのアセンブラの派生？</li>
-</ul></li>
-</ol>
-
-<h1>2日目</h1>
-
-<ol>
-<li>アセンブリ言語のコードをもう少し見やすくした(アセンブリ言語の勉強)</li>
-<li>Makefileについて勉強した</li>
-</ol>
-
-<h1>わからないこと</h1>
-
-<p><code>tolsetOSX</code>と<code>Q.app</code>が何をしているのか．</p>
-
-<h1>雑記</h1>
-
-<p>やることがつまっているのにうまくやる気が出せない．根性が必要．生活を豊かにするために，とりあえず積極的に自炊することにした．やりたいことがでてくるとお金に困りそうなので，アルバイトについても少し考えておく．</p>
 ]]></content>
   </entry>
   

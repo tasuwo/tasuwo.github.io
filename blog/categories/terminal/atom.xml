@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Emacs, | tasuwo blog]]></title>
-  <link href="http://tasuwo.github.io/blog/categories/emacs/atom.xml" rel="self"/>
+  <title><![CDATA[Category: Terminal | tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/blog/categories/terminal/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
   <updated>2015-08-16T15:44:28+09:00</updated>
   <id>http://tasuwo.github.io/</id>
