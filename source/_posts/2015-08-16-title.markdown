@@ -1,0 +1,47 @@
+---
+layout: post
+title: "Emacs の色表示がおかしかったのでなおした"
+date: 2015-08-16 15:25:56 +0900
+comments: true
+categories: emacs, terminal
+---
+
+結論から言うと，悪いのは emacs ではなく， screen が 256 色表示に対応していなかったせいだった．
+
+<!-- more -->
+
+256色表示できているか確かめる(参考サイト参照)
+
+* ターミナル上
+
+![terminal_color](/images/terminal_color.png)
+
+* screen上
+
+![screen_color](/images/screen_color.png)
+
+
+screen のバージョン確認
+
+```bash
+$ screen -v
+Screen version 4.00.03 (FAU) 23-Oct-06
+```
+
+homebrew で最新版を導入する
+
+```bash
+$ brew tap homebrew/dupes
+$ brew install screen
+...
+$ screen -v
+Screen version 4.03.00 (GNU) 27-May-15
+```
+
+これでおk．
+
+##参考
+
+>[OSXに256color対応Screenをインストールする - Qiita](http://qiita.com/trapple/items/8ad1b0a7c4fa5b8341b0)
+>[Mac OS X + iTerm2 + tmux + emacs で256色表示 - 人生ずっと勉強](http://kiyotakagoto.hatenablog.com/entry/2013/02/17/210834)
+>[emacsclientを使用するとテーマのmode-lineが効かない - Qiita](http://qiita.com/sesame/items/e752b53ebf478d0d081f)
