@@ -4,7 +4,7 @@
   <title><![CDATA[tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2015-08-16T15:44:28+09:00</updated>
+  <updated>2015-08-16T16:13:53+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -12,6 +12,67 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Xcode のプラグイン導入についてメモ]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/08/16/xcode-plugin/"/>
+    <updated>2015-08-16T16:08:37+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/08/16/xcode-plugin</id>
+    <content type="html"><![CDATA[<p>メモしておこう．</p>
+
+<!-- more -->
+
+<h2>Alcatraz</h2>
+
+<p>パッケージ管理ツールをいれる．<br>
+パッケージのインストールや管理がラクになる．</p>
+
+<blockquote>
+<p><a href="https://github.com/supermarin/Alcatraz">supermarin/Alcatraz · GitHub</a></p>
+</blockquote>
+
+<p>以下を実行．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>curl -fsSL https://raw.github.com/supermarin/Alcatraz/master/Scripts/install.sh <span class="p">|</span> sh
+</span></code></pre></td></tr></table></div></figure>
+
+<p>Xcode を起動すると以下のような画面が表示されるので，<code>Load Bundle</code>する．</p>
+
+<p><img src="http://tasuwo.github.io/images/xcode_alcatraz.png" alt="xcode_alcatraz"></p>
+
+<p><code>Window &gt; Package Manager</code> からパッケージをインストールできるようになる．</p>
+
+<h2>いれたもの</h2>
+
+<p>とりあえず一通り見てみていれてみたもの．</p>
+
+<h3>プラグイン</h3>
+
+<ul>
+<li>BlockJump</li>
+<li>FuzzyAutocomplete</li>
+<li>VVDocumenter-Xcode</li>
+<li>XAlign</li>
+</ul>
+
+<h3>テーマ</h3>
+
+<ul>
+<li>Tomorrow Night</li>
+</ul>
+
+<p>まだ全然使っていないので，使用感だとかどんなものだとかは気が向いたら書く．</p>
+
+<h2>その他</h2>
+
+<p>他にも Xcode 使う上で知っておくといいことがいろいろあるらしいけど，気が向いたら読む．</p>
+
+<blockquote>
+<p><a href="http://himaratsu.hatenablog.com/entry/xcode">Xcodeを便利に使って爆速開発という発表をしました - Think Big Act Local</a></p>
+</blockquote>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Emacs の色表示がおかしかったのでなおした]]></title>
@@ -3980,96 +4041,6 @@ homebrewでemacsをインストールしたため，インストール先は<cod
 
 <p>設定は奥が深いようだ．使いながら欲しい機能を探すのがいいだろう．あとは今回設定した中でも，気に入らない設定が出てくるかもしれない．落ち着いたら，設定はgithubで公開したい．<br>
 自作OSの方は8日目くらいまで進んでいるのだけど，まとめが終わっていない．明日はそちらをまとめることを目標にする．</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[自作OS3日目]]></title>
-    <link href="http://tasuwo.github.io/blog/2015/02/26/title/"/>
-    <updated>2015-02-26T00:13:10+09:00</updated>
-    <id>http://tasuwo.github.io/blog/2015/02/26/title</id>
-    <content type="html"><![CDATA[<p>3日目です．</p>
-
-<!-- more -->
-
-<p>余計なことをしていたら，結構時間がかかってしまった．現在進めている本は2006年の本なので，実はかなり情報が古い．でも，OSの根本の部分ってそんな簡単に変わらないと思うので，無駄になることはないはずだ．多分．また，組み込みOSの方はたぶんCPUとかの組み立てからやるのだけど，レジスタとかメモリとか利用していると実際にそれらを見てみたくなるのはわかる．余裕があればいつかやってみたいな．そっちは2010年でまだ新しいしね．<br>
-前回同様やったことの整理をする．</p>
-
-<h1>2日目</h1>
-
-<h3>今まで</h3>
-
-<ol>
-<li>naskでアセンブリコードからディスクイメージ全体を生成する</li>
-<li>qemuでエミュレートする</li>
-</ol>
-
-<h3>これから</h3>
-
-<ol>
-<li>naskにはアセンブリコードからブートセクタを生成してもらう</li>
-<li>ディスクイメージは，edimg(筆者作のディスクイメージ管理ツール) を使用して生成する</li>
-<li>qemuでエミュレートする</li>
-</ol>
-
-<h3>つまり</h3>
-
-<p>Makefileが以下のように書きかわるというワケ．</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>run :
-</span><span class='line'>  ../../z_tools/nask helloos.nas helloos.img
-</span><span class='line'>  cp helloos.img ../../z_tools/qemu/fdimage0.bin
-</span><span class='line'>  make -C ../../z_tools/qemu</span></code></pre></td></tr></table></div></figure>
-
-<p>↓</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>ipl.bin : ipl.nas Makefile
-</span><span class='line'>  ../../z_tools/nask ipl.nas ipl.bin ipl.lst
-</span><span class='line'>helloos.img : ipl.bin Makefile
-</span><span class='line'>  ../../z_tools/edimg   imgin:../../z_tools/fdimg0at.tek \
-</span><span class='line'>  wbinimg src:ipl.bin len:512 from:0 to:0   imgout:helloos.img
-</span><span class='line'>img :
-</span><span class='line'>  make -r helloos.img
-</span><span class='line'>run :
-</span><span class='line'>  make img
-</span><span class='line'>  cp helloos.img ../../z_tools/qemu/fdimage0.bin
-</span><span class='line'>  make -C ../../z_tools/qemu</span></code></pre></td></tr></table></div></figure>
-
-<h1>3日目</h1>
-
-<p>アセンブラの命令とかレジスタの略称とかをまとめた用紙を作った．すぐわからなくなる．<br>
-今まで作っていたのはIPL(初期プログラムローダ)というらしい．今回はOS本体のプログラムをロードするまでが目的(即ち，IPLの完成)．<br>
-IPLにはフロッピーディスクの全情報を読み込ませる(実際にはシリンダー10まで)．OS本体はC言語とアセンブリ言語を組み合わせて記述し，ロードする．</p>
-
-<p>コンパイル時に様々な中間言語が登場する．かなり回りくどい．でも，こういう中身を知っておくのは大事だと思う(だからこそ自作OSに手を出してる部分もある)．</p>
-
-<p>とりあえず，真っ黒な画面を生成しただけだけど今回はおしまい．</p>
-
-<h1>雑記</h1>
-
-<p>書籍の古さもあって，出来上がりのGUIが一昔前のOSになりそう．フロッピーディスクも今時使えないし．</p>
-
-<ul>
-<li>GUIを今風にする</li>
-<li>USBからブートする</li>
-</ul>
-
-<p>の2点がこの本から発展した個人的な課題になりそう．とりあえず，見れるものを作っておきたい．</p>
 ]]></content>
   </entry>
   

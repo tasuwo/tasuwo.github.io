@@ -5,11 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: Mendeley - tasuwo blog</title>
+  <title>Xcode のプラグイン導入についてメモ - tasuwo blog</title>
   <meta name="author" content="tasuwo">
 
   
-  <meta name="description" content="Category: mendeley">
+  <meta name="description" content="メモしておこう． Alcatraz パッケージ管理ツールをいれる．
+パッケージのインストールや管理がラクになる． supermarin/Alcatraz · GitHub 以下を実行． 1
+curl -fsSL https://raw.github.com/supermarin/Alcatraz/ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +20,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://tasuwo.github.io/blog/categories/mendeley">
+  <link rel="canonical" href="http://tasuwo.github.io/blog/2015/08/16/xcode-plugin">
   <link href="/favicon.ico" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="tasuwo blog" type="application/atom+xml">
@@ -75,36 +77,127 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: Mendeley</h1>
+    
+      <h1 class="entry-title">Xcode のプラグイン導入についてメモ</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-08-16T16:08:37+09:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>4:08 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tasuwo.github.io">Comments</a>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content"><p>メモしておこう．</p>
 
-  
-  <h2>2015</h2>
+<!-- more -->
 
-<article>
-  
-<h1><a href="/blog/2015/05/14/mendeley/">論文の管理に Mendeley を導入した話</a></h1>
-<time datetime="2015-05-14T10:59:35+09:00" pubdate><span class='month'>May</span> <span class='day'>14</span> <span class='year'>2015</span></time>
+<h2>Alcatraz</h2>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/automator/'>automator</a>, <a class='category' href='/blog/categories/mendeley/'>mendeley</a>, <a class='category' href='/blog/categories/zi-dong-hua/'>自動化</a>, <a class='category' href='/blog/categories/lun-wen/'>論文</a></span>
-</footer>
+<p>パッケージ管理ツールをいれる．<br>
+パッケージのインストールや管理がラクになる．</p>
 
+<blockquote>
+<p><a href="https://github.com/supermarin/Alcatraz">supermarin/Alcatraz · GitHub</a></p>
+</blockquote>
 
-</article>
+<p>以下を実行．</p>
 
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>curl -fsSL https://raw.github.com/supermarin/Alcatraz/master/Scripts/install.sh <span class="p">|</span> sh
+</span></code></pre></td></tr></table></div></figure>
+
+<p>Xcode を起動すると以下のような画面が表示されるので，<code>Load Bundle</code>する．</p>
+
+<p><img src="/images/xcode_alcatraz.png" alt="xcode_alcatraz"></p>
+
+<p><code>Window &gt; Package Manager</code> からパッケージをインストールできるようになる．</p>
+
+<h2>いれたもの</h2>
+
+<p>とりあえず一通り見てみていれてみたもの．</p>
+
+<h3>プラグイン</h3>
+
+<ul>
+<li>BlockJump</li>
+<li>FuzzyAutocomplete</li>
+<li>VVDocumenter-Xcode</li>
+<li>XAlign</li>
+</ul>
+
+<h3>テーマ</h3>
+
+<ul>
+<li>Tomorrow Night</li>
+</ul>
+
+<p>まだ全然使っていないので，使用感だとかどんなものだとかは気が向いたら書く．</p>
+
+<h2>その他</h2>
+
+<p>他にも Xcode 使う上で知っておくといいことがいろいろあるらしいけど，気が向いたら読む．</p>
+
+<blockquote>
+<p><a href="http://himaratsu.hatenablog.com/entry/xcode">Xcodeを便利に使って爆速開発という発表をしました - Think Big Act Local</a></p>
+</blockquote>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">tasuwo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-08-16T16:08:37+09:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>4:08 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2015/08/16/xcode-plugin/" data-via="" data-counturl="http://tasuwo.github.io/blog/2015/08/16/xcode-plugin/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <br />
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/08/16/title/" title="Previous Post: Emacs の色表示がおかしかったのでなおした">&laquo; Emacs の色表示がおかしかったのでなおした</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -176,7 +269,10 @@
       var disqus_shortname = 'tasuwoblog';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tasuwo.github.io/blog/2015/08/16/xcode-plugin/';
+        var disqus_url = 'http://tasuwo.github.io/blog/2015/08/16/xcode-plugin/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
