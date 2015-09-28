@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 環境構築 | tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/blog/categories/huan-jing-gou-zhu/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2015-08-16T16:13:53+09:00</updated>
+  <updated>2015-09-28T11:40:13+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -215,7 +215,7 @@ Unable to load any of the alternatives:
 
 <ol>
 <li>Homebrewを用いてSBCLをダウンロード<br>
-<code>brew install sblc</code></li>
+<code>brew install sbcl</code></li>
 <li>QuickLispを<a href="http://www.quicklisp.org/beta/#installation">公式サイト</a>からダウンロード. <code>quicklisp.lisp</code>をDLすれば良い.</li>
 <li>SBCLから<code>quicklisp.lisp</code>を実行する. Terminalで <code>sbcl --load quicklisp.lisp</code> を入力. SBCLが起動する.</li>
 <li><code>(quicklisp-quickstart:install)</code>とタイプし, Returnを押下. Quicklispのインストールルーチンが開始される.</li>
