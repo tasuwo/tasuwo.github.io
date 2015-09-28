@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Cakephp, | tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/blog/categories/cakephp/atom.xml" rel="self"/>
+  <link href="http://tasuwo.github.io/"/>
+  <updated>2015-09-28T15:04:57+09:00</updated>
+  <id>http://tasuwo.github.io/</id>
+  <author>
+    <name><![CDATA[tasuwo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[cakePHPの導入からIDCFの仮想サーバでの立ち上げまでメモ]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/09/28/cakephp/"/>
+    <updated>2015-09-28T14:16:16+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/09/28/cakephp</id>
+    <content type="html"><![CDATA[<p>某合宿で web サービスを作成する際に cakePHP を利用したので，そのまとめ．ローカルでの立ち上げから，サーバに up して外部から見れるようにするまでやる．導入とサーバ立ち上げの両方ではまった．</p>
+
+<!-- more -->
+
+<h2>自分の環境</h2>
+
+<p>Mac OS X Yosemite です.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>sw_vers
+ProductName:    Mac OS X
+ProductVersion: 10.10.3
+BuildVersion:   14D136
+</code></pre></div>
+<h2>インストール</h2>
+
+<p>まず composer をいれる．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>curl -s https://getcomposer.org/installer <span class="p">|</span> php
+</code></pre></div>
+<p>適当なプロジェクトを作成してみる．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>composer create-project --prefer-dist cakephp/app <span class="o">[</span>プロジェクト名<span class="o">]</span>
+</code></pre></div>
+<p>エラーが出た．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">Your requirements could not be resolved to an installable <span class="nb">set </span>of packages.
+
+Problem 1
+ - cakephp/cakephp 3.0.x-dev reqyures ext-intl * -&gt; the requested PHP extention intl is missing from your system.
+ ...
+</code></pre></div>
+<p>intl がないと言われる．Mac の人は pecl を利用して<code>intl</code>を導入する(pecl導入していない場合は導入して&#8230;)．<br>
+Win の人は <code>php.ini</code> の <code>;extention=php_intl.dll</code> のコメントアウトを外すと良い．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>sudo pecl install intl
+</code></pre></div>
+<p>すると，またエラーが出る．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">checking <span class="k">for</span> location of ICU headers and libraries... not found
+configure: error: Unable to detect ICU prefix or ./bin/icu-config failed. Please verify ICU install prefix and make sure icu-config works.
+</code></pre></div>
+<p>ICUがないと言われるので導入する．homebrew でインストールした．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>brew install icu4c
+<span class="nv">$ </span>brew link icu4c
+</code></pre></div>
+<p>もう一度インストールしてみる．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>sudo pecl install intl
+downloading intl-3.0.0.tgz ...
+
+<span class="o">[</span>略<span class="o">]</span>
+
+Build process completed successfully
+Installing <span class="s1">&#39;/usr/local/Cellar/php56/5.6.11_2/lib/php/extensions/no-debug-non-zts-20131226/intl.so&#39;</span>
+install ok: channel://pecl.php.net/intl-3.0.0
+Extension intl enabled in php.ini
+</code></pre></div>
+<p>やっとインストールできた！</p>
+
+<p><code>sudo apachectl start</code> でapacheを起動し，phpでintlがロードできているか確認する．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>php -m <span class="p">|</span> grep intl
+intl
+</code></pre></div>
+<p>できているらしい．今度こそプロジェクトをちゃんと作ってみる．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>composer create-project --prefer-dist cakephp/app cake_test
+Installing cakephp/app <span class="o">(</span>3.0.4<span class="o">)</span>
+  - Installing cakephp/app <span class="o">(</span>3.0.4<span class="o">)</span>
+    Loading from cache
+</code></pre></div>
+<p><code>bin/cake server</code> を起動し，<code>localhost:8765</code>にアクセスできて確認できればOK．</p>
+
+<blockquote>
+<p><a href="http://stackoverflow.com/questions/27886117/php-intl-installation-on-xampp">$ sudo ./pecl install intl</a><br>
+<a href="http://qiita.com/ms2sato/items/fd76d67fd5d63c3cb4a5">環境構築 - icuのインストール - Qiita</a><br>
+<a href="http://tetsuwo.tumblr.com/post/35060809036/intl-%E3%81%A8-apc-%E3%82%92-php-5315-macbook-air">intl と APC を PHP 5.3.15 (MacBook Air)&#8230; « をぶろぐ</a><br>
+<a href="http://darraghenright.tumblr.com/post/22027208929/installing-intl-package-on-osx-lion">Installing Intl package on OSX Lion - Darragh Enright</a><br>
+<a href="http://qiita.com/s-kiriki/items/636ec1109f48fb977347">CakePHP3の使い方まとめ - Qiita</a></p>
+</blockquote>
+
+<h2>サーバにアップロード</h2>
+
+<p>IDCFクラウドのサービスを利用した．</p>
+
+<blockquote>
+<p><a href="http://www.idcf.jp/cloud/">クラウドサービスならIDCFクラウド -使いやすく、パワフル</a></p>
+</blockquote>
+
+<h3>設定</h3>
+
+<p>仮想マシンを作成して，めちゃらくガイドを参考に設定すればいい．OS は班員の一人が利用したことがあるということで Debian にした．<br>
+ネットワークの設定は以下のような感じ．</p>
+
+<h3>ログイン</h3>
+
+<p>秘密鍵をダウンロードできたはず(うろ覚え&#8230;)なので，以下でアクセスできるはず．</p>
+
+<p><code>ssh -i [/path/to/秘密鍵] -p 22 [user_name]@[IPアドレス]</code></p>
+
+<h3>アプリの立ち上げ</h3>
+
+<p>cakePHP で作成したアプリケーションは，Github あたりで共有しておいて，サーバにログイン &amp; clone すればよい．設定で 80 番ポートを開けていたので，そこでアプリケーションを起動すればよいはず．ポートの指定方法は公式にある．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bin/cake server -p 80
+</code></pre></div>
+<blockquote>
+<p><a href="http://book.cakephp.org/3.0/ja/installation.html#id6">インストール — CakePHP Cookbook 3.x ドキュメント</a></p>
+</blockquote>
+
+<p>これで<code>http://[IPアドレス]</code>にアクセスすればよいはずなんだけど，できなくてはまった．ちょっと調べてみると&#8230;</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>netstat -an <span class="p">|</span> grep LISTEN
+tcp6       <span class="m">0</span>      <span class="m">0</span>  ::1.80                 *.*                    LISTEN
+</code></pre></div>
+<p>IPv4 ではなく，IPv6 で LISTEN してしまっているので，以下のようにホストを指定して起動する．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>bin/cake server -p <span class="m">80</span> -H 0.0.0.0
+<span class="nv">$ </span>netstat -an <span class="p">|</span> grep LISTEN
+tcp4       <span class="m">0</span>      <span class="m">0</span>  *.80                   *.*                    LISTEN
+</code></pre></div>
+<p>これで外部から見れるようになった！サーバの設定が悪いのかと思ってだいぶ時間がかかってしまった&#8230;</p>
+
+<blockquote>
+<p><a href="http://qiita.com/IKEA_dless/items/f536b3c009af295bb4a5">春だし CakePHP 3.0をComposer経由でCentOS6.5にインストール してみた - Qiita</a><br>
+<a href="http://esoz.blog.fc2.com/blog-entry-49.html">コンピュータとかバイクとか。 Apache HTTP Server の設定いろいろ。</a><br>
+<a href="http://qiita.com/cubicdaiya/items/003e36e17519ef32ac8a">Linux - 特定のポート番号をLISTENしているプロセスが知りたい - Qiita</a></p>
+</blockquote>
+
+<h2>ユーザの追加</h2>
+
+<p>班員各が公開鍵認証でサーバにアクセスできるようにしたかったので，ユーザ追加の方法もメモっておく.<br>
+クライアント側で以下の操作を行う．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cd</span> ~/.ssh/
+<span class="nv">$ </span>ssh-keygen
+名前は適当に
+id_hoge でつくって id_hoge<span class="o">(</span>秘密鍵<span class="o">)</span> と id_hoge.pub<span class="o">(</span>公開鍵<span class="o">)</span> ができた場合について説明する
+</code></pre></div>
+<p>サーバ側で以下の操作を行う．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>adduser hoge
+パスワードとか設定する
+<span class="nv">$ </span>mv /home/hoge
+<span class="nv">$ </span>mkdir .ssh
+<span class="nv">$ </span>chown hoge .ssh
+<span class="nv">$ </span>chmod <span class="m">700</span> .ssh
+<span class="nv">$ </span>emacs .ssh/authorized_keys
+公開鍵<span class="o">(</span>id_hoe.pub<span class="o">)</span>の内容を貼り付け
+<span class="nv">$ </span>chown hoge authorized_keys
+<span class="nv">$ </span>chmod <span class="m">600</span> authorized_keys
+<span class="nv">$ </span>/etc/ssh/sshd_config
+AllowUsers に hoge を追加
+<span class="nv">$ </span>/etc/init.d/sshd restart
+</code></pre></div>
+<p>これで，クライアント側から <code>ssh -i [/path/to/id_hoge] -p 22 [user_name]@210.140.68.52</code> でサーバにログインできるはず．</p>
+
+<blockquote>
+<p><a href="http://www.serverlog.jp/ssh-key-auth/">公開鍵認証による SSH 接続の方法</a><br>
+<a href="http://www015.upp.so-net.ne.jp/unixlife/linux/de-user.html">Debianでのユーザ管理</a></p>
+</blockquote>
+
+<p>ちなみに，ユーザに管理者権限を付与したい場合は，以下のサイトを参考にすればよい．グループに対して設定を行うときには，<code>%wheel ALL=(ALL) ALL</code> のように先頭に <code>%</code> を付加するんだけど，なぜか除いてしまっていてつまづいた．</p>
+
+<blockquote>
+<p><a href="http://www.websec-room.com/2014/01/18/1590">CentOS で root 権限を持ち、sudo を実行できるユーザーを作成する | Webセキュリティの小部屋</a><br>
+<a href="http://qiita.com/n0bisuke/items/4e4419290d789699cafa">Debianでユーザー追加を追加して権限を付与などをするメモ - Qiita</a></p>
+</blockquote>
+]]></content>
+  </entry>
+  
+</feed>

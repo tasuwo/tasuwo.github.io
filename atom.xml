@@ -4,7 +4,7 @@
   <title><![CDATA[tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2015-09-28T11:40:13+09:00</updated>
+  <updated>2015-09-28T15:04:57+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -12,6 +12,252 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[cakePHPの導入からIDCFの仮想サーバでの立ち上げまでメモ]]></title>
+    <link href="http://tasuwo.github.io/blog/2015/09/28/cakephp/"/>
+    <updated>2015-09-28T14:16:16+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2015/09/28/cakephp</id>
+    <content type="html"><![CDATA[<p>某合宿で web サービスを作成する際に cakePHP を利用したので，そのまとめ．ローカルでの立ち上げから，サーバに up して外部から見れるようにするまでやる．導入とサーバ立ち上げの両方ではまった．</p>
+
+<!-- more -->
+
+<h2>自分の環境</h2>
+
+<p>Mac OS X Yosemite です.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sw_vers
+</span><span class='line'>ProductName:  Mac OS X
+</span><span class='line'>ProductVersion:   10.10.3
+</span><span class='line'>BuildVersion: 14D136
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>インストール</h2>
+
+<p>まず composer をいれる．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>curl -s https://getcomposer.org/installer <span class="p">|</span> php
+</span></code></pre></td></tr></table></div></figure>
+
+<p>適当なプロジェクトを作成してみる．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>composer create-project --prefer-dist cakephp/app <span class="o">[</span>プロジェクト名<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>エラーが出た．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>Your requirements could not be resolved to an installable <span class="nb">set </span>of packages.
+</span><span class='line'>
+</span><span class='line'>Problem 1
+</span><span class='line'> - cakephp/cakephp 3.0.x-dev reqyures ext-intl * -&gt; the requested PHP extention intl is missing from your system.
+</span><span class='line'> ...
+</span></code></pre></td></tr></table></div></figure>
+
+<p>intl がないと言われる．Mac の人は pecl を利用して<code>intl</code>を導入する(pecl導入していない場合は導入して&#8230;)．<br>
+Win の人は <code>php.ini</code> の <code>;extention=php_intl.dll</code> のコメントアウトを外すと良い．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo pecl install intl
+</span></code></pre></td></tr></table></div></figure>
+
+<p>すると，またエラーが出る．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>checking <span class="k">for</span> location of ICU headers and libraries... not found
+</span><span class='line'>configure: error: Unable to detect ICU prefix or ./bin/icu-config failed. Please verify ICU install prefix and make sure icu-config works.
+</span></code></pre></td></tr></table></div></figure>
+
+<p>ICUがないと言われるので導入する．homebrew でインストールした．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew install icu4c
+</span><span class='line'><span class="nv">$ </span>brew link icu4c
+</span></code></pre></td></tr></table></div></figure>
+
+<p>もう一度インストールしてみる．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo pecl install intl
+</span><span class='line'>downloading intl-3.0.0.tgz ...
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>略<span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'>Build process completed successfully
+</span><span class='line'>Installing <span class="s1">&#39;/usr/local/Cellar/php56/5.6.11_2/lib/php/extensions/no-debug-non-zts-20131226/intl.so&#39;</span>
+</span><span class='line'>install ok: channel://pecl.php.net/intl-3.0.0
+</span><span class='line'>Extension intl enabled in php.ini
+</span></code></pre></td></tr></table></div></figure>
+
+<p>やっとインストールできた！</p>
+
+<p><code>sudo apachectl start</code> でapacheを起動し，phpでintlがロードできているか確認する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>php -m <span class="p">|</span> grep intl
+</span><span class='line'>intl
+</span></code></pre></td></tr></table></div></figure>
+
+<p>できているらしい．今度こそプロジェクトをちゃんと作ってみる．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>composer create-project --prefer-dist cakephp/app cake_test
+</span><span class='line'>Installing cakephp/app <span class="o">(</span>3.0.4<span class="o">)</span>
+</span><span class='line'>  - Installing cakephp/app <span class="o">(</span>3.0.4<span class="o">)</span>
+</span><span class='line'>    Loading from cache
+</span></code></pre></td></tr></table></div></figure>
+
+<p><code>bin/cake server</code> を起動し，<code>localhost:8765</code>にアクセスできて確認できればOK．</p>
+
+<blockquote>
+<p><a href="http://stackoverflow.com/questions/27886117/php-intl-installation-on-xampp">$ sudo ./pecl install intl</a><br>
+<a href="http://qiita.com/ms2sato/items/fd76d67fd5d63c3cb4a5">環境構築 - icuのインストール - Qiita</a><br>
+<a href="http://tetsuwo.tumblr.com/post/35060809036/intl-%E3%81%A8-apc-%E3%82%92-php-5315-macbook-air">intl と APC を PHP 5.3.15 (MacBook Air)&#8230; « をぶろぐ</a><br>
+<a href="http://darraghenright.tumblr.com/post/22027208929/installing-intl-package-on-osx-lion">Installing Intl package on OSX Lion - Darragh Enright</a><br>
+<a href="http://qiita.com/s-kiriki/items/636ec1109f48fb977347">CakePHP3の使い方まとめ - Qiita</a></p>
+</blockquote>
+
+<h2>サーバにアップロード</h2>
+
+<p>IDCFクラウドのサービスを利用した．</p>
+
+<blockquote>
+<p><a href="http://www.idcf.jp/cloud/">クラウドサービスならIDCFクラウド -使いやすく、パワフル</a></p>
+</blockquote>
+
+<h3>設定</h3>
+
+<p>仮想マシンを作成して，めちゃらくガイドを参考に設定すればいい．OS は班員の一人が利用したことがあるということで Debian にした．<br>
+ネットワークの設定は以下のような感じ．</p>
+
+<h3>ログイン</h3>
+
+<p>秘密鍵をダウンロードできたはず(うろ覚え&#8230;)なので，以下でアクセスできるはず．</p>
+
+<p><code>ssh -i [/path/to/秘密鍵] -p 22 [user_name]@[IPアドレス]</code></p>
+
+<h3>アプリの立ち上げ</h3>
+
+<p>cakePHP で作成したアプリケーションは，Github あたりで共有しておいて，サーバにログイン &amp; clone すればよい．設定で 80 番ポートを開けていたので，そこでアプリケーションを起動すればよいはず．ポートの指定方法は公式にある．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>bin/cake server -p 80
+</span></code></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p><a href="http://book.cakephp.org/3.0/ja/installation.html#id6">インストール — CakePHP Cookbook 3.x ドキュメント</a></p>
+</blockquote>
+
+<p>これで<code>http://[IPアドレス]</code>にアクセスすればよいはずなんだけど，できなくてはまった．ちょっと調べてみると&#8230;</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>netstat -an <span class="p">|</span> grep LISTEN
+</span><span class='line'>tcp6       <span class="m">0</span>      <span class="m">0</span>  ::1.80                 *.*                    LISTEN
+</span></code></pre></td></tr></table></div></figure>
+
+<p>IPv4 ではなく，IPv6 で LISTEN してしまっているので，以下のようにホストを指定して起動する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>bin/cake server -p <span class="m">80</span> -H 0.0.0.0
+</span><span class='line'><span class="nv">$ </span>netstat -an <span class="p">|</span> grep LISTEN
+</span><span class='line'>tcp4       <span class="m">0</span>      <span class="m">0</span>  *.80                   *.*                    LISTEN
+</span></code></pre></td></tr></table></div></figure>
+
+<p>これで外部から見れるようになった！サーバの設定が悪いのかと思ってだいぶ時間がかかってしまった&#8230;</p>
+
+<blockquote>
+<p><a href="http://qiita.com/IKEA_dless/items/f536b3c009af295bb4a5">春だし CakePHP 3.0をComposer経由でCentOS6.5にインストール してみた - Qiita</a><br>
+<a href="http://esoz.blog.fc2.com/blog-entry-49.html">コンピュータとかバイクとか。 Apache HTTP Server の設定いろいろ。</a><br>
+<a href="http://qiita.com/cubicdaiya/items/003e36e17519ef32ac8a">Linux - 特定のポート番号をLISTENしているプロセスが知りたい - Qiita</a></p>
+</blockquote>
+
+<h2>ユーザの追加</h2>
+
+<p>班員各が公開鍵認証でサーバにアクセスできるようにしたかったので，ユーザ追加の方法もメモっておく.<br>
+クライアント側で以下の操作を行う．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span><span class="nb">cd</span> ~/.ssh/
+</span><span class='line'><span class="nv">$ </span>ssh-keygen
+</span><span class='line'>名前は適当に
+</span><span class='line'>id_hoge でつくって id_hoge<span class="o">(</span>秘密鍵<span class="o">)</span> と id_hoge.pub<span class="o">(</span>公開鍵<span class="o">)</span> ができた場合について説明する
+</span></code></pre></td></tr></table></div></figure>
+
+<p>サーバ側で以下の操作を行う．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>adduser hoge
+</span><span class='line'>パスワードとか設定する
+</span><span class='line'><span class="nv">$ </span>mv /home/hoge
+</span><span class='line'><span class="nv">$ </span>mkdir .ssh
+</span><span class='line'><span class="nv">$ </span>chown hoge .ssh
+</span><span class='line'><span class="nv">$ </span>chmod <span class="m">700</span> .ssh
+</span><span class='line'><span class="nv">$ </span>emacs .ssh/authorized_keys
+</span><span class='line'>公開鍵<span class="o">(</span>id_hoe.pub<span class="o">)</span>の内容を貼り付け
+</span><span class='line'><span class="nv">$ </span>chown hoge authorized_keys
+</span><span class='line'><span class="nv">$ </span>chmod <span class="m">600</span> authorized_keys
+</span><span class='line'><span class="nv">$ </span>/etc/ssh/sshd_config
+</span><span class='line'>AllowUsers に hoge を追加
+</span><span class='line'><span class="nv">$ </span>/etc/init.d/sshd restart
+</span></code></pre></td></tr></table></div></figure>
+
+<p>これで，クライアント側から <code>ssh -i [/path/to/id_hoge] -p 22 [user_name]@210.140.68.52</code> でサーバにログインできるはず．</p>
+
+<blockquote>
+<p><a href="http://www.serverlog.jp/ssh-key-auth/">公開鍵認証による SSH 接続の方法</a><br>
+<a href="http://www015.upp.so-net.ne.jp/unixlife/linux/de-user.html">Debianでのユーザ管理</a></p>
+</blockquote>
+
+<p>ちなみに，ユーザに管理者権限を付与したい場合は，以下のサイトを参考にすればよい．グループに対して設定を行うときには，<code>%wheel ALL=(ALL) ALL</code> のように先頭に <code>%</code> を付加するんだけど，なぜか除いてしまっていてつまづいた．</p>
+
+<blockquote>
+<p><a href="http://www.websec-room.com/2014/01/18/1590">CentOS で root 権限を持ち、sudo を実行できるユーザーを作成する | Webセキュリティの小部屋</a><br>
+<a href="http://qiita.com/n0bisuke/items/4e4419290d789699cafa">Debianでユーザー追加を追加して権限を付与などをするメモ - Qiita</a></p>
+</blockquote>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Xcode のプラグイン導入についてメモ]]></title>
@@ -3388,659 +3634,6 @@ GFMモードを快適に利用したいので，さらに以下を設定して�
 </ul>
 
 <p>とりあえず，MarkdownをEmacsから手軽に書いて，ブログを更新するという目標は達成できた．</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Emacsについて 02]]></title>
-    <link href="http://tasuwo.github.io/blog/2015/03/14/title/"/>
-    <updated>2015-03-14T21:30:29+09:00</updated>
-    <id>http://tasuwo.github.io/blog/2015/03/14/title</id>
-    <content type="html"><![CDATA[<p>研究会とか諸々で忙しかったため，久しぶりの更新．Emacsの設定をしたので自分用にメモ．<br>
-やったことは&#8230;</p>
-
-<ul>
-<li>基本設定</li>
-<li>Caskを導入してのパッケージ管理</li>
-</ul>
-
-<!-- more -->
-
-<h1>1. インストール</h1>
-
-<p>emacsのインストール．前回やった．<br>
-homebrewでemacsをインストールしたため，インストール先は<code>/usr/local/Cellar</code>にある．<code>Emacs.app</code>をAppフォルダに移動しておく．</p>
-
-<h1>2. ディレクトリ構成</h1>
-
-<p>まず，ホームディレクトリがどこか確認する．Emacsを立ち上げて<code>C-x C-f</code>で<code>~/</code>を指定すれば分かる．</p>
-
-<p>ホームディレクトリに，設定を保存するための<code>.emacs.d</code>フォルダを作成する(自動生成されている場合もある)．下記のサイトを参考にすると．</p>
-
-<blockquote>
-<p><a href="http://www.gfd-dennou.org/member/uwabami/cc-env/EmacsBasic.html">Emacs の基本設定</a></p>
-</blockquote>
-
-<p>Emacs22以降は，<code>~/.emacs.d/</code>以下に設定ファイル群をまとめておくと便利だそう．このサイトはいろいろ作っているけど，よくわからないので最低限のものだけ作成する．とりあえず，<code>inits</code>フォルダと<code>init.el</code>ファイルを作成する．それぞれの役割は以下．</p>
-
-<ul>
-<li>init.el
-
-<ul>
-<li>Emacsの初期化ファイル</li>
-<li>ウインドウの大きさ，フォントの種類とか</li>
-<li>elispパッケージの読み込みとか</li>
-</ul></li>
-<li>inits
-
-<ul>
-<li>各種設定ファイルをおく</li>
-<li>init-loaderの項で説明する</li>
-</ul></li>
-</ul>
-
-<h1>3. 設定を書く</h1>
-
-<p>下記サイトをとりあえず参考に．</p>
-
-<blockquote>
-<p><a href="http://d.hatena.ne.jp/sandai/20120304/p2">うわっ&#8230;私のEmacs、使いにくすぎ？だったら&#8230;ｶｽﾀﾏｲｽﾞｼﾔｯｾｰ!!ﾀﾞｧﾀﾞｧｼｴﾘｲｪｯｽｯｼｪｰｼｮｰﾍｲﾍｲ!!!</a></p>
-</blockquote>
-
-<h2>3.1 load-pathの設定</h2>
-
-<p>いろいろなライブラリを利用できた方が便利だ．EmacsのライブラリはEmacs Lispで記述されており，拡張子は<code>.el</code>である．<code>M-x load-library</code>を実行すると，<code>load-path</code>に存在するライブラリが読み込まれる．<br>
-よって，この<code>load parh</code>を設定しておく必要がある．<code>load path</code>は変数<code>load-path</code>として定義されているため，これを書き換えればよい．<br>
-初期化ファイルである<code>init.el</code>に，以下を追記する．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="c1">;; load-pathの追加関数</span>
-</span><span class='line'><span class="p">(</span><span class="nb">defun</span> <span class="nv">add-to-load-path</span> <span class="p">(</span><span class="k">&amp;rest</span> <span class="nv">paths</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">(</span><span class="k">let</span> <span class="p">(</span><span class="nv">path</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">(</span><span class="nb">dolist</span> <span class="p">(</span><span class="nv">path</span> <span class="nv">paths</span> <span class="nv">paths</span><span class="p">)</span>
-</span><span class='line'>      <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">default-directory</span> <span class="p">(</span><span class="nv">expand-file-name</span> <span class="p">(</span><span class="nv">concat</span> <span class="nv">user-emacs-directory</span> <span class="nv">path</span><span class="p">))))</span>
-</span><span class='line'>        <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;load-path</span> <span class="nv">default-directory</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">fboundp</span> <span class="ss">&#39;normal-top-level-add-subdirs-to-load-path</span><span class="p">)</span>
-</span><span class='line'>            <span class="p">(</span><span class="nv">normal-top-level-add-subdirs-to-load-path</span><span class="p">))))))</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; load-pathに追加するフォルダ</span>
-</span><span class='line'><span class="c1">;; 2つ以上フォルダを指定する場合の引数 =&gt; (add-to-load-path &quot;elisp&quot; &quot;xxx&quot; &quot;xxx&quot;)</span>
-</span><span class='line'><span class="p">(</span><span class="nv">add-to-load-path</span> <span class="s">&quot;elisp&quot;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<p>やり方はいろいろあると思うけど，関数として定義しておけば，追加が楽だ．</p>
-
-<h2>3.2 全体的な設定</h2>
-
-<p>途中フォントの設定があるが，Emacsで使用可能なフォント一覧は<code>(font-family-list)</code>をscratchバッファ実行すれば良い．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-<span class='line-number'>87</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="c1">;; 文字コード</span>
-</span><span class='line'><span class="c1">;; WindowsとMacでわける</span>
-</span><span class='line'><span class="p">(</span><span class="nv">set-language-environment</span> <span class="s">&quot;Japanese&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">ws</span> <span class="nv">window-system</span><span class="p">))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nb">cond</span> <span class="p">((</span><span class="nb">eq</span> <span class="nv">ws</span> <span class="ss">&#39;w32</span><span class="p">)</span>
-</span><span class='line'>         <span class="p">(</span><span class="nv">prefer-coding-system</span> <span class="ss">&#39;utf-8-unix</span><span class="p">)</span>
-</span><span class='line'>         <span class="p">(</span><span class="nv">set-default-coding-systems</span> <span class="ss">&#39;utf-8-unix</span><span class="p">)</span>
-</span><span class='line'>         <span class="p">(</span><span class="k">setq</span> <span class="nv">file-name-coding-system</span> <span class="ss">&#39;sjis</span><span class="p">)</span>
-</span><span class='line'>         <span class="p">(</span><span class="k">setq</span> <span class="nv">locale-coding-system</span> <span class="ss">&#39;utf-8</span><span class="p">))</span>
-</span><span class='line'>        <span class="p">((</span><span class="nb">eq</span> <span class="nv">ws</span> <span class="ss">&#39;ns</span><span class="p">)</span>
-</span><span class='line'>         <span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;ucs-normalize</span><span class="p">)</span>
-</span><span class='line'>         <span class="p">(</span><span class="nv">prefer-coding-system</span> <span class="ss">&#39;utf-8-hfs</span><span class="p">)</span>
-</span><span class='line'>         <span class="p">(</span><span class="k">setq</span> <span class="nv">file-name-coding-system</span> <span class="ss">&#39;utf-8-hfs</span><span class="p">)</span>
-</span><span class='line'>         <span class="p">(</span><span class="k">setq</span> <span class="nv">locale-coding-system</span> <span class="ss">&#39;utf-8-hfs</span><span class="p">))))</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; Windowsで英数と日本語にMeiryoを指定</span>
-</span><span class='line'><span class="c1">;; Macで英数と日本語にRictyを指定</span>
-</span><span class='line'><span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">ws</span> <span class="nv">window-system</span><span class="p">))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nb">cond</span> <span class="p">((</span><span class="nb">eq</span> <span class="nv">ws</span> <span class="ss">&#39;w32</span><span class="p">)</span>
-</span><span class='line'>         <span class="p">(</span><span class="nv">set-face-attribute</span> <span class="ss">&#39;default</span> <span class="no">nil</span>
-</span><span class='line'>                             <span class="ss">:family</span> <span class="s">&quot;Meiryo&quot;</span>  <span class="c1">;; 英数</span>
-</span><span class='line'>                             <span class="ss">:height</span> <span class="mi">100</span><span class="p">)</span>
-</span><span class='line'>         <span class="p">(</span><span class="nv">set-fontset-font</span> <span class="no">nil</span> <span class="ss">&#39;japanese-jisx0208</span> <span class="p">(</span><span class="nv">font-spec</span> <span class="ss">:family</span> <span class="s">&quot;Meiryo&quot;</span><span class="p">)))</span>  <span class="c1">;; 日本語</span>
-</span><span class='line'>        <span class="p">((</span><span class="nb">eq</span> <span class="nv">ws</span> <span class="ss">&#39;ns</span><span class="p">)</span>
-</span><span class='line'>         <span class="p">(</span><span class="nv">set-face-attribute</span> <span class="ss">&#39;default</span> <span class="no">nil</span>
-</span><span class='line'>                             <span class="ss">:family</span> <span class="s">&quot;Ricty&quot;</span>  <span class="c1">;; 英数</span>
-</span><span class='line'>                             <span class="ss">:height</span> <span class="mi">140</span><span class="p">)</span>
-</span><span class='line'>         <span class="p">(</span><span class="nv">set-fontset-font</span> <span class="no">nil</span> <span class="ss">&#39;japanese-jisx0208</span> <span class="p">(</span><span class="nv">font-spec</span> <span class="ss">:family</span> <span class="s">&quot;Ricty&quot;</span><span class="p">)))))</span>  <span class="c1">;; 日本語</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; スタートアップ非表示</span>
-</span><span class='line'><span class="p">(</span><span class="k">setq</span> <span class="nv">inhibit-startup-screen</span> <span class="no">t</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; scratchの初期メッセージ消去</span>
-</span><span class='line'><span class="p">(</span><span class="k">setq</span> <span class="nv">initial-scratch-message</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; ツールバー非表示</span>
-</span><span class='line'><span class="p">(</span><span class="nv">tool-bar-mode</span> <span class="mi">-1</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; メニューバーを非表示</span>
-</span><span class='line'><span class="p">(</span><span class="nv">menu-bar-mode</span> <span class="mi">-1</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; スクロールバー非表示</span>
-</span><span class='line'><span class="p">(</span><span class="nv">set-scroll-bar-mode</span> <span class="no">nil</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; 行番号表示</span>
-</span><span class='line'><span class="p">(</span><span class="nv">global-linum-mode</span> <span class="no">t</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="nv">set-face-attribute</span> <span class="ss">&#39;linum</span> <span class="no">nil</span>
-</span><span class='line'>                    <span class="ss">:foreground</span> <span class="s">&quot;#800&quot;</span>
-</span><span class='line'>                    <span class="ss">:height</span> <span class="mf">0.9</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; タイトルバーにファイルのフルパス表示</span>
-</span><span class='line'><span class="p">(</span><span class="k">setq</span> <span class="nv">frame-title-format</span>
-</span><span class='line'>      <span class="p">(</span><span class="nb">format</span> <span class="s">&quot;%%f - Emacs@%s&quot;</span> <span class="p">(</span><span class="nv">system-name</span><span class="p">)))</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; 選択領域の色</span>
-</span><span class='line'><span class="p">(</span><span class="nv">set-face-background</span> <span class="ss">&#39;region</span> <span class="s">&quot;#555&quot;</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; 行末の空白を強調表示</span>
-</span><span class='line'><span class="p">(</span><span class="nv">setq-default</span> <span class="nv">show-trailing-whitespace</span> <span class="no">t</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="nv">set-face-background</span> <span class="ss">&#39;trailing-whitespace</span> <span class="s">&quot;#b14770&quot;</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; タブをスペースで扱う</span>
-</span><span class='line'><span class="p">(</span><span class="nv">setq-default</span> <span class="nv">indent-tabs-mode</span> <span class="no">nil</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; タブ幅</span>
-</span><span class='line'><span class="p">(</span><span class="nv">custom-set-variables</span> <span class="o">&#39;</span><span class="p">(</span><span class="nv">tab-width</span> <span class="mi">4</span><span class="p">))</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; 行間</span>
-</span><span class='line'><span class="p">(</span><span class="nv">setq-default</span> <span class="nv">line-spacing</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; 1行ずつスクロール</span>
-</span><span class='line'><span class="p">(</span><span class="k">setq</span> <span class="nv">scroll-conservatively</span> <span class="mi">35</span>
-</span><span class='line'>      <span class="nv">scroll-margin</span> <span class="mi">0</span>
-</span><span class='line'>      <span class="nv">scroll-step</span> <span class="mi">1</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="k">setq</span> <span class="nv">comint-scroll-show-maximum-output</span> <span class="no">t</span><span class="p">)</span> <span class="c1">;; shell-mode</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; フレームの透明度</span>
-</span><span class='line'><span class="p">(</span><span class="nv">set-frame-parameter</span> <span class="p">(</span><span class="nv">selected-frame</span><span class="p">)</span> <span class="ss">&#39;alpha</span> <span class="o">&#39;</span><span class="p">(</span><span class="mf">0.85</span><span class="p">))</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; モードラインに行番号表示</span>
-</span><span class='line'><span class="p">(</span><span class="nv">line-number-mode</span> <span class="no">t</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; モードラインに列番号表示</span>
-</span><span class='line'><span class="p">(</span><span class="nv">column-number-mode</span> <span class="no">t</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; yes or noをy or n</span>
-</span><span class='line'><span class="p">(</span><span class="nv">fset</span> <span class="ss">&#39;yes-or-no-p</span> <span class="ss">&#39;y-or-n-p</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<h2>3.3 追記</h2>
-
-<p>上記のような設定を<code>init.el</code>にだらだらと書いたら，<code>init-loader</code>なるものを見つけたので，後述する．また，<code>init.el</code>に設定を追記したものの，ちゃんと機能しているかが不安というときは，式の後ろで<code>C-x C-e</code>を実行するとlisp式を評価できるので，これで確認すると良い．</p>
-
-<h1>4. パッケージ管理</h1>
-
-<p>Emacsのパッケージ管理が必要となるが，どうやらいろいろあるようだ．</p>
-
-<ul>
-<li>package.elを使う</li>
-<li>Cask,Palletを使う</li>
-</ul>
-
-<p>後者の方が便利らしい．よくわからないのでとりあえずどちらも見ておく．</p>
-
-<h2>4.1 package.el</h2>
-
-<p>Emacsのパッケージは，リポジトリにまとまって公開されている．</p>
-
-<ul>
-<li>GNU ELPA
-
-<ul>
-<li>公式のリポジトリ</li>
-<li>デフォルトではこれのみ利用可能</li>
-</ul></li>
-<li>MELPA
-
-<ul>
-<li>非公式のリポジトリ</li>
-<li>リポジトリに変更があるたびに更新されるため，最新版をインストール可能</li>
-</ul></li>
-</ul>
-
-<p>上記のようなリポジトリを登録したのちに，インストールしたいパッケージを指定する，という流れになる．リポジトリ情報は<code>package-archives</code>変数に格納されているので，新規に追加する場合はこれをいじる．以下が設定例．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;package</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; MELPAを追加</span>
-</span><span class='line'><span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;package-archives</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;melpa&quot;</span> <span class="o">.</span> <span class="s">&quot;http://melpa.milkbox.net/packages/&quot;</span><span class="p">))</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; 初期化</span>
-</span><span class='line'><span class="p">(</span><span class="nv">package-initialize</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<p>指定したパッケージをインストールするには，<code>M-x package-install</code>を実行する．更新は<code>M-x package-refresh-contents</code>．</p>
-
-<p>以上がパッケージをインストールする流れになるが，環境が変わった際にいちいちパッケージをインストールしなおすのは面倒．そこで，<code>package.el</code>にインストールすべきパッケージを記載しておき，これを実行すれば同様の環境が構築できるようにしておく．</p>
-
-<p><code>(package-installed-p package-name)</code>で<code>package-name</code>がインストール済みかどうか確認できるため，これが<code>nil</code>を返すようなパッケージについてインストールすれば，同様の環境が構築できる．<code>package.el</code>に必要なパッケージを記述し(例は省略)，<code>M-x eval-buffer</code>を実行することでパッケージ群をインストールできる．便利．</p>
-
-<blockquote>
-<p><a href="http://emacs-jp.github.io/packages/package-management/package-el.html">package.el - Emacs JP</a></p>
-</blockquote>
-
-<h2>4.2 Cask</h2>
-
-<p><code>package.el</code>は便利だなーと思ったけれど，最近だと<code>Cask</code>なるものを使うらしい．<code>Cask</code>は，ざっくりいうとパッケージ管理システム．パッケージの依存関係をみながらライブラリを管理してくれる，のかな？</p>
-
-<p><code>package.el</code>もライブラリの依存関係を考慮して必要ライブラリを一括でダウンロードできるが，個人の設定であるため<code>~./emacs.d</code>にダウンロードするのが前提．<br>
-よって，ライブラリ開発で利用するのには向かない．<code>Cask</code>は Cask ファイルに依存しているライブラリを記述することで，一括ダウンロードや<code>PATH</code>，<code>load-path</code>の調整をしてくれる．</p>
-
-<h3>4.2.1 Caskのインストール</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew install cask
-</span></code></pre></td></tr></table></div></figure>
-
-<h3>4.2.2 Caskファイルの初期化</h3>
-
-<p><code>~/.emacs.d</code>(設定ファイルが置かれた場所)で<code>cask init</code>．<br>
-<code>Cask</code>というファイルができるため，今後このファイルでパッケージを管理する．<br>
-本ファイルには，すでにCaskオススメのパッケージが依存関係として記述されているので，これを好みに記述し直していけば良い．</p>
-
-<h3>4.2.3 Caskファイルの記述</h3>
-
-<h4>source</h4>
-
-<p>パッケージリポジトリを指定する．<br>
-現状，gnu, melpa, marmalade, SC, orgが指定可能．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nv">source</span> <span class="nv">gnu</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="nv">source</span> <span class="nv">melpa</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<h4>depends-on</h4>
-
-<p>インストールするパッケージをいろいろ書いていく．指定方法は以下が可能．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span> <span class="s">&quot;0.8.1&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span> <span class="ss">:git</span> <span class="s">&quot;https://github.com/magit/magit.git&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span> <span class="ss">:git</span> <span class="s">&quot;https://github.com/magit/magit.git&quot;</span> <span class="ss">:ref</span> <span class="s">&quot;7j3bj4d&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span> <span class="ss">:git</span> <span class="s">&quot;https://github.com/magit/magit.git&quot;</span> <span class="ss">:branch</span> <span class="s">&quot;next&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;magit&quot;</span> <span class="ss">:git</span> <span class="s">&quot;https://github.com/magit/magit.git&quot;</span> <span class="ss">:files</span> <span class="p">(</span><span class="s">&quot;*.el&quot;</span> <span class="p">(</span><span class="ss">:exclude</span> <span class="s">&quot;magit-svn.el&quot;</span><span class="p">)))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<h3>4.2.4 ライブラリのインストール</h3>
-
-<p><code>Cask</code>に記述されたライブラリがインストールされる．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>cask install
-</span></code></pre></td></tr></table></div></figure>
-
-<h3>4.2.5 インストールされたパッケージにパスを通す</h3>
-
-<p>cask.elをロードし，cask-initializeを呼ぶ．こうすることで，load-path，autoloadの設定を読み込んでくれる．<br>
-<code>init.el</code>に以下を記述．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="c1">;; homebrewで導入したtool用のpathを追加</span>
-</span><span class='line'><span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;load-path</span> <span class="s">&quot;/usr/local/share/emacs/site-lisp&quot;</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; ------------------------------------------------------------------------</span>
-</span><span class='line'><span class="c1">;; @ Cask設定</span>
-</span><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;cask</span> <span class="s">&quot;cask.el&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="nv">cask-initialize</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<h3>4.2.6 おまけ</h3>
-
-<p>とりあえず初期設定のままでパッケージをインストールした．暇なときに以下のサイトを見たりしておく．</p>
-
-<blockquote>
-<p><a href="http://posaune.hatenablog.com/entry/2014/06/17/221041">Cask init して入ってくるライブラリ一覧 - 亀岡的プログラマ日記</a></p>
-
-<p><a href="https://github.com/cask/cask">Cask</a><br>
-<a href="http://kiririmode.hatenablog.jp/entry/20141228/1419762171">Cask とは何であるのか、および init.el が非常にシンプルになった件</a><br>
-<a href="http://www.kaichan.info/blog/2014-02-23-emacs-cask.html">Emacs Lispのテスト、依存性管理、CI</a><br>
-<a href="http://d.hatena.ne.jp/syohex/20140424/1398310931">package.elから Caskに切り替えました</a></p>
-</blockquote>
-
-<h1>5. init-loaderによる設定ファイルの分割</h1>
-
-<p><code>init-loader</code>は，指定したディレクトリ内のelファイルを読み込んでくれるelisp．それだけではなく，ファイル名を見て環境に合わせて読み込んでくれたり，エラーのあるファイルをスルーしてくれたりする．他にも，環境依存な設定を分離できたりするので便利．</p>
-
-<h2>5.1 init-loaderインストール</h2>
-
-<p>Caskを導入したので，利用してパッケージをいれる．Caskファイルにinit-loaderを追加．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;init-loader&quot;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<p>インストール</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>cask install
-</span></code></pre></td></tr></table></div></figure>
-
-<p>アップデート</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>cask update
-</span></code></pre></td></tr></table></div></figure>
-
-<h2>5.2 設定ファイル記述</h2>
-
-<p><code>inits</code>フォルダの中に設定ファイルを書いていく．ファイルは以下の設定に従って作成していく．</p>
-
-<ul>
-<li>環境に依存しない設定はファイル名の最初に2けたの数字をつける
-
-<ul>
-<li>番号は優先度．00が最初，99が最後に読み込まれる</li>
-<li>同じ数字も可</li>
-</ul></li>
-<li>環境依存な設定は各環境のプレフィックスをファイル名の最初につける</li>
-</ul>
-
-<p>プレフィックスは以下</p>
-
-<table><thead>
-<tr>
-<th>環境</th>
-<th>prefix</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>Meadow</td>
-<td>meadow</td>
-</tr>
-<tr>
-<td>Carbon Emacs</td>
-<td>carbon-emacs</td>
-</tr>
-<tr>
-<td>Cocoa Emacs</td>
-<td>cocoa-emacs</td>
-</tr>
-<tr>
-<td>emacs -nw</td>
-<td>nw</td>
-</tr>
-<tr>
-<td>Windows</td>
-<td>windows</td>
-</tr>
-<tr>
-<td>Linux</td>
-<td>linux</td>
-</tr>
-</tbody></table>
-
-<h2>5.3 設定の反映</h2>
-
-<p><code>inits.el</code>に設定追記</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="c1">;;; init-loader 設定</span>
-</span><span class='line'><span class="c1">;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;</span>
-</span><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;init-loader</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="k">setq</span> <span class="nv">init-loader-show-lod-after-init</span> <span class="s">&quot;error-only&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="nv">init-loader-load</span> <span class="s">&quot;~/.emacs.d/inits&quot;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<p><code>C-x C-e</code>で評価してエラーがないか確かめたら，一度終了して<code>emacs</code>コマンドでemacsを再起動．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="nv">-------</span> <span class="nb">error</span> <span class="nb">log</span> <span class="nv">-------</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="nv">-------</span> <span class="nv">init</span> <span class="nb">log</span> <span class="nv">-------</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">loaded</span> <span class="nv">/Users/hogehoge/.emacs.d/inits/00_hoge.</span> <span class="mf">0.002511</span>
-</span><span class='line'><span class="nv">loaded</span> <span class="nv">/Users/hogehoge/.emacs.d/inits/01_hoge.</span> <span class="mf">0.00703</span>
-</span><span class='line'><span class="o">...</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">-------</span> <span class="nb">load</span> <span class="nv">path</span> <span class="nv">-------</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">/Users/hogehoge/.emacs.d/inits</span>
-</span><span class='line'><span class="o">...</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<p>エラーがなく，inits内のファイルが呼び出されていることが確認できる．設定ファイルの分け方はまた考える．</p>
-
-<blockquote>
-<p><a href="http://tech.kayac.com/archive/divide-dot-emacs.html">.emacs分割のすゝめ</a><br>
-<a href="https://github.com/emacs-jp/init-loader">emacs-jp/init-loader</a><br>
-<a href="http://block-given.hatenablog.com/entry/2014/11/09/134725">モダンなEmacsを求めて (3) init-loaderで設定ファイルを分割する</a><br>
-<a href="http://qiita.com/catatsuy/items/5f1cd86e2522fd3384a0">init-loader.el と package.el を導入して快適 Emacs ライフ</a><br>
-<a href="http://blog.shibayu36.org/entry/2013/12/03/213942">自分流の .emacs管理</a></p>
-</blockquote>
-
-<h2>6. 最終的に</h2>
-
-<p>Caskとinit-loaderを導入した．<br>
-ので，次はどのパッケージを導入するか？設定(と，その分割)をどうするか？を考える．</p>
-
-<p>設定については，どんなものがあるのかわからないし，いろんな人の.emacs.dを参考にする．</p>
-
-<blockquote>
-<p><a href="https://github.com/shibayu36/emacs/tree/master/emacs.d">shibayu36/emacs</a><br>
-<a href="https://github.com/shomah4a/.emacs.d">shomah4a/.emacs.d</a><br>
-<a href="https://github.com/catatsuy/dot.emacs.d">catatsuy/dot.emacs.d</a><br>
-<a href="https://github.com/gongo/elfactory">gongo/elfactory</a></p>
-</blockquote>
-
-<h2>6.1 導入パッケージ</h2>
-
-<p>下記サイトを参考にいくつか</p>
-
-<blockquote>
-<p><a href="http://qiita.com/hottestseason/items/1e8a46ad1ebcf7d0e11c#2-3">Emacsパッケージ特集</a></p>
-</blockquote>
-
-<ul>
-<li>init-loader
-
-<ul>
-<li>いわずもがな</li>
-</ul></li>
-<li>auto-complete
-
-<ul>
-<li>字句保管機能</li>
-<li>バッファ内にある文字列を自動的に保管対象にする</li>
-<li>tabを押して選択</li>
-</ul></li>
-<li>popup
-
-<ul>
-<li>emacsでpopupメニューを使う．auto-completeで使われている．<br>
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;auto-complete</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;auto-complete-config</span><span class="p">)</span>    <span class="c1">; 必須ではないですが一応</span>
-</span><span class='line'><span class="p">(</span><span class="nv">global-auto-complete-mode</span> <span class="no">t</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></li>
-</ul></li>
-<li>smartparens
-
-<ul>
-<li>括弧やクォート等の自動挿入・管理<br>
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;smartparens-config</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="nv">smartparens-global-mode</span> <span class="no">t</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></li>
-</ul></li>
-<li>rainbow-delimiters
-
-<ul>
-<li>括弧の対応を色付けする<br>
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;rainbow-delimiters</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;(add-hook &#39;clojure-mode-hook &#39;rainbow-delimiters-mode)</span>
-</span><span class='line'><span class="p">(</span><span class="nv">add-hook</span> <span class="ss">&#39;prog-mode-hook</span> <span class="ss">&#39;rainbow-delimiters-mode</span><span class="p">)</span>
-</span><span class='line'><span class="c1">;(global-rainbow-delimiters-mode)</span>
-</span></code></pre></td></tr></table></div></figure></li>
-</ul></li>
-<li>helm
-
-<ul>
-<li>超絶便利らしいので勉強してみる</li>
-</ul></li>
-<li>ace-jump-mode
-
-<ul>
-<li>特定語句にジャンプする</li>
-<li>練習が必要そう</li>
-</ul></li>
-</ul>
-
-<blockquote>
-<p><a href="http://kiririmode.hatenablog.jp/entry/20131231/p1">smartparens.el での括弧処理</a><br>
-<a href="http://d.hatena.ne.jp/murase_syuka/20140815/1408061850">rainbow-delimiters.elの括弧色付けをデフォルトより強調する方法</a><br>
-<a href="http://dev.ariel-networks.com/wp/documents/aritcles/emacs/part9">「Emacsのトラノマキ」連載第09回「auto-completeを使おう」(松山智大)</a></p>
-</blockquote>
-
-<h1>7. おわりに</h1>
-
-<p>設定は奥が深いようだ．使いながら欲しい機能を探すのがいいだろう．あとは今回設定した中でも，気に入らない設定が出てくるかもしれない．落ち着いたら，設定はgithubで公開したい．<br>
-自作OSの方は8日目くらいまで進んでいるのだけど，まとめが終わっていない．明日はそちらをまとめることを目標にする．</p>
 ]]></content>
   </entry>
   
