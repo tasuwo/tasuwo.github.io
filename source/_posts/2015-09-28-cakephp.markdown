@@ -1,0 +1,197 @@
+---
+layout: post
+title: "cakePHPの導入からIDCFの仮想サーバでの立ち上げまでメモ"
+date: 2015-09-28 14:16:16 +0900
+comments: true
+categories: php, cakephp, server
+---
+
+某合宿で web サービスを作成する際に cakePHP を利用したので，そのまとめ．ローカルでの立ち上げから，サーバに up して外部から見れるようにするまでやる．導入とサーバ立ち上げの両方ではまった．
+
+<!-- more -->
+
+##自分の環境
+
+Mac OS X Yosemite です.
+
+```bash
+$ sw_vers
+ProductName:	Mac OS X
+ProductVersion:	10.10.3
+BuildVersion:	14D136
+```
+
+##インストール
+
+まず composer をいれる．
+
+```bash
+$ curl -s https://getcomposer.org/installer | php
+```
+
+適当なプロジェクトを作成してみる．
+
+```bash
+$ composer create-project --prefer-dist cakephp/app [プロジェクト名]
+```
+
+エラーが出た．
+
+```bash
+Your requirements could not be resolved to an installable set of packages.
+
+Problem 1
+ - cakephp/cakephp 3.0.x-dev reqyures ext-intl * -> the requested PHP extention intl is missing from your system.
+ ...
+```
+
+intl がないと言われる．Mac の人は pecl を利用して`intl`を導入する(pecl導入していない場合は導入して...)．
+Win の人は `php.ini` の `;extention=php_intl.dll` のコメントアウトを外すと良い．
+
+```bash
+$ sudo pecl install intl
+```
+
+すると，またエラーが出る．
+
+```bash
+checking for location of ICU headers and libraries... not found
+configure: error: Unable to detect ICU prefix or ./bin/icu-config failed. Please verify ICU install prefix and make sure icu-config works.
+```
+
+ICUがないと言われるので導入する．homebrew でインストールした．
+
+```bash
+$ brew install icu4c
+$ brew link icu4c
+```
+
+もう一度インストールしてみる．
+
+```bash
+$ sudo pecl install intl
+downloading intl-3.0.0.tgz ...
+
+[略]
+
+Build process completed successfully
+Installing '/usr/local/Cellar/php56/5.6.11_2/lib/php/extensions/no-debug-non-zts-20131226/intl.so'
+install ok: channel://pecl.php.net/intl-3.0.0
+Extension intl enabled in php.ini
+```
+
+やっとインストールできた！
+
+`sudo apachectl start` でapacheを起動し，phpでintlがロードできているか確認する．
+
+```bash
+$ php -m | grep intl
+intl
+```
+
+できているらしい．今度こそプロジェクトをちゃんと作ってみる．
+
+```bash
+$ composer create-project --prefer-dist cakephp/app cake_test
+Installing cakephp/app (3.0.4)
+  - Installing cakephp/app (3.0.4)
+    Loading from cache
+```
+
+`bin/cake server` を起動し，`localhost:8765`にアクセスできて確認できればOK．
+
+>[$ sudo ./pecl install intl](http://stackoverflow.com/questions/27886117/php-intl-installation-on-xampp)
+>[環境構築 - icuのインストール - Qiita](http://qiita.com/ms2sato/items/fd76d67fd5d63c3cb4a5)
+>[intl と APC を PHP 5.3.15 (MacBook Air)... « をぶろぐ](http://tetsuwo.tumblr.com/post/35060809036/intl-%E3%81%A8-apc-%E3%82%92-php-5315-macbook-air)
+>[Installing Intl package on OSX Lion - Darragh Enright](http://darraghenright.tumblr.com/post/22027208929/installing-intl-package-on-osx-lion)
+>[CakePHP3の使い方まとめ - Qiita](http://qiita.com/s-kiriki/items/636ec1109f48fb977347)
+
+
+##サーバにアップロード
+
+IDCFクラウドのサービスを利用した．
+
+>[クラウドサービスならIDCFクラウド -使いやすく、パワフル](http://www.idcf.jp/cloud/)
+
+###設定
+
+仮想マシンを作成して，めちゃらくガイドを参考に設定すればいい．OS は班員の一人が利用したことがあるということで Debian にした．
+ネットワークの設定は以下のような感じ．
+
+###ログイン
+
+秘密鍵をダウンロードできたはず(うろ覚え...)なので，以下でアクセスできるはず．
+
+`ssh -i [/path/to/秘密鍵] -p 22 [user_name]@[IPアドレス]`
+
+###アプリの立ち上げ
+
+cakePHP で作成したアプリケーションは，Github あたりで共有しておいて，サーバにログイン & clone すればよい．設定で 80 番ポートを開けていたので，そこでアプリケーションを起動すればよいはず．ポートの指定方法は公式にある．
+
+```bash
+$ bin/cake server -p 80
+```
+
+>[インストール — CakePHP Cookbook 3.x ドキュメント](http://book.cakephp.org/3.0/ja/installation.html#id6)
+
+これで`http://[IPアドレス]`にアクセスすればよいはずなんだけど，できなくてはまった．ちょっと調べてみると...
+
+```bash
+$ netstat -an | grep LISTEN
+tcp6       0      0  ::1.80                 *.*                    LISTEN
+```
+
+IPv4 ではなく，IPv6 で LISTEN してしまっているので，以下のようにホストを指定して起動する．
+
+```bash
+$ bin/cake server -p 80 -H 0.0.0.0
+$ netstat -an | grep LISTEN
+tcp4       0      0  *.80                   *.*                    LISTEN
+```
+
+これで外部から見れるようになった！サーバの設定が悪いのかと思ってだいぶ時間がかかってしまった...
+
+>[春だし CakePHP 3.0をComposer経由でCentOS6.5にインストール してみた - Qiita](http://qiita.com/IKEA_dless/items/f536b3c009af295bb4a5)
+>[コンピュータとかバイクとか。 Apache HTTP Server の設定いろいろ。](http://esoz.blog.fc2.com/blog-entry-49.html)
+>[Linux - 特定のポート番号をLISTENしているプロセスが知りたい - Qiita](http://qiita.com/cubicdaiya/items/003e36e17519ef32ac8a)
+
+
+##ユーザの追加
+
+班員各が公開鍵認証でサーバにアクセスできるようにしたかったので，ユーザ追加の方法もメモっておく.
+クライアント側で以下の操作を行う．
+
+```bash
+$ cd ~/.ssh/
+$ ssh-keygen
+名前は適当に
+id_hoge でつくって id_hoge(秘密鍵) と id_hoge.pub(公開鍵) ができた場合について説明する
+```
+
+サーバ側で以下の操作を行う．
+
+```bash
+$ adduser hoge
+パスワードとか設定する
+$ mv /home/hoge
+$ mkdir .ssh
+$ chown hoge .ssh
+$ chmod 700 .ssh
+$ emacs .ssh/authorized_keys
+公開鍵(id_hoe.pub)の内容を貼り付け
+$ chown hoge authorized_keys
+$ chmod 600 authorized_keys
+$ /etc/ssh/sshd_config
+AllowUsers に hoge を追加
+$ /etc/init.d/sshd restart
+```
+
+これで，クライアント側から `ssh -i [/path/to/id_hoge] -p 22 [user_name]@210.140.68.52` でサーバにログインできるはず．
+
+>[公開鍵認証による SSH 接続の方法](http://www.serverlog.jp/ssh-key-auth/)
+>[Debianでのユーザ管理](http://www015.upp.so-net.ne.jp/unixlife/linux/de-user.html)
+
+ちなみに，ユーザに管理者権限を付与したい場合は，以下のサイトを参考にすればよい．グループに対して設定を行うときには，`%wheel ALL=(ALL) ALL` のように先頭に `%` を付加するんだけど，なぜか除いてしまっていてつまづいた．
+
+>[CentOS で root 権限を持ち、sudo を実行できるユーザーを作成する | Webセキュリティの小部屋](http://www.websec-room.com/2014/01/18/1590)
+>[Debianでユーザー追加を追加して権限を付与などをするメモ - Qiita](http://qiita.com/n0bisuke/items/4e4419290d789699cafa)
