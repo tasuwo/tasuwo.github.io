@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Php, | tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/blog/categories/php/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2015-09-28T15:04:57+09:00</updated>
+  <updated>2015-09-28T15:09:37+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -100,8 +100,7 @@ Installing cakephp/app <span class="o">(</span>3.0.4<span class="o">)</span>
 
 <h3>設定</h3>
 
-<p>仮想マシンを作成して，めちゃらくガイドを参考に設定すればいい．OS は班員の一人が利用したことがあるということで Debian にした．<br>
-ネットワークの設定は以下のような感じ．</p>
+<p>仮想マシンを作成して，めちゃらくガイドを参考に設定すればいい．OS は班員の一人が利用したことがあるということで Debian にした．</p>
 
 <h3>ログイン</h3>
 
