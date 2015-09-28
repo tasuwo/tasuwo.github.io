@@ -39,7 +39,7 @@ categories: [lisp, 環境構築]
 前提として，Homebrewが導入されている必要がある．手順は以下．
 
 1. Homebrewを用いてSBCLをダウンロード  
-`brew install sblc`
+`brew install sbcl`
 2. QuickLispを[公式サイト](http://www.quicklisp.org/beta/#installation)からダウンロード. `quicklisp.lisp`をDLすれば良い.
 3. SBCLから`quicklisp.lisp`を実行する. Terminalで `sbcl --load quicklisp.lisp` を入力. SBCLが起動する.
 4. `(quicklisp-quickstart:install)`とタイプし, Returnを押下. Quicklispのインストールルーチンが開始される.
