@@ -4,7 +4,7 @@
   <title><![CDATA[tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2015-09-28T15:09:37+09:00</updated>
+  <updated>2016-01-10T21:00:26+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -12,6 +12,241 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[iOSアプリ開発時の個人的に好みなディレクトリ構成とか Xib ファイルの使い方とか]]></title>
+    <link href="http://tasuwo.github.io/blog/2016/01/10/ios-dev-setting/"/>
+    <updated>2016-01-10T20:47:24+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2016/01/10/ios-dev-setting</id>
+    <content type="html"><![CDATA[<p>自分が iOS アプリケーションを作るとき使いまわそうと思った，テンプレ的な設定とかをまとめておく．</p>
+
+<!-- more -->
+
+<h2>やりたいこと</h2>
+
+<p>やることは以下．</p>
+
+<ol>
+<li>ディレクトリ構成をきれいにする
+
+<ul>
+<li>MVCアーキテクチャに対応させる</li>
+</ul></li>
+<li>Storyboard を削除する
+
+<ul>
+<li>segue とかで画面遷移させたり，一つの storyboard に複数の view controller が対応しているのは管理しづらくなりそうかな，と思ったので</li>
+</ul></li>
+<li>UI 整形に xib ファイルを使う
+
+<ul>
+<li>UIView を各画面ごとに作成し，対応した xib ファイルを UI 整形用に使う</li>
+</ul></li>
+</ol>
+
+<h2>0. 環境</h2>
+
+<ul>
+<li>Xcode7.2</li>
+<li>Swift2.0</li>
+<li>OS X Yosemite</li>
+</ul>
+
+<h2>1. ディレクトリ構成をきれいにする</h2>
+
+<p>iOS アプリケーションは MVC アーキテクチャに則っているので，対応したディレクトリ構成にする．<code>File &gt; New &gt; Project</code> から <code>Single View Application</code> を作成すると，デフォルトのディレクトリ構成は以下のようなかんじ．</p>
+
+<p><img src="http://tasuwo.github.io/images/20160110_default.png" alt="default.png"></p>
+
+<p>これを，以下のようなディレクトリ構成に変更する．</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>┬ /resources
+</span><span class='line'>│  ├ info.plist
+</span><span class='line'>│  └ Assets.xcassets
+</span><span class='line'>└ /src
+</span><span class='line'>   ├ AppDelegate.swift
+</span><span class='line'>   ├ /model
+</span><span class='line'>   ├ /view
+</span><span class='line'>   └ /controller
+</span><span class='line'>       └ ViewController.swift</span></code></pre></td></tr></table></div></figure>
+
+<p>実際のディレクトリ構成と Xcode のカラム上でのディレクトリ構成は異なるので，その同期を撮りたいときには <a href="https://github.com/venmo/synx">venmo/synx</a> を使うと良い．</p>
+
+<h2>2. Storyboard を削除する</h2>
+
+<p>デフォルトで存在する，<code>Main.storyboard</code>, <code>LaunchScreen.storyboard</code> は削除する．削除するだけだとエラーとなってしまうので，以下のようにプロジェクトの設定を変更する．</p>
+
+<ul>
+<li><code>Deployment Info &gt; Main Interface</code> のテキストフィールドを空にする</li>
+<li><code>App Icons and Launch Images &gt; Launch Screen File</code> のテキストフィールドを空にする</li>
+</ul>
+
+<p>これでプロジェクトから storyboard を除くことはできたが，この時点で Run しても画面に何も表示されない．rootViewConstroller を設定できていないためである．</p>
+
+<p><img src="http://tasuwo.github.io/images/20160110_black.png" alt="black.png"></p>
+
+<p>そこで，<code>AppDelegate.swift</code> に以下を追記することで，ViewController を rootViewController に設定する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">func</span> <span class="n">application</span><span class="p">(</span><span class="nl">application</span><span class="p">:</span> <span class="bp">UIApplication</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span> <span class="nl">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="nl">NSObject</span><span class="p">:</span> <span class="n">AnyObject</span><span class="p">]</span><span class="o">?</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bool</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">window</span> <span class="o">=</span> <span class="bp">UIWindow</span><span class="p">(</span><span class="nl">frame</span><span class="p">:</span> <span class="bp">UIScreen</span><span class="p">.</span><span class="n">mainScreen</span><span class="p">().</span><span class="n">bounds</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">if</span> <span class="k">let</span> <span class="n">window</span> <span class="o">=</span> <span class="n">window</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">window</span><span class="p">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="bp">UIColor</span><span class="p">.</span><span class="n">whiteColor</span><span class="p">()</span>
+</span><span class='line'>            <span class="n">window</span><span class="p">.</span><span class="n">rootViewController</span> <span class="o">=</span> <span class="n">ViewController</span><span class="p">()</span>
+</span><span class='line'>            <span class="n">window</span><span class="p">.</span><span class="n">makeKeyAndVisible</span><span class="p">()</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">true</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>これでOK．</p>
+
+<p><img src="http://tasuwo.github.io/images/20160110_white.png" alt="white.png"></p>
+
+<h2>3. UI 整形に xib ファイルを使う</h2>
+
+<p>まず，以下のような <code>MainView.swift</code> を <code>src/view</code> 以下に作成する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">import</span> <span class="n">UIKit</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nl">MainView</span> <span class="p">:</span> <span class="bp">UIView</span> <span class="p">{</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>次に，<code>New file</code> から <code>iOS &gt; User Interface</code> 内の <code>view</code> を選択し， xib ファイル作成する．その <code>File&#39;s Owner</code> の Custom Class を <code>Main View</code> に設定</p>
+
+<p><img src="http://tasuwo.github.io/images/20160110_mainview.png" alt="mainview.png"></p>
+
+<p>この UI が適用されたことがわかるように，適当にラベルを設置しておく．</p>
+
+<p><img src="http://tasuwo.github.io/images/20160110_main.png" alt="main.png"></p>
+
+<p>xib ファイル側の view を <code>MainView.swift</code> に対応させる．</p>
+
+<p><img src="http://tasuwo.github.io/images/20160110_outlet.png" alt="outlet.png"></p>
+
+<p>MainView.swift を以下のように編集する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">import</span> <span class="n">UIKit</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nl">MainView</span> <span class="p">:</span> <span class="bp">UIView</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">@</span><span class="kt">IBOutlet</span> <span class="k">var</span> <span class="nl">MainView</span><span class="p">:</span> <span class="bp">UIView</span><span class="o">!</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kr">override</span> <span class="k">init</span><span class="p">(</span><span class="nl">frame</span><span class="p">:</span> <span class="bp">CGRect</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nb">super</span><span class="p">.</span><span class="k">init</span><span class="p">(</span><span class="nl">frame</span><span class="p">:</span> <span class="n">frame</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="bp">NSBundle</span><span class="p">.</span><span class="n">mainBundle</span><span class="p">().</span><span class="n">loadNibNamed</span><span class="p">(</span><span class="s">&quot;MainView&quot;</span><span class="p">,</span> <span class="nl">owner</span><span class="p">:</span> <span class="nb">self</span><span class="p">,</span> <span class="nl">options</span><span class="p">:</span> <span class="nb">nil</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">MainView</span><span class="p">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">addSubview</span><span class="p">(</span><span class="n">MainView</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">required</span> <span class="k">init</span><span class="o">?</span><span class="p">(</span><span class="n">coder</span> <span class="nl">aDecoder</span><span class="p">:</span> <span class="bp">NSCoder</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">fatalError</span><span class="p">(</span><span class="s">&quot;init(coder:) has not been implemented&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>さらに，<code>ViewController.swift</code> に以下を追記</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="kr">override</span> <span class="k">func</span> <span class="nf">viewDidLoad</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nb">super</span><span class="p">.</span><span class="n">viewDidLoad</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">let</span> <span class="n">view</span> <span class="o">=</span> <span class="n">MainView</span><span class="p">(</span><span class="nl">frame</span><span class="p">:</span> <span class="nb">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">frame</span><span class="p">)</span>
+</span><span class='line'>    <span class="nb">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">addSubview</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>これで Run すればよい．</p>
+
+<p><img src="http://tasuwo.github.io/images/20160110_mianvi.png" alt="mianvi.png"></p>
+
+<h2>捕捉 : Auto layout</h2>
+
+<p>中央揃えしたいとかそういうのは auto layout を活用すれば良い．以下のサイトが参考になる．</p>
+
+<p><a href="http://qiita.com/teradonburi/items/94b89379aa5a0bfdc71d">iOS - xcode6でAutoLayoutでレスポンシブデザイン - Qiita</a><br>
+<a href="http://swift-salaryman.com/autolayout.php">AutoLayout - Swiftサラリーマン</a></p>
+
+<p>ラベルから Ctrl 押しながら 親view へドラッグ</p>
+
+<p><img src="http://tasuwo.github.io/images/20160110_auto.png" alt=" auto.png"></p>
+
+<p>制約を適当に付加する．</p>
+
+<p><img src="http://tasuwo.github.io/images/20160110_constraint.png" alt="constraint.png"></p>
+
+<p>今回はこんな感じ．</p>
+
+<p><img src="http://tasuwo.github.io/images/20160110_cons.png" alt="cons.png"></p>
+
+<p>これで Run すると中央揃えになる．</p>
+
+<p><img src="http://tasuwo.github.io/images/20160110_mmm.png" alt="mmm.png"></p>
+
+<h2>おわりに</h2>
+
+<p>最終的なディレクトリ構成は以下．</p>
+
+<p><img src="http://tasuwo.github.io/images/20160110_V.png" alt="V.png"></p>
+
+<h2>参考</h2>
+
+<p><a href="http://tanihiro.hatenablog.com/entry/2015/10/13/092710">【iOS】【swift】カスタムViewとxibを紐付ける - tanihiro.log</a><br>
+<a href="http://qiita.com/iKichiemon/items/3cfa6c2bf2a0acb299a0">[Swift]xibファイルを呼び出す最も簡単な方法 - Qiita</a><br>
+<a href="http://qiita.com/noppefoxwolf/items/11401622950768c93fd2">Swift+xibで簡単レイアウトでカスタムビュー - Qiita</a><br>
+<a href="http://qiita.com/MTattin/items/61beb3b4afcc779f707f">XCode7 - Storyboardにxib利用 - Qiita</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[cakePHPの導入からIDCFの仮想サーバでの立ち上げまでメモ]]></title>
@@ -3340,299 +3575,6 @@ Webページを楽に制作できるフレームワーク<em>Rails</em>に採用
 また，その依存関係を管理するのに<em>bundler</em>というgemパッケージが広く用いられている．<br>
 bundler は アプリケーション毎に Gemfile を用意する．<br>
 Gemfile にアプリケーションが依存する gem やそのバージョンを記述することで，アプリケーションとライブラリの依存関係を管理する．</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Emacsに色々設定したメモ]]></title>
-    <link href="http://tasuwo.github.io/blog/2015/03/17/title/"/>
-    <updated>2015-03-17T02:14:21+09:00</updated>
-    <id>http://tasuwo.github.io/blog/2015/03/17/title</id>
-    <content type="html"><![CDATA[<p>やったことは以下</p>
-
-<ol>
-<li>タブ，全角/半角スペースを可視化(whitespaceの導入)</li>
-<li>タブをスペースで変換するように設定</li>
-<li>Markdownにおける行頭タブの自動整形の無効化</li>
-<li>GFMを利用する</li>
-</ol>
-
-<p>それぞれまとめていく．</p>
-
-<!-- more -->
-
-<h1>1. やったこと</h1>
-
-<h2>1.1 whitespace導入</h2>
-
-<blockquote>
-<p><a href="http://qiita.com/itiut@github/items/4d74da2412a29ef59c3a">whitespace-modeを使って、ファイルの保存時に行末のスペースや末尾の改行を削除する</a></p>
-</blockquote>
-
-<p>上記を参考に，whitespace-modeを導入．<br>
-<code>(setq-default show-trailing-whitespace t)</code>と設定がかぶっていたので削除した．</p>
-
-<h2>1.2 タブをスペースに変換</h2>
-
-<p><code>(setq-default indent-tabs-mode nil)</code>を使っていたのだけど，タブがスペースに置換されない．<br>
-そもそもどのタイミングで置換されていたのか?</p>
-
-<blockquote>
-<p><a href="http://www.math.s.chiba-u.ac.jp/%7Ematsu/lisp/emacs-lisp-intro-jp_17.html#SEC198">16. .emacs ファイル</a></p>
-</blockquote>
-
-<p>上記サイトによれば，自動インデントをした際のインデントがスペースになる，ということらしい．<br>
-普段入力するタブをスペースに置換するにはどうすればよいかと考えたけれど，単純にキーバインドに割り当てればよいだけだということに気づく．<br>
-<code>init.el</code>内でのタブ周りの設定は以下．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="c1">;; タブ幅</span>
-</span><span class='line'><span class="p">(</span><span class="nv">custom-set-variables</span> <span class="o">&#39;</span><span class="p">(</span><span class="nv">tab-width</span> <span class="mi">4</span><span class="p">))</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; インデント整形時，タブの代わりにスペースを用いる</span>
-</span><span class='line'><span class="p">(</span><span class="nv">setq-default</span> <span class="nv">indent-tabs-mode</span> <span class="no">nil</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<p>これとは別に，キーバインドとして以下を設定したらうまくいった．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nv">global-set-key</span> <span class="s">&quot;\C-i&quot;</span> <span class="o">&#39;</span><span class="p">(</span><span class="k">lambda</span> <span class="p">()</span>
-</span><span class='line'>                          <span class="p">(</span><span class="nv">interactive</span><span class="p">)</span>
-</span><span class='line'>                          <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">width</span> <span class="nv">tab-width</span><span class="p">)</span>
-</span><span class='line'>                                <span class="p">(</span><span class="nv">str</span>   <span class="s">&quot;&quot;</span><span class="p">))</span>
-</span><span class='line'>                            <span class="p">(</span><span class="nb">dotimes</span> <span class="p">(</span><span class="nv">i</span> <span class="nv">width</span><span class="p">)</span>
-</span><span class='line'>                              <span class="p">(</span><span class="k">setq</span> <span class="nv">str</span> <span class="p">(</span><span class="nv">concat</span> <span class="nv">str</span> <span class="s">&quot; &quot;</span><span class="p">)))</span>
-</span><span class='line'>                            <span class="p">(</span><span class="nv">insert</span> <span class="nv">str</span><span class="p">))))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<p>タブを<code>C-i</code>で入力できるように，<code>C-i</code>を<code>\t</code>で置き換えていた．<br>
-タブ文字の挿入を割り当てているのだから，設定が反映されないのは当たり前だった．<br>
-スペース4つ分で代わりに置き換えようと思ったが，タブ幅の設定を反映できた方が良いと思ったのでこうなった．<br>
-ちょっとやり方が苦しい．もっと上手い方法があるかもしれない．</p>
-
-<h2>1.3 Markdownにおける行頭タブの自動整形の無効化</h2>
-
-<p>タブ入力した後に字句入力して改行するとタブが削除されてしまうのでなんとかしかった．<br>
-これはつまり，直前にインデントがない場合，Emacs が余分なインデントだと判断して自動整形してしまっているのだと思われる．</p>
-
-<blockquote>
-<p><a href="http://www.nofuture.tv/diary/20141114.html">emacs 24.4のmarkdown-modeでリストのインデントが行頭に揃えられてしまう(解決)</a><br><br>
-<a href="http://www.muskmelon.jp/?p=1068">Emacs 24.4 のインデントを無効化</a></p>
-</blockquote>
-
-<p>コーディングの際には自動インデントは欲しいので，Markdownの編集時のみ自動インデントを無効化したい．<br>
-Emacsはモードが設定されると，対応するモードフック変数に登録されている関数を呼び出す．<br>
-各モードのカスタマイズのためには，このモードフック変数を編集する．<br>
-今回は，以下のように設定を追記して自動インデントを無効化した．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="c1">;; markdown</span>
-</span><span class='line'><span class="p">(</span><span class="nv">autoload</span> <span class="ss">&#39;markdown-mode</span> <span class="s">&quot;markdown-mode.el&quot;</span> <span class="s">&quot;Major mode for editing Markdown files&quot;</span> <span class="no">t</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="k">setq</span> <span class="nv">auto-mode-alist</span> <span class="p">(</span><span class="nb">cons</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;\\.md&quot;</span> <span class="o">.</span> <span class="nv">gfm-mode</span><span class="p">)</span> <span class="nv">auto-mode-alist</span><span class="p">))</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">(</span><span class="nv">add-hook</span> <span class="ss">&#39;gfm-mode-hook</span>
-</span><span class='line'>          <span class="o">&#39;</span><span class="p">(</span><span class="k">lambda</span> <span class="p">()</span>
-</span><span class='line'>             <span class="p">(</span><span class="k">setq</span> <span class="nv">global-linum-mode</span> <span class="no">nil</span><span class="p">)</span>
-</span><span class='line'>             <span class="p">(</span><span class="nv">electric-indent-local-mode</span> <span class="mi">-1</span><span class="p">)))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<p><code>global-linum-mode</code>は画面外にはみ出した文章の改行指定．<br>
-コーディングでは全体の形が崩れるので無効にしておくが，Markdownは文章なので改行したほうが読みやすい．</p>
-
-<h2>1.4 GFMモードを利用する</h2>
-
-<p>行末のスペースも削除されてしまうので，どうしようと思っていたが，GFMモードというものを利用すれば良いらしい．<br>
-具体的な使い方は前項に示した．gfm-mode は markdown-mode.el 内に定義されているようだ．<br>
-GFMモードを快適に利用したいので，さらに以下を設定していく．</p>
-
-<ol>
-<li>OctopressでGFMが使用できるように設定する</li>
-<li>GFMのプレビューができるようにする</li>
-</ol>
-
-<h3>1.4.1 OctopressでGFMが使用できるように設定する</h3>
-
-<ol>
-<li><code>Gemfile</code>に<code>gem &#39;redcarpet&#39;, &#39;~&gt; 3.1</code>を追記(他のgemがこのバージョンに依存していたため，参考サイトと違うバージョンを指定)</li>
-<li>なかったので，<code>gem &#39;albino&#39;, &#39;~&gt; 1.3.3&#39;</code>も追加</li>
-<li><code>bundle install</code></li>
-<li><code>plugins</code>ディレクトリに，<code>redcarpet2_markdown.rb</code>を追加(<a href="https://github.com/nono/Jekyll-plugins">source</a>)</li>
-<li><code>_config.yml</code>の<code>markdown: rdiscount</code>を下記のように書き換え</li>
-</ol>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="nv">markdown:</span> <span class="nv">redcarpet</span>
-</span><span class='line'><span class="nv">redcarpet:</span>
-</span><span class='line'>  <span class="nv">extensions:</span> <span class="nv">[</span><span class="s">&quot;hard_wrap&quot;</span><span class="nv">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<p><code>redcarpet2</code>を指定するとエラーとなった．(<a href="https://github.com/clayallsopp/rubymotion-tutorial/issues/30">参考</a>)</p>
-
-<blockquote>
-<p><a href="http://blog.tdksk.com/2013/05/06/use-gfm-in-octopress.html">Octopress で GitHub Flavored Markdown (GFM) を使う</a></p>
-</blockquote>
-
-<h3>1.4.2 emacs上からGFMのプレビューができるようにする</h3>
-
-<p>Grip は Markdown を GitHub Flavor に変換してプレビューできる．</p>
-
-<ol>
-<li>Gripをインストール</li>
-</ol>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo pip install grip
-</span></code></pre></td></tr></table></div></figure>
-
-<blockquote>
-<p><a href="http://blog.wonderrabbitproject.net/2014/07/github-flavored-markdown-grip.html">GitHub Flavored Markdown に対応した Grip というツールが便利だったので備忘録</a><br>
-<a href="http://www.moongift.jp/2014/01/grip-github%E9%A2%A8%E3%81%ABmarkdown%E3%82%92html%E3%83%97%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC/">Grip - GitHub風にMarkdownをHTMLプレビュー</a></p>
-</blockquote>
-
-<ol>
-<li>binファイルを作成し，パスの通ったディレクトリにおく</li>
-</ol>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>which grip
-</span><span class='line'><span class="nv">$ </span>emacs /usr/local/bin/markdown
-</span><span class='line'>
-</span><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="nv">filename</span><span class="o">=</span><span class="nv">$1</span>
-</span><span class='line'>/usr/local/bin/grip --export --gfm <span class="k">${</span><span class="nv">filename</span><span class="k">}</span> &gt; /dev/null
-</span><span class='line'>cat <span class="k">${</span><span class="nv">filename</span><span class="p">%.*</span><span class="k">}</span>.html
-</span></code></pre></td></tr></table></div></figure>
-
-<p>GFMモードでプレビューするためには，<code>--gfm</code>オプションを追加する．<br>
-<code>markdown</code>ファイルについて．既にパス内に存在している場合がある(通常のプレビュー時に用いていたのかも)<br>
-なので，<code>which markdown</code>で存在するかどうか調べて，存在したならバックアップをとって新たに置き換えると良い．<br>
-また，権限を755に設定しておくこと．</p>
-
-<ol>
-<li>設定の追加</li>
-</ol>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="c1">;; markdown mode</span>
-</span><span class='line'><span class="p">(</span><span class="nv">autoload</span> <span class="ss">&#39;markdown-mode</span> <span class="s">&quot;markdown-mode&quot;</span>
-</span><span class='line'>   <span class="s">&quot;Major mode for editing Markdown files&quot;</span> <span class="no">t</span><span class="p">)</span>
-</span><span class='line'>   <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;auto-mode-alist</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;\\.text\\&#39;&quot;</span> <span class="o">.</span> <span class="nv">gfm-mode</span><span class="p">))</span>
-</span><span class='line'>   <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;auto-mode-alist</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;\\.markdown\\&#39;&quot;</span> <span class="o">.</span> <span class="nv">gfm-mode</span><span class="p">))</span>
-</span><span class='line'>   <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;auto-mode-alist</span> <span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;\\.md\\&#39;&quot;</span> <span class="o">.</span> <span class="nv">gfm-mode</span><span class="p">))</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">;; ファイルパスを渡す</span>
-</span><span class='line'><span class="p">(</span><span class="nb">defun</span> <span class="nv">markdown-custom</span> <span class="p">()</span>
-</span><span class='line'>  <span class="s">&quot;markdown-mode-hook&quot;</span>
-</span><span class='line'>    <span class="p">(</span><span class="k">setq</span> <span class="nv">markdown-command-needs-filename</span> <span class="no">t</span><span class="p">)</span>
-</span><span class='line'>      <span class="p">)</span>
-</span><span class='line'>      <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">&#39;markdown-mode-hook</span> <span class="o">&#39;</span><span class="p">(</span><span class="k">lambda</span><span class="p">()</span> <span class="p">(</span><span class="nv">markdown-custom</span><span class="p">)))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<ol>
-<li><code>C-c C-c p</code>，<code>C-c C- v</code>で実行</li>
-</ol>
-
-<h3>トラブルシューティング</h3>
-
-<p>これでok&#8230;と思ったら，文字化けする上にちっともGitHub Flavor でない．</p>
-
-<p>試しに，Markdownファイルに対して直接<code>grip</code>を叩く．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>grip test.md
-</span></code></pre></td></tr></table></div></figure>
-
-<p>するとエラーがでて，プレビューできない．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>UnicodeDecodeError: <span class="s1">&#39;utf8&#39;</span> codec can<span class="err">&#39;</span>t decode byte 0xa4 in position 2: invalid start byte
-</span></code></pre></td></tr></table></div></figure>
-
-<p>文字コード関連かと思い，対象ファイルの文字コードをnkfで調べる．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>nkf --guess test.md
-</span><span class='line'>EUC-JP <span class="o">(</span>LF<span class="o">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<p>UTF-8に変換．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>nkf -u --overwrite test.md
-</span></code></pre></td></tr></table></div></figure>
-
-<p>再び実行．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>nkf --guess test.md
-</span><span class='line'>UTF-8 <span class="o">(</span>LF<span class="o">)</span>
-</span><span class='line'><span class="nv">$ </span>grip test.md
-</span></code></pre></td></tr></table></div></figure>
-
-<p>うまくいった．<br>
-ただ，エラーが表示されてしまう．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>/usr/local/lib/python2.7/site-packages/requests/packages/urllib3/connectionpool.py:769: InsecureRequestWarning: Unverified HTTPS request is being made. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.org/en/latest/security.html InsecureRequestWarning<span class="o">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<p>証明書関連のエラーだと思われる．<br>
-詳しくは後日調べることにして，プレビューもできたのでとりあえずコレでOK．<br>
-ただ，<code>#</code>で指定する見出しがなぜか変換されない．これもとりあえず後日調べることにする．</p>
-
-<blockquote>
-<p><a href="http://blog.s-amemiya.com/development/emacs%E3%81%AEmarkdown-mode%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%82%8B/">Emacsのmarkdown-modeを使ってみる</a>  </p>
-</blockquote>
-
-<h1>2. 今後やりたいことのメモ</h1>
-
-<ul>
-<li>Emacsにおける文字コードの設定</li>
-<li>認証局関連の知識ほしい&#8230;(<a href="http://qiita.com/kawaz/items/f90810b9ea823b6556a8">認証局を立ててぼろもうけしたいんですが＞無理な理由を理解しよう</a>)</li>
-<li>ブログの見た目を少し変えたい(文字が大きい&#8230;)</li>
-</ul>
-
-<p>とりあえず，MarkdownをEmacsから手軽に書いて，ブログを更新するという目標は達成できた．</p>
 ]]></content>
   </entry>
   

@@ -1,0 +1,483 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>iOSアプリ開発時の個人的に好みなディレクトリ構成とか Xib ファイルの使い方とか - tasuwo blog</title>
+  <meta name="author" content="tasuwo">
+
+  
+  <meta name="description" content="自分が iOS アプリケーションを作るとき使いまわそうと思った，テンプレ的な設定とかをまとめておく． やりたいこと やることは以下． ディレクトリ構成をきれいにする MVCアーキテクチャに対応させる Storyboard を削除する segue とかで画面遷移させたり，一つの storyboard &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tasuwo.github.io/blog/2016/01/10/ios-dev-setting">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="tasuwo blog" type="application/atom+xml">
+  <link href="/stylesheets/data-table.css" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-60860415-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">tasuwo blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:tasuwo.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">iOSアプリ開発時の個人的に好みなディレクトリ構成とか Xib ファイルの使い方とか</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-01-10T20:47:24+09:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>8:47 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tasuwo.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>自分が iOS アプリケーションを作るとき使いまわそうと思った，テンプレ的な設定とかをまとめておく．</p>
+
+<!-- more -->
+
+<h2>やりたいこと</h2>
+
+<p>やることは以下．</p>
+
+<ol>
+<li>ディレクトリ構成をきれいにする
+
+<ul>
+<li>MVCアーキテクチャに対応させる</li>
+</ul></li>
+<li>Storyboard を削除する
+
+<ul>
+<li>segue とかで画面遷移させたり，一つの storyboard に複数の view controller が対応しているのは管理しづらくなりそうかな，と思ったので</li>
+</ul></li>
+<li>UI 整形に xib ファイルを使う
+
+<ul>
+<li>UIView を各画面ごとに作成し，対応した xib ファイルを UI 整形用に使う</li>
+</ul></li>
+</ol>
+
+<h2>0. 環境</h2>
+
+<ul>
+<li>Xcode7.2</li>
+<li>Swift2.0</li>
+<li>OS X Yosemite</li>
+</ul>
+
+<h2>1. ディレクトリ構成をきれいにする</h2>
+
+<p>iOS アプリケーションは MVC アーキテクチャに則っているので，対応したディレクトリ構成にする．<code>File &gt; New &gt; Project</code> から <code>Single View Application</code> を作成すると，デフォルトのディレクトリ構成は以下のようなかんじ．</p>
+
+<p><img src="/images/20160110_default.png" alt="default.png"></p>
+
+<p>これを，以下のようなディレクトリ構成に変更する．</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>┬ /resources
+</span><span class='line'>│  ├ info.plist
+</span><span class='line'>│  └ Assets.xcassets
+</span><span class='line'>└ /src
+</span><span class='line'>   ├ AppDelegate.swift
+</span><span class='line'>   ├ /model
+</span><span class='line'>   ├ /view
+</span><span class='line'>   └ /controller
+</span><span class='line'>       └ ViewController.swift</span></code></pre></td></tr></table></div></figure>
+
+<p>実際のディレクトリ構成と Xcode のカラム上でのディレクトリ構成は異なるので，その同期を撮りたいときには <a href="https://github.com/venmo/synx">venmo/synx</a> を使うと良い．</p>
+
+<h2>2. Storyboard を削除する</h2>
+
+<p>デフォルトで存在する，<code>Main.storyboard</code>, <code>LaunchScreen.storyboard</code> は削除する．削除するだけだとエラーとなってしまうので，以下のようにプロジェクトの設定を変更する．</p>
+
+<ul>
+<li><code>Deployment Info &gt; Main Interface</code> のテキストフィールドを空にする</li>
+<li><code>App Icons and Launch Images &gt; Launch Screen File</code> のテキストフィールドを空にする</li>
+</ul>
+
+<p>これでプロジェクトから storyboard を除くことはできたが，この時点で Run しても画面に何も表示されない．rootViewConstroller を設定できていないためである．</p>
+
+<p><img src="/images/20160110_black.png" alt="black.png"></p>
+
+<p>そこで，<code>AppDelegate.swift</code> に以下を追記することで，ViewController を rootViewController に設定する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">func</span> <span class="n">application</span><span class="p">(</span><span class="nl">application</span><span class="p">:</span> <span class="bp">UIApplication</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span> <span class="nl">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="nl">NSObject</span><span class="p">:</span> <span class="n">AnyObject</span><span class="p">]</span><span class="o">?</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bool</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">window</span> <span class="o">=</span> <span class="bp">UIWindow</span><span class="p">(</span><span class="nl">frame</span><span class="p">:</span> <span class="bp">UIScreen</span><span class="p">.</span><span class="n">mainScreen</span><span class="p">().</span><span class="n">bounds</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">if</span> <span class="k">let</span> <span class="n">window</span> <span class="o">=</span> <span class="n">window</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">window</span><span class="p">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="bp">UIColor</span><span class="p">.</span><span class="n">whiteColor</span><span class="p">()</span>
+</span><span class='line'>            <span class="n">window</span><span class="p">.</span><span class="n">rootViewController</span> <span class="o">=</span> <span class="n">ViewController</span><span class="p">()</span>
+</span><span class='line'>            <span class="n">window</span><span class="p">.</span><span class="n">makeKeyAndVisible</span><span class="p">()</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">true</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>これでOK．</p>
+
+<p><img src="/images/20160110_white.png" alt="white.png"></p>
+
+<h2>3. UI 整形に xib ファイルを使う</h2>
+
+<p>まず，以下のような <code>MainView.swift</code> を <code>src/view</code> 以下に作成する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">import</span> <span class="n">UIKit</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nl">MainView</span> <span class="p">:</span> <span class="bp">UIView</span> <span class="p">{</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>次に，<code>New file</code> から <code>iOS &gt; User Interface</code> 内の <code>view</code> を選択し， xib ファイル作成する．その <code>File&#39;s Owner</code> の Custom Class を <code>Main View</code> に設定</p>
+
+<p><img src="/images/20160110_mainview.png" alt="mainview.png"></p>
+
+<p>この UI が適用されたことがわかるように，適当にラベルを設置しておく．</p>
+
+<p><img src="/images/20160110_main.png" alt="main.png"></p>
+
+<p>xib ファイル側の view を <code>MainView.swift</code> に対応させる．</p>
+
+<p><img src="/images/20160110_outlet.png" alt="outlet.png"></p>
+
+<p>MainView.swift を以下のように編集する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">import</span> <span class="n">UIKit</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nl">MainView</span> <span class="p">:</span> <span class="bp">UIView</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">@</span><span class="kt">IBOutlet</span> <span class="k">var</span> <span class="nl">MainView</span><span class="p">:</span> <span class="bp">UIView</span><span class="o">!</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kr">override</span> <span class="k">init</span><span class="p">(</span><span class="nl">frame</span><span class="p">:</span> <span class="bp">CGRect</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nb">super</span><span class="p">.</span><span class="k">init</span><span class="p">(</span><span class="nl">frame</span><span class="p">:</span> <span class="n">frame</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="bp">NSBundle</span><span class="p">.</span><span class="n">mainBundle</span><span class="p">().</span><span class="n">loadNibNamed</span><span class="p">(</span><span class="s">&quot;MainView&quot;</span><span class="p">,</span> <span class="nl">owner</span><span class="p">:</span> <span class="nb">self</span><span class="p">,</span> <span class="nl">options</span><span class="p">:</span> <span class="nb">nil</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">MainView</span><span class="p">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">addSubview</span><span class="p">(</span><span class="n">MainView</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">required</span> <span class="k">init</span><span class="o">?</span><span class="p">(</span><span class="n">coder</span> <span class="nl">aDecoder</span><span class="p">:</span> <span class="bp">NSCoder</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">fatalError</span><span class="p">(</span><span class="s">&quot;init(coder:) has not been implemented&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>さらに，<code>ViewController.swift</code> に以下を追記</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="kr">override</span> <span class="k">func</span> <span class="nf">viewDidLoad</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nb">super</span><span class="p">.</span><span class="n">viewDidLoad</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">let</span> <span class="n">view</span> <span class="o">=</span> <span class="n">MainView</span><span class="p">(</span><span class="nl">frame</span><span class="p">:</span> <span class="nb">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">frame</span><span class="p">)</span>
+</span><span class='line'>    <span class="nb">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">addSubview</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>これで Run すればよい．</p>
+
+<p><img src="/images/20160110_mianvi.png" alt="mianvi.png"></p>
+
+<h2>捕捉 : Auto layout</h2>
+
+<p>中央揃えしたいとかそういうのは auto layout を活用すれば良い．以下のサイトが参考になる．</p>
+
+<p><a href="http://qiita.com/teradonburi/items/94b89379aa5a0bfdc71d">iOS - xcode6でAutoLayoutでレスポンシブデザイン - Qiita</a><br>
+<a href="http://swift-salaryman.com/autolayout.php">AutoLayout - Swiftサラリーマン</a></p>
+
+<p>ラベルから Ctrl 押しながら 親view へドラッグ</p>
+
+<p><img src="/images/20160110_auto.png" alt=" auto.png"></p>
+
+<p>制約を適当に付加する．</p>
+
+<p><img src="/images/20160110_constraint.png" alt="constraint.png"></p>
+
+<p>今回はこんな感じ．</p>
+
+<p><img src="/images/20160110_cons.png" alt="cons.png"></p>
+
+<p>これで Run すると中央揃えになる．</p>
+
+<p><img src="/images/20160110_mmm.png" alt="mmm.png"></p>
+
+<h2>おわりに</h2>
+
+<p>最終的なディレクトリ構成は以下．</p>
+
+<p><img src="/images/20160110_V.png" alt="V.png"></p>
+
+<h2>参考</h2>
+
+<p><a href="http://tanihiro.hatenablog.com/entry/2015/10/13/092710">【iOS】【swift】カスタムViewとxibを紐付ける - tanihiro.log</a><br>
+<a href="http://qiita.com/iKichiemon/items/3cfa6c2bf2a0acb299a0">[Swift]xibファイルを呼び出す最も簡単な方法 - Qiita</a><br>
+<a href="http://qiita.com/noppefoxwolf/items/11401622950768c93fd2">Swift+xibで簡単レイアウトでカスタムビュー - Qiita</a><br>
+<a href="http://qiita.com/MTattin/items/61beb3b4afcc779f707f">XCode7 - Storyboardにxib利用 - Qiita</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">tasuwo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-01-10T20:47:24+09:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>8:47 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/swift/'>swift</a>, <a class='category' href='/blog/categories/xcode/'>xcode</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2016/01/10/ios-dev-setting/" data-via="" data-counturl="http://tasuwo.github.io/blog/2016/01/10/ios-dev-setting/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <br />
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/09/28/cakephp/" title="Previous Post: cakePHPの導入からIDCFの仮想サーバでの立ち上げまでメモ">&laquo; cakePHPの導入からIDCFの仮想サーバでの立ち上げまでメモ</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h2 id="toc_0">Profile</h2>
+
+  <h3 id="toc_1">ME</h3>
+
+  <ul>
+  <li>情報系の学生</li>
+  <li>プログラミング初心者でMac初心者</li>
+  </ul>
+
+  <h3 id="toc_2">SNS</h3>
+
+  <ul>
+  <li>Twitter: <a href="https://twitter.com/tasuwo_">@tasuwo_</a></li>
+  <li>GiHub: <a href="https://github.com/tasuwo">tasuwo</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/01/10/ios-dev-setting/">iOSアプリ開発時の個人的に好みなディレクトリ構成とか Xib ファイルの使い方とか</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/09/28/cakephp/">cakePHPの導入からIDCFの仮想サーバでの立ち上げまでメモ</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/08/16/xcode-plugin/">Xcode のプラグイン導入についてメモ</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/08/16/title/">Emacs の色表示がおかしかったのでなおした</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/06/26/title/">Vim をさわってみた感想</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - tasuwo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'tasuwoblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tasuwo.github.io/blog/2016/01/10/ios-dev-setting/';
+        var disqus_url = 'http://tasuwo.github.io/blog/2016/01/10/ios-dev-setting/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

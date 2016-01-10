@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Xcode | tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/blog/categories/xcode/atom.xml" rel="self"/>
+  <link href="http://tasuwo.github.io/"/>
+  <updated>2016-01-10T21:00:26+09:00</updated>
+  <id>http://tasuwo.github.io/</id>
+  <author>
+    <name><![CDATA[tasuwo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[iOSアプリ開発時の個人的に好みなディレクトリ構成とか Xib ファイルの使い方とか]]></title>
+    <link href="http://tasuwo.github.io/blog/2016/01/10/ios-dev-setting/"/>
+    <updated>2016-01-10T20:47:24+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2016/01/10/ios-dev-setting</id>
+    <content type="html"><![CDATA[<p>自分が iOS アプリケーションを作るとき使いまわそうと思った，テンプレ的な設定とかをまとめておく．</p>
+
+<!-- more -->
+
+<h2>やりたいこと</h2>
+
+<p>やることは以下．</p>
+
+<ol>
+<li>ディレクトリ構成をきれいにする
+
+<ul>
+<li>MVCアーキテクチャに対応させる</li>
+</ul></li>
+<li>Storyboard を削除する
+
+<ul>
+<li>segue とかで画面遷移させたり，一つの storyboard に複数の view controller が対応しているのは管理しづらくなりそうかな，と思ったので</li>
+</ul></li>
+<li>UI 整形に xib ファイルを使う
+
+<ul>
+<li>UIView を各画面ごとに作成し，対応した xib ファイルを UI 整形用に使う</li>
+</ul></li>
+</ol>
+
+<h2>0. 環境</h2>
+
+<ul>
+<li>Xcode7.2</li>
+<li>Swift2.0</li>
+<li>OS X Yosemite</li>
+</ul>
+
+<h2>1. ディレクトリ構成をきれいにする</h2>
+
+<p>iOS アプリケーションは MVC アーキテクチャに則っているので，対応したディレクトリ構成にする．<code>File &gt; New &gt; Project</code> から <code>Single View Application</code> を作成すると，デフォルトのディレクトリ構成は以下のようなかんじ．</p>
+
+<p><img src="/images/20160110_default.png" alt="default.png"></p>
+
+<p>これを，以下のようなディレクトリ構成に変更する．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">┬ /resources
+│  ├ info.plist
+│  └ Assets.xcassets
+└ /src
+   ├ AppDelegate.swift
+   ├ /model
+   ├ /view
+   └ /controller
+       └ ViewController.swift
+</code></pre></div>
+<p>実際のディレクトリ構成と Xcode のカラム上でのディレクトリ構成は異なるので，その同期を撮りたいときには <a href="https://github.com/venmo/synx">venmo/synx</a> を使うと良い．</p>
+
+<h2>2. Storyboard を削除する</h2>
+
+<p>デフォルトで存在する，<code>Main.storyboard</code>, <code>LaunchScreen.storyboard</code> は削除する．削除するだけだとエラーとなってしまうので，以下のようにプロジェクトの設定を変更する．</p>
+
+<ul>
+<li><code>Deployment Info &gt; Main Interface</code> のテキストフィールドを空にする</li>
+<li><code>App Icons and Launch Images &gt; Launch Screen File</code> のテキストフィールドを空にする</li>
+</ul>
+
+<p>これでプロジェクトから storyboard を除くことはできたが，この時点で Run しても画面に何も表示されない．rootViewConstroller を設定できていないためである．</p>
+
+<p><img src="/images/20160110_black.png" alt="black.png"></p>
+
+<p>そこで，<code>AppDelegate.swift</code> に以下を追記することで，ViewController を rootViewController に設定する．</p>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="k">func</span> <span class="n">application</span><span class="p">(</span><span class="nl">application</span><span class="p">:</span> <span class="bp">UIApplication</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span> <span class="nl">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="nl">NSObject</span><span class="p">:</span> <span class="n">AnyObject</span><span class="p">]</span><span class="o">?</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bool</span> <span class="p">{</span>
+
+        <span class="n">window</span> <span class="o">=</span> <span class="bp">UIWindow</span><span class="p">(</span><span class="nl">frame</span><span class="p">:</span> <span class="bp">UIScreen</span><span class="p">.</span><span class="n">mainScreen</span><span class="p">().</span><span class="n">bounds</span><span class="p">)</span>
+        <span class="k">if</span> <span class="k">let</span> <span class="n">window</span> <span class="o">=</span> <span class="n">window</span> <span class="p">{</span>
+            <span class="n">window</span><span class="p">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="bp">UIColor</span><span class="p">.</span><span class="n">whiteColor</span><span class="p">()</span>
+            <span class="n">window</span><span class="p">.</span><span class="n">rootViewController</span> <span class="o">=</span> <span class="n">ViewController</span><span class="p">()</span>
+            <span class="n">window</span><span class="p">.</span><span class="n">makeKeyAndVisible</span><span class="p">()</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nb">true</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>これでOK．</p>
+
+<p><img src="/images/20160110_white.png" alt="white.png"></p>
+
+<h2>3. UI 整形に xib ファイルを使う</h2>
+
+<p>まず，以下のような <code>MainView.swift</code> を <code>src/view</code> 以下に作成する．</p>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="k">import</span> <span class="n">UIKit</span>
+
+<span class="k">class</span> <span class="nl">MainView</span> <span class="p">:</span> <span class="bp">UIView</span> <span class="p">{</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>次に，<code>New file</code> から <code>iOS &gt; User Interface</code> 内の <code>view</code> を選択し， xib ファイル作成する．その <code>File&#39;s Owner</code> の Custom Class を <code>Main View</code> に設定</p>
+
+<p><img src="/images/20160110_mainview.png" alt="mainview.png"></p>
+
+<p>この UI が適用されたことがわかるように，適当にラベルを設置しておく．</p>
+
+<p><img src="/images/20160110_main.png" alt="main.png"></p>
+
+<p>xib ファイル側の view を <code>MainView.swift</code> に対応させる．</p>
+
+<p><img src="/images/20160110_outlet.png" alt="outlet.png"></p>
+
+<p>MainView.swift を以下のように編集する．</p>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="k">import</span> <span class="n">UIKit</span>
+
+<span class="k">class</span> <span class="nl">MainView</span> <span class="p">:</span> <span class="bp">UIView</span> <span class="p">{</span>
+    <span class="p">@</span><span class="kt">IBOutlet</span> <span class="k">var</span> <span class="nl">MainView</span><span class="p">:</span> <span class="bp">UIView</span><span class="o">!</span>
+
+    <span class="kr">override</span> <span class="k">init</span><span class="p">(</span><span class="nl">frame</span><span class="p">:</span> <span class="bp">CGRect</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">super</span><span class="p">.</span><span class="k">init</span><span class="p">(</span><span class="nl">frame</span><span class="p">:</span> <span class="n">frame</span><span class="p">)</span>
+
+        <span class="bp">NSBundle</span><span class="p">.</span><span class="n">mainBundle</span><span class="p">().</span><span class="n">loadNibNamed</span><span class="p">(</span><span class="s">&quot;MainView&quot;</span><span class="p">,</span> <span class="nl">owner</span><span class="p">:</span> <span class="nb">self</span><span class="p">,</span> <span class="nl">options</span><span class="p">:</span> <span class="nb">nil</span><span class="p">)</span>
+        <span class="n">MainView</span><span class="p">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span>
+
+        <span class="n">addSubview</span><span class="p">(</span><span class="n">MainView</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="n">required</span> <span class="k">init</span><span class="o">?</span><span class="p">(</span><span class="n">coder</span> <span class="nl">aDecoder</span><span class="p">:</span> <span class="bp">NSCoder</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fatalError</span><span class="p">(</span><span class="s">&quot;init(coder:) has not been implemented&quot;</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>さらに，<code>ViewController.swift</code> に以下を追記</p>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="kr">override</span> <span class="k">func</span> <span class="nf">viewDidLoad</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nb">super</span><span class="p">.</span><span class="n">viewDidLoad</span><span class="p">()</span>
+
+    <span class="k">let</span> <span class="n">view</span> <span class="o">=</span> <span class="n">MainView</span><span class="p">(</span><span class="nl">frame</span><span class="p">:</span> <span class="nb">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">frame</span><span class="p">)</span>
+    <span class="nb">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">addSubview</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>これで Run すればよい．</p>
+
+<p><img src="/images/20160110_mianvi.png" alt="mianvi.png"></p>
+
+<h2>捕捉 : Auto layout</h2>
+
+<p>中央揃えしたいとかそういうのは auto layout を活用すれば良い．以下のサイトが参考になる．</p>
+
+<p><a href="http://qiita.com/teradonburi/items/94b89379aa5a0bfdc71d">iOS - xcode6でAutoLayoutでレスポンシブデザイン - Qiita</a><br>
+<a href="http://swift-salaryman.com/autolayout.php">AutoLayout - Swiftサラリーマン</a></p>
+
+<p>ラベルから Ctrl 押しながら 親view へドラッグ</p>
+
+<p><img src="/images/20160110_auto.png" alt=" auto.png"></p>
+
+<p>制約を適当に付加する．</p>
+
+<p><img src="/images/20160110_constraint.png" alt="constraint.png"></p>
+
+<p>今回はこんな感じ．</p>
+
+<p><img src="/images/20160110_cons.png" alt="cons.png"></p>
+
+<p>これで Run すると中央揃えになる．</p>
+
+<p><img src="/images/20160110_mmm.png" alt="mmm.png"></p>
+
+<h2>おわりに</h2>
+
+<p>最終的なディレクトリ構成は以下．</p>
+
+<p><img src="/images/20160110_V.png" alt="V.png"></p>
+
+<h2>参考</h2>
+
+<p><a href="http://tanihiro.hatenablog.com/entry/2015/10/13/092710">【iOS】【swift】カスタムViewとxibを紐付ける - tanihiro.log</a><br>
+<a href="http://qiita.com/iKichiemon/items/3cfa6c2bf2a0acb299a0">[Swift]xibファイルを呼び出す最も簡単な方法 - Qiita</a><br>
+<a href="http://qiita.com/noppefoxwolf/items/11401622950768c93fd2">Swift+xibで簡単レイアウトでカスタムビュー - Qiita</a><br>
+<a href="http://qiita.com/MTattin/items/61beb3b4afcc779f707f">XCode7 - Storyboardにxib利用 - Qiita</a></p>
+]]></content>
+  </entry>
+  
+</feed>
