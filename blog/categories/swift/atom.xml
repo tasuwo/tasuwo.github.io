@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Swift | tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/blog/categories/swift/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2016-01-10T21:00:26+09:00</updated>
+  <updated>2016-02-14T13:04:38+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -12,6 +12,114 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[クラスにおける Failable Initializerについて]]></title>
+    <link href="http://tasuwo.github.io/blog/2016/02/02/failable-initializer/"/>
+    <updated>2016-02-02T13:58:13+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2016/02/02/failable-initializer</id>
+    <content type="html"><![CDATA[<p>Swift で，構造体やenum，クラスにおいて，初期化が失敗しうるコンストラクタを利用したい時には，<em>Failable Initializer</em> を利用すれば良いらしいのだが，これをクラスで利用しようとしたらハマったのでメモ．</p>
+
+<!-- more -->
+
+<h2>Failable Initializer とは</h2>
+
+<p>初期化に失敗したことを，<code>nil</code> を返すことで伝えることのできるイニシャライザ．</p>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="k">struct</span> <span class="n">Animal</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nl">species</span><span class="p">:</span> <span class="n">String</span>
+
+    <span class="c1">// failable initializer</span>
+    <span class="c1">// init の末尾に ? を付加する</span>
+    <span class="k">init</span><span class="o">?</span><span class="p">(</span><span class="nl">species</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="n">species</span><span class="p">.</span><span class="n">isEmpty</span> <span class="p">{</span>
+            <span class="c1">// 初期化失敗の場合には nil を返す</span>
+            <span class="k">return</span> <span class="nb">nil</span>
+        <span class="p">}</span>
+        <span class="nb">self</span><span class="p">.</span><span class="n">species</span> <span class="o">=</span> <span class="n">species</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>これで，初期化がうまくいかなかった場合には，<code>nil</code> が返される．</p>
+
+<h2>ハマったこと</h2>
+
+<p>やろうとしたことは，コンストラクタ内で例外を扱うことで，具体的には以下のような感じ．</p>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="k">class</span> <span class="n">Hoge</span> <span class="p">{</span>
+    <span class="n">private</span> <span class="k">var</span> <span class="nl">foo1</span><span class="p">:</span> <span class="n">Int</span><span class="o">!</span>
+    <span class="n">private</span> <span class="k">var</span> <span class="nl">foo2</span><span class="p">:</span> <span class="n">Int</span><span class="o">!</span>
+
+    <span class="k">init</span><span class="o">?</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">do</span> <span class="p">{</span>
+            <span class="n">foo1</span> <span class="o">=</span> <span class="n">try</span> <span class="cm">/* 例外を投げうる処理 */</span>
+            <span class="n">foo2</span> <span class="o">=</span> <span class="mi">0</span>   <span class="cm">/* 単純な代入 */</span>
+        <span class="p">}</span> <span class="n">catch</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nb">nil</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>ところが，このように記述すると，<code>return nil</code> の位置で以下のようなエラーが発生する．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">All stored properties of a class instance must be initialized before returning nil from an initializer
+</code></pre></div>
+<p>同じことでハマった人がいるらしい．</p>
+
+<blockquote>
+<p><a href="http://stackoverflow.com/questions/26495586/best-practice-to-implement-a-failable-initializer-in-swift">All stored properties of a class instance must be initialized before returning nil from an initializer</a></p>
+</blockquote>
+
+<p>結論から言うと，値型である構造体や列挙型ではいかなるタイミングでも初期化を失敗(<code>return nil</code>)できるが，クラスについては，すべての stored property が明示的に初期化された後でなければ初期化を失敗させることができないらしい．</p>
+
+<blockquote>
+<p>A failable initializer for a value type (that is, a structure or enumeration) can trigger an initialization failure at any point within its initializer implementation. In the Animal structure example above, the initializer triggers an initialization failure at the very start of its implementation, before the species property has been set.<br>
+For classes, however, a failable initializer can trigger an initialization failure only after all stored properties introduced by that class have been set to an initial value and any initializer delegation has taken place.<br>
+<a href="https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Initialization.html#//apple_ref/doc/uid/TP40014097-CH18-ID224">The Swift Programming Language (Swift 2.1): Initialization</a></p>
+</blockquote>
+
+<h2>動作を確認してみる</h2>
+
+<p>Playground でサンプルコードを動かして動作を確かめてみる．<br>
+まずは，構造体の場合．</p>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="c1">// 構造体</span>
+<span class="k">struct</span> <span class="n">Animal</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nl">species</span><span class="p">:</span> <span class="n">String</span>
+    <span class="k">init</span><span class="o">?</span><span class="p">(</span><span class="nl">species</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="n">species</span><span class="p">.</span><span class="n">isEmpty</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">nil</span> <span class="p">}</span>
+        <span class="nb">self</span><span class="p">.</span><span class="n">species</span> <span class="o">=</span> <span class="n">species</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">let</span> <span class="nl">hoge</span><span class="p">:</span> <span class="n">String</span> <span class="o">=</span> <span class="cm">/* ここに任意の値 */</span>
+<span class="k">let</span> <span class="n">anonymousCreature</span> <span class="o">=</span> <span class="n">Animal</span><span class="p">(</span><span class="nl">species</span><span class="p">:</span> <span class="n">hoge</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">anonymousCreature</span> <span class="o">==</span> <span class="nb">nil</span> <span class="p">{</span>
+    <span class="n">print</span><span class="p">(</span><span class="s">&quot;NG&quot;</span><span class="p">)</span> <span class="cm">/* hoge=&quot;&quot; の時 */</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">print</span><span class="p">(</span><span class="s">&quot;OK&quot;</span><span class="p">)</span> <span class="cm">/* hoge=&quot;任意の文字列&quot; の時 */</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>次に，クラスの場合．</p>
+<div class="highlight"><pre><code class="language-swift" data-lang="swift"><span class="k">class</span> <span class="n">Product</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nl">name</span><span class="p">:</span> <span class="n">String</span><span class="o">!</span>
+    <span class="k">init</span><span class="o">?</span><span class="p">(</span><span class="nl">name</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">self</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">if</span> <span class="n">name</span><span class="p">.</span><span class="n">isEmpty</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">nil</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">let</span> <span class="nl">hoge</span><span class="p">:</span> <span class="n">String</span> <span class="o">=</span> <span class="cm">/* ここに任意の値 */</span>
+<span class="k">if</span> <span class="k">let</span> <span class="n">bowTie</span> <span class="o">=</span> <span class="n">Product</span><span class="p">(</span><span class="nl">name</span><span class="p">:</span> <span class="n">hoge</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">print</span><span class="p">(</span><span class="s">&quot;The product&#39;s name is \(bowTie.name)&quot;</span><span class="p">)</span> <span class="cm">/* hoge=&quot;任意の文字列&quot; の時．The product&#39;s name is &lt;任意の文字列&gt; */</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">print</span><span class="p">(</span><span class="s">&quot;NG&quot;</span><span class="p">)</span> <span class="cm">/* hoge=&quot;&quot; の時 */</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>公式ドキュメント曰く，stored property である name は <code>String!</code> として宣言する．すると，デフォルト値として <code>nil</code> が格納されるが，初期化成功時には，stored property が nil かどうかを気にせずにアクセスしたい．(stored property に対する nil チェックが必要ないようにしたい)ので，クラスでは全ての stored property を初期化してから return nil する必要があるそうだ．<br>
+でも，コンストラクタの返り値が nil であったならどちらにしろプロパティにアクセスはしないわけで，なぜ全プロパティを初期化してから nil を返す必要があるのか，いまいちわからなかった．</p>
+
+<h2>参考</h2>
+
+<p><a href="https://developer.apple.com/swift/blog/?id=17">Failable Initializers - Swift Blog - Apple Developer</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[iOSアプリ開発時の個人的に好みなディレクトリ構成とか Xib ファイルの使い方とか]]></title>

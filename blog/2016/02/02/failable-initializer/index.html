@@ -1,0 +1,423 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>クラスにおける Failable Initializerについて - tasuwo blog</title>
+  <meta name="author" content="tasuwo">
+
+  
+  <meta name="description" content="Swift で，構造体やenum，クラスにおいて，初期化が失敗しうるコンストラクタを利用したい時には，Failable Initializer を利用すれば良いらしいのだが，これをクラスで利用しようとしたらハマったのでメモ． Failable Initializer とは 初期化に失敗したことを， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tasuwo.github.io/blog/2016/02/02/failable-initializer">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="tasuwo blog" type="application/atom+xml">
+  <link href="/stylesheets/data-table.css" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-60860415-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">tasuwo blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:tasuwo.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">クラスにおける Failable Initializerについて</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-02-02T13:58:13+09:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>1:58 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tasuwo.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Swift で，構造体やenum，クラスにおいて，初期化が失敗しうるコンストラクタを利用したい時には，<em>Failable Initializer</em> を利用すれば良いらしいのだが，これをクラスで利用しようとしたらハマったのでメモ．</p>
+
+<!-- more -->
+
+<h2>Failable Initializer とは</h2>
+
+<p>初期化に失敗したことを，<code>nil</code> を返すことで伝えることのできるイニシャライザ．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">struct</span> <span class="n">Animal</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">let</span> <span class="nl">species</span><span class="p">:</span> <span class="n">String</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// failable initializer</span>
+</span><span class='line'>    <span class="c1">// init の末尾に ? を付加する</span>
+</span><span class='line'>    <span class="k">init</span><span class="o">?</span><span class="p">(</span><span class="nl">species</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="n">species</span><span class="p">.</span><span class="n">isEmpty</span> <span class="p">{</span>
+</span><span class='line'>            <span class="c1">// 初期化失敗の場合には nil を返す</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nb">nil</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="nb">self</span><span class="p">.</span><span class="n">species</span> <span class="o">=</span> <span class="n">species</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>これで，初期化がうまくいかなかった場合には，<code>nil</code> が返される．</p>
+
+<h2>ハマったこと</h2>
+
+<p>やろうとしたことは，コンストラクタ内で例外を扱うことで，具体的には以下のような感じ．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">class</span> <span class="n">Hoge</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">private</span> <span class="k">var</span> <span class="nl">foo1</span><span class="p">:</span> <span class="n">Int</span><span class="o">!</span>
+</span><span class='line'>    <span class="n">private</span> <span class="k">var</span> <span class="nl">foo2</span><span class="p">:</span> <span class="n">Int</span><span class="o">!</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">init</span><span class="o">?</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">do</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">foo1</span> <span class="o">=</span> <span class="n">try</span> <span class="cm">/* 例外を投げうる処理 */</span>
+</span><span class='line'>            <span class="n">foo2</span> <span class="o">=</span> <span class="mi">0</span>   <span class="cm">/* 単純な代入 */</span>
+</span><span class='line'>        <span class="p">}</span> <span class="n">catch</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nb">nil</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>ところが，このように記述すると，<code>return nil</code> の位置で以下のようなエラーが発生する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="n">All</span> <span class="n">stored</span> <span class="n">properties</span> <span class="n">of</span> <span class="n">a</span> <span class="k">class</span> <span class="n">instance</span> <span class="n">must</span> <span class="n">be</span> <span class="n">initialized</span> <span class="n">before</span> <span class="n">returning</span> <span class="nb">nil</span> <span class="n">from</span> <span class="n">an</span> <span class="n">initializer</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>同じことでハマった人がいるらしい．</p>
+
+<blockquote>
+<p><a href="http://stackoverflow.com/questions/26495586/best-practice-to-implement-a-failable-initializer-in-swift">All stored properties of a class instance must be initialized before returning nil from an initializer</a></p>
+</blockquote>
+
+<p>結論から言うと，値型である構造体や列挙型ではいかなるタイミングでも初期化を失敗(<code>return nil</code>)できるが，クラスについては，すべての stored property が明示的に初期化された後でなければ初期化を失敗させることができないらしい．</p>
+
+<blockquote>
+<p>A failable initializer for a value type (that is, a structure or enumeration) can trigger an initialization failure at any point within its initializer implementation. In the Animal structure example above, the initializer triggers an initialization failure at the very start of its implementation, before the species property has been set.<br>
+For classes, however, a failable initializer can trigger an initialization failure only after all stored properties introduced by that class have been set to an initial value and any initializer delegation has taken place.<br>
+<a href="https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Initialization.html#//apple_ref/doc/uid/TP40014097-CH18-ID224">The Swift Programming Language (Swift 2.1): Initialization</a></p>
+</blockquote>
+
+<h2>動作を確認してみる</h2>
+
+<p>Playground でサンプルコードを動かして動作を確かめてみる．<br>
+まずは，構造体の場合．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="c1">// 構造体</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">Animal</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">let</span> <span class="nl">species</span><span class="p">:</span> <span class="n">String</span>
+</span><span class='line'>    <span class="k">init</span><span class="o">?</span><span class="p">(</span><span class="nl">species</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="n">species</span><span class="p">.</span><span class="n">isEmpty</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">nil</span> <span class="p">}</span>
+</span><span class='line'>        <span class="nb">self</span><span class="p">.</span><span class="n">species</span> <span class="o">=</span> <span class="n">species</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">let</span> <span class="nl">hoge</span><span class="p">:</span> <span class="n">String</span> <span class="o">=</span> <span class="cm">/* ここに任意の値 */</span>
+</span><span class='line'><span class="k">let</span> <span class="n">anonymousCreature</span> <span class="o">=</span> <span class="n">Animal</span><span class="p">(</span><span class="nl">species</span><span class="p">:</span> <span class="n">hoge</span><span class="p">)</span>
+</span><span class='line'><span class="k">if</span> <span class="n">anonymousCreature</span> <span class="o">==</span> <span class="nb">nil</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">print</span><span class="p">(</span><span class="s">&quot;NG&quot;</span><span class="p">)</span> <span class="cm">/* hoge=&quot;&quot; の時 */</span>
+</span><span class='line'><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">print</span><span class="p">(</span><span class="s">&quot;OK&quot;</span><span class="p">)</span> <span class="cm">/* hoge=&quot;任意の文字列&quot; の時 */</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>次に，クラスの場合．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">class</span> <span class="n">Product</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">let</span> <span class="nl">name</span><span class="p">:</span> <span class="n">String</span><span class="o">!</span>
+</span><span class='line'>    <span class="k">init</span><span class="o">?</span><span class="p">(</span><span class="nl">name</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nb">self</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+</span><span class='line'>        <span class="k">if</span> <span class="n">name</span><span class="p">.</span><span class="n">isEmpty</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">nil</span> <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">let</span> <span class="nl">hoge</span><span class="p">:</span> <span class="n">String</span> <span class="o">=</span> <span class="cm">/* ここに任意の値 */</span>
+</span><span class='line'><span class="k">if</span> <span class="k">let</span> <span class="n">bowTie</span> <span class="o">=</span> <span class="n">Product</span><span class="p">(</span><span class="nl">name</span><span class="p">:</span> <span class="n">hoge</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">print</span><span class="p">(</span><span class="s">&quot;The product&#39;s name is \(bowTie.name)&quot;</span><span class="p">)</span> <span class="cm">/* hoge=&quot;任意の文字列&quot; の時．The product&#39;s name is &lt;任意の文字列&gt; */</span>
+</span><span class='line'><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">print</span><span class="p">(</span><span class="s">&quot;NG&quot;</span><span class="p">)</span> <span class="cm">/* hoge=&quot;&quot; の時 */</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>公式ドキュメント曰く，stored property である name は <code>String!</code> として宣言する．すると，デフォルト値として <code>nil</code> が格納されるが，初期化成功時には，stored property が nil かどうかを気にせずにアクセスしたい．(stored property に対する nil チェックが必要ないようにしたい)ので，クラスでは全ての stored property を初期化してから return nil する必要があるそうだ．<br>
+でも，コンストラクタの返り値が nil であったならどちらにしろプロパティにアクセスはしないわけで，なぜ全プロパティを初期化してから nil を返す必要があるのか，いまいちわからなかった．</p>
+
+<h2>参考</h2>
+
+<p><a href="https://developer.apple.com/swift/blog/?id=17">Failable Initializers - Swift Blog - Apple Developer</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">tasuwo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-02-02T13:58:13+09:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>1:58 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/swift/'>swift</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2016/02/02/failable-initializer/" data-via="" data-counturl="http://tasuwo.github.io/blog/2016/02/02/failable-initializer/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <br />
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/01/10/ios-dev-setting/" title="Previous Post: iOSアプリ開発時の個人的に好みなディレクトリ構成とか xib ファイルの使い方とか">&laquo; iOSアプリ開発時の個人的に好みなディレクトリ構成とか xib ファイルの使い方とか</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h2 id="toc_0">Profile</h2>
+
+  <h3 id="toc_1">ME</h3>
+
+  <ul>
+  <li>情報系の学生</li>
+  <li>プログラミング初心者でMac初心者</li>
+  </ul>
+
+  <h3 id="toc_2">SNS</h3>
+
+  <ul>
+  <li>Twitter: <a href="https://twitter.com/tasuwo_">@tasuwo_</a></li>
+  <li>GiHub: <a href="https://github.com/tasuwo">tasuwo</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/02/02/failable-initializer/">クラスにおける Failable Initializerについて</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/01/10/ios-dev-setting/">iOSアプリ開発時の個人的に好みなディレクトリ構成とか Xib ファイルの使い方とか</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/09/28/cakephp/">cakePHPの導入からIDCFの仮想サーバでの立ち上げまでメモ</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/08/16/xcode-plugin/">Xcode のプラグイン導入についてメモ</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/08/16/title/">Emacs の色表示がおかしかったのでなおした</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - tasuwo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'tasuwoblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tasuwo.github.io/blog/2016/02/02/failable-initializer/';
+        var disqus_url = 'http://tasuwo.github.io/blog/2016/02/02/failable-initializer/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
