@@ -4,7 +4,7 @@
   <title><![CDATA[tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2016-02-14T13:04:38+09:00</updated>
+  <updated>2016-02-14T13:10:08+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -12,6 +12,107 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[El Capitan でブログを更新しようとしたらエラーを吐かれた]]></title>
+    <link href="http://tasuwo.github.io/blog/2016/02/14/fix-octopress/"/>
+    <updated>2016-02-14T13:06:20+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2016/02/14/fix-octopress</id>
+    <content type="html"><![CDATA[<p>Mac OS X El Capitan にしてからブログを更新しようとしたらエラーを吐かれたので，解決方法をメモしておく．</p>
+
+<!-- more -->
+
+<p>octpress でブログを書こうとしたらエラーを吐かれた．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>rake preview
+</span><span class='line'>Starting to watch <span class="nb">source </span>with Jekyll and Compass. Starting Rack on port 4000
+</span><span class='line'>rake aborted!
+</span><span class='line'>Errno::ENOENT: No such file or directory - jekyll
+</span><span class='line'>/Users/Tasuku_Tozawa/Documents/STUDY/blog/octopress/Rakefile:84:in <span class="sb">`</span>spawn<span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">/Users/Tasuku_Tozawa/Documents/STUDY/blog/octopress/Rakefile:84:in `block in &lt;top (requir                                                                                          </span>
+</span><span class='line'><span class="s1">ed)&gt;&#39;</span>
+</span><span class='line'>Tasks: <span class="nv">TOP</span> <span class="o">=</span>&gt; preview
+</span><span class='line'><span class="o">(</span>See full trace by running task with --trace<span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>El Capitan におけるバグらしい．</p>
+
+<p><a href="https://github.com/imathis/octopress/issues/1749">When I upgraded the Mac system, I can&#39;t Preview · Issue #1749 · imathis/octopress</a></p>
+
+<p>ruby のバージョンをあげたいんだけどエラーになる．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>rbenv install 2.2.3
+</span><span class='line'>The following versions contain <span class="sb">`</span>2.2.3<span class="s1">&#39; in the name:</span>
+</span><span class='line'><span class="s1">  rbx-2.2.3</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">See all available versions with `rbenv install --list&#39;</span>.
+</span><span class='line'>
+</span><span class='line'>If the version you need is missing, try upgrading ruby-build:
+</span><span class='line'>
+</span><span class='line'>  brew update <span class="o">&amp;&amp;</span> brew upgrade ruby-build
+</span></code></pre></td></tr></table></div></figure>
+
+<p><a href="http://qiita.com/ngtk/items/cc85c0d916ac4bcc2188">rbenvでインストールできるバージョンリストを最新にする - Qiita</a></p>
+
+<p><code>brew update &amp;&amp; brew upgrade ruby-build</code> したら，インストールできた．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>rbenv install 2.2.3
+</span><span class='line'>Downloading ruby-2.2.3.tar.bz2...
+</span><span class='line'>-&gt; https://cache.ruby-lang.org/pub/ruby/2.2/ruby-2.2.3.tar.bz2
+</span><span class='line'>Installing ruby-2.2.3...
+</span><span class='line'>Installed ruby-2.2.3 to /Users/Tasuku_Tozawa/.rbenv/versions/2.2.3
+</span></code></pre></td></tr></table></div></figure>
+
+<p>その後，octopress の root ディレクトリで以下を実行．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>rbenv <span class="nb">local </span>2.2.3
+</span><span class='line'><span class="nv">$ </span>gem install bundler
+</span><span class='line'><span class="nv">$ </span>rbenv rehash
+</span><span class='line'><span class="nv">$ </span>bundle install
+</span></code></pre></td></tr></table></div></figure>
+
+<p>無事実行できた．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>rake preview                                                                              56<span class="p">|</span>
+</span><span class='line'>Starting to watch <span class="nb">source </span>with Jekyll and Compass. Starting Rack on port <span class="m">4000</span>                57<span class="p">|</span> <span class="sb">```</span> bash
+</span><span class='line'><span class="o">[</span>2016-02-14 12:50:40<span class="o">]</span> INFO  WEBrick 1.3.1                                                   58<span class="p">|</span>
+</span><span class='line'><span class="o">[</span>2016-02-14 12:50:40<span class="o">]</span> INFO  ruby 2.2.3 <span class="o">(</span>2015-08-18<span class="o">)</span> <span class="o">[</span>x86_64-darwin15<span class="o">]</span>                       59<span class="p">|</span> <span class="sb">```</span>
+</span><span class='line'><span class="o">[</span>2016-02-14 12:50:40<span class="o">]</span> INFO  WEBrick::HTTPServer#start: <span class="nv">pid</span><span class="o">=</span><span class="m">80458</span> <span class="nv">port</span><span class="o">=</span>4000
+</span></code></pre></td></tr></table></div></figure>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[クラスにおける Failable Initializerについて]]></title>
@@ -3318,196 +3419,6 @@ Gitはローカルでの操作だけでなく，リモートリポジトリか�
 <td>hoge &lt;<em>file</em>&gt;&#8230; ：<code>hoge file1 file2 file3</code>と使用できる</td>
 </tr>
 </tbody></table>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[OctopressのCSSをいじる]]></title>
-    <link href="http://tasuwo.github.io/blog/2015/03/17/title01/"/>
-    <updated>2015-03-17T15:01:37+09:00</updated>
-    <id>http://tasuwo.github.io/blog/2015/03/17/title01</id>
-    <content type="html"><![CDATA[<p>やったこと．</p>
-
-<ol>
-<li>CSSを変更</li>
-<li>テーブル表記を修正・変更</li>
-</ol>
-
-<!-- more -->
-
-<h1>1. やったこと</h1>
-
-<h2>1.1 CSSを変更</h2>
-
-<p><code>sass/custom/_styles.scss</code>の末尾に追記すれば反映される．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="o">//</span> <span class="err">追記</span>
-</span><span class='line'><span class="nt">h1</span><span class="nc">.entry-title</span> <span class="nt">a</span> <span class="p">{</span> <span class="k">font-size</span><span class="o">:</span> <span class="m">0.8em</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'><span class="nt">h1</span> <span class="p">{</span> <span class="k">font-size</span><span class="o">:</span> <span class="m">1.6em</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'><span class="nt">h2</span> <span class="p">{</span> <span class="k">font-size</span><span class="o">:</span> <span class="m">1.3em</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'><span class="nt">h3</span> <span class="p">{</span> <span class="k">font-size</span><span class="o">:</span> <span class="m">1em</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'><span class="nt">h4</span> <span class="p">{</span> <span class="k">font-size</span><span class="o">:</span> <span class="m">0.9em</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">ul</span><span class="p">{</span><span class="k">margin</span><span class="o">:</span><span class="m">1em</span> <span class="m">0</span> <span class="m">1em</span> <span class="m">2em</span><span class="p">;}</span>
-</span><span class='line'><span class="nt">ol</span><span class="p">{</span><span class="k">margin</span><span class="o">:</span><span class="m">1em</span> <span class="m">0</span> <span class="m">1em</span> <span class="m">2em</span><span class="p">;}</span>
-</span><span class='line'><span class="nt">ul</span> <span class="nt">li</span><span class="o">,</span><span class="nt">ol</span> <span class="nt">li</span><span class="p">{</span><span class="k">margin-top</span><span class="o">:.</span><span class="m">5em</span><span class="p">;</span><span class="k">margin-bottom</span><span class="o">:.</span><span class="m">5em</span><span class="p">;}</span>
-</span><span class='line'><span class="nt">ul</span> <span class="nt">ul</span><span class="o">,</span><span class="nt">ul</span> <span class="nt">ol</span><span class="o">,</span><span class="nt">ol</span> <span class="nt">ol</span><span class="o">,</span><span class="nt">ol</span> <span class="nt">ul</span><span class="p">{</span><span class="k">margin-top</span><span class="o">:</span><span class="m">0</span><span class="p">;</span><span class="k">margin-bottom</span><span class="o">:</span><span class="m">0</span><span class="p">;}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<blockquote>
-<p><a href="http://blog.textfile.org/20140920/font/">Octopressでフォントサイズを変える&lt;</a></p>
-</blockquote>
-
-<h2>1.2 テーブル表記を修正・変更</h2>
-
-<p>テーブルがちゃんと表示されていないことに気づく．extensionが足りなかったらしい．<code>config.yml</code>を以下のように編集．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='basic'><span class='line'><span class="err">#</span><span class="w"> </span><span class="vg">markdown</span>
-</span><span class='line'><span class="nl">markdown:</span><span class="w"> </span><span class="vg">redcarpet</span>
-</span><span class='line'><span class="nl">redcarpet:</span>
-</span><span class='line'><span class="w">  </span><span class="nl">extensions:</span><span class="w"> </span><span class="p">[</span>
-</span><span class='line'><span class="w">      </span><span class="s2">&quot;hard_wrap&quot;</span><span class="p">,</span>
-</span><span class='line'><span class="w">      </span><span class="s2">&quot;no_intra_emphasis&quot;</span><span class="p">,</span>
-</span><span class='line'><span class="w">      </span><span class="s2">&quot;fenced_code_blocks&quot;</span><span class="p">,</span>
-</span><span class='line'><span class="w">      </span><span class="s2">&quot;autolink&quot;</span><span class="p">,</span>
-</span><span class='line'><span class="w">      </span><span class="s2">&quot;tables&quot;</span><span class="p">,</span>
-</span><span class='line'><span class="w">      </span><span class="s2">&quot;footnotes&quot;</span><span class="p">,</span>
-</span><span class='line'><span class="w">      </span><span class="s2">&quot;strikethrough&quot;</span><span class="p">,</span>
-</span><span class='line'><span class="w">      </span><span class="s2">&quot;lax_html_blocks&quot;</span>
-</span><span class='line'><span class="w">      </span><span class="p">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<p>ついでに，テーブルをいい感じのレイアウトに変更する．以下のような<code>source/stylesheets/data-table.css</code>を追加．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">border-style</span><span class="o">:</span><span class="k">solid</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">border-width</span><span class="o">:</span><span class="m">1px</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">border-color</span><span class="o">:</span><span class="m">#e7e3e7</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">margin</span><span class="o">:</span> <span class="m">10px</span> <span class="m">0</span> <span class="m">30px</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">th</span><span class="o">,</span> <span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">td</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">border-style</span><span class="o">:</span><span class="k">dashed</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">border-width</span><span class="o">:</span><span class="m">1px</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">border-color</span><span class="o">:</span><span class="m">#e7e3e7</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">th</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">border-style</span><span class="o">:</span><span class="k">solid</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">font-weight</span><span class="o">:</span><span class="k">bold</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">background</span><span class="o">:</span> <span class="sx">url(&quot;/images/noise.png?1330434582&quot;)</span> <span class="k">repeat</span> <span class="k">scroll</span> <span class="k">left</span> <span class="k">top</span> <span class="m">#F7F3F7</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">padding</span><span class="o">:</span> <span class="m">2px</span> <span class="m">9px</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">td</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">padding</span><span class="o">:</span> <span class="m">2px</span> <span class="m">9px</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">th</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="o">],</span> <span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">td</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="o">]</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">text-align</span><span class="o">:</span><span class="k">left</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">th</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="o">],</span> <span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">td</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="o">]</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">text-align</span><span class="o">:</span><span class="k">right</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">th</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="o">],</span> <span class="o">*</span> <span class="o">+</span> <span class="nt">table</span> <span class="nt">td</span><span class="o">[</span><span class="nt">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="o">]</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">text-align</span><span class="o">:</span><span class="k">center</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">tr</span><span class="nd">:nth-child</span><span class="o">(</span><span class="nt">even</span><span class="o">)</span><span class="p">{</span>
-</span><span class='line'>    <span class="k">background</span><span class="o">:</span> <span class="sx">url(&quot;/images/noise.png?1330434582&quot;)</span> <span class="k">repeat</span> <span class="k">scroll</span> <span class="k">left</span> <span class="k">top</span> <span class="m">#F7F3F7</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<p><code>source/_includes/head.html</code>に以下を追記して反映させる．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;link</span> <span class="na">href=</span><span class="s">&quot;/stylesheets/data-table.css&quot;</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">type=</span><span class="s">&quot;text/css&quot;</span><span class="nt">&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<blockquote>
-<p><a href="http://whiskers.nukos.kitchen/2014/08/02/markdown.html">Redcarpetを使ったmarkdown記法サンプル</a><br>
-<a href="http://morizyun.github.io/blog/octopress-table-tag-css/">Octopressでテーブルをmarkdownで編集できるようにする</a></p>
-</blockquote>
-
-<h1>2. 関連知識</h1>
-
-<p>CSSを修正するときに参考になりそうなサイトをメモ．</p>
-
-<blockquote>
-<p><a href="http://tokkonopapa.github.io/blog/2012/01/03/customizing-octopress-styles/">Octopressのスタイル設定とカスタマイズ</a></p>
-</blockquote>
-
-<h1>3. 雑記</h1>
-
-<p>前回の記事でプレビューを表示できるように四苦八苦していたけど，<code>rake preview</code>しながらファイル内容を変更しても動的に編集結果が反映されることに気づいた．これは便利だ．<br>
-ただし，動的に変更を反映しているため，一度プレビューを終了すると次回プレビュー/デプロイ時に変更は反映されない．<code>rake generate</code>してから各操作を行うこと．</p>
-
-<p>ブログが少し見やすくなった気がする．ひとまずemacsとブログに関する諸々はこれでOKかな．</p>
 ]]></content>
   </entry>
   
