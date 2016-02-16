@@ -5,11 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Palletを導入した - tasuwo blog</title>
+  <title>OS X でターミナルをきれいにする - tasuwo blog</title>
   <meta name="author" content="tasuwo">
 
   
-  <meta name="description" content="EmacsにPalletを導入しました． Cask + Pallet に移行した，みたいな話はよく聞いていたけど，cask はわかるが Pallet のうまみがわからなかったのでインストールしていなかった． rdallasgray/pallet 1. Pallet の目的と利点 Pallet &hellip;">
+  <meta name="description" content="ターミナルをきれいにする手順をメモってなかったなぁと思ったのでメモっておく．
+本当に，単純に見た目を変えるだけ． ターミナルをきれいにします．やることは， コマンドラインの表示形式をきれいにする
+色をきれいにする テーマを手軽に導入するために Antigen を導入したいので，それに伴って zsh &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +20,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://tasuwo.github.io/blog/2015/03/21/pallet">
+  <link rel="canonical" href="http://tasuwo.github.io/blog/2016/02/16/zsh-setting">
   <link href="/favicon.ico" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="tasuwo blog" type="application/atom+xml">
@@ -79,7 +81,7 @@
   
   <header>
     
-      <h1 class="entry-title">Palletを導入した</h1>
+      <h1 class="entry-title">OS X でターミナルをきれいにする</h1>
     
     
       <p class="meta">
@@ -88,7 +90,7 @@
 
 
 
-<time class='entry-date' datetime='2015-03-21T22:37:06+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>10:37 pm</span></time>
+<time class='entry-date' datetime='2016-02-16T11:20:22+09:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>11:20 am</span></time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://tasuwo.github.io">Comments</a>
@@ -98,71 +100,47 @@
   </header>
 
 
-<div class="entry-content"><p>EmacsにPalletを導入しました．</p>
+<div class="entry-content"><p>ターミナルをきれいにする手順をメモってなかったなぁと思ったのでメモっておく．<br>
+本当に，単純に見た目を変えるだけ．</p>
 
 <!-- more -->
 
-<p>Cask + Pallet に移行した，みたいな話はよく聞いていたけど，cask はわかるが Pallet のうまみがわからなかったのでインストールしていなかった．</p>
-
-<blockquote>
-<p><a href="https://github.com/rdallasgray/pallet">rdallasgray/pallet</a></p>
-</blockquote>
-
-<h2>1. Pallet の目的と利点</h2>
-
-<p>Pallet の主目的は，Emacs備え付けのパッケージ管理システムを用いたパッケージのインストール，アンインストールにあわせて，Cask ファイルの記述を追加・削除すること．<br>
-すなわち，<code>M-x package-install</code>などを用いても自動で同期をとってくれるので，パッケージのインストール/アンインストールと Cask ファイルの記述内容との生合成について気を使わなくてよくなる．</p>
-
-<h2>2. 導入</h2>
-
-<p>Cask ファイルに以下を記述</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nv">source</span> <span class="nv">melpa</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;cask&quot;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<p>インストール</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>cask
-</span></code></pre></td></tr></table></div></figure>
-
-<p>設定ファイル内に<code>(pallet-mode t)</code>を記述，もしくは<code>pallet-mode</code>を呼び出す(<code>M-x pallet-mode</code>)ことにより使用できる．<br>
-例えば，<code>init.el</code>に以下のように記述する．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;pallet</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="nv">pallet-mode</span> <span class="no">t</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-<h2>3. 使い方</h2>
+<p>ターミナルをきれいにします．やることは，</p>
 
 <ul>
-<li><p><code>M-x pallet-init</code></p>
-
-<ul>
-<li><code>package.el</code>によってインストールされたパッケージを元に Cask ファイル生成</li>
-</ul></li>
-<li><p><code>M-x pallet-install</code></p>
-
-<ul>
-<li>Cask ファイルに記述されたパッケージをインストール</li>
-</ul></li>
-<li><p><code>M-x pallet-update</code></p>
-
-<ul>
-<li>インストールされたパッケージの更新</li>
-</ul></li>
+<li>コマンドラインの表示形式をきれいにする</li>
+<li>色をきれいにする</li>
 </ul>
 
-<h2>4. おまけ</h2>
+<p>テーマを手軽に導入するために Antigen を導入したいので，それに伴って zsh を導入します．</p>
 
-<p>Cask の記述を Pallet に無視させたい場合は以下のように記述する</p>
+<h2>zsh</h2>
+
+<p>Homebrew で導入する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew install zsh
+</span></code></pre></td></tr></table></div></figure>
+
+<p>bash で設定していたパスを zsh でも有効になるようにお引越し．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>cp ~/.bash_profile ~/.zprofile
+</span></code></pre></td></tr></table></div></figure>
+
+<p>ターミナルの環境設定から、<code>一般</code> &gt; <code>開くシェル</code> &gt; <code>コマンド</code> に <code>/usr/local/bin/zsh</code> を設定すればおk．</p>
+
+<h2>Antigen</h2>
+
+<p>プラグイン管理ツールの <a href="https://github.com/zsh-users/antigen">Antigen</a> を導入する．<code>antigen theme テーマ名</code> で，oh-my-zsh で提供されているテーマなら手軽に導入できるので便利．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span><span class="nb">cd</span>
+</span><span class='line'><span class="nv">$ </span>git clone https://github.com/zsh-users/antigen.git
+</span></code></pre></td></tr></table></div></figure>
+
+<p><code>.zshrc</code> に以下を記述</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -171,20 +149,44 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='lisp'><span class='line'><span class="p">(</span><span class="nv">source</span> <span class="nv">melpa</span><span class="p">)</span>
-</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;s&quot;</span><span class="p">)</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">source</span> ~/antigen/antigen.zsh
 </span><span class='line'>
-</span><span class='line'><span class="c1">;;;pallet-ignore</span>
-</span><span class='line'><span class="c1">;;;これ以降が無視される</span>
-</span><span class='line'><span class="p">(</span><span class="nv">depends-on</span> <span class="s">&quot;newlisp&quot;</span> <span class="ss">:git</span>
-</span><span class='line'><span class="s">&quot;https://github.com/coldnew/newlisp-mode.git&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="c"># Load the oh-my-zsh&#39;s library.</span>
+</span><span class='line'>antigen use oh-my-zsh
+</span><span class='line'>
+</span><span class='line'><span class="c"># Syntax highlighting bundle.</span>
+</span><span class='line'>antigen bundle zsh-users/zsh-syntax-highlighting
+</span><span class='line'>
+</span><span class='line'><span class="c"># Load the theme.</span>
+</span><span class='line'>antigen theme https://github.com/denysdovhan/spaceship-zsh-theme spaceship
+</span><span class='line'>
+</span><span class='line'><span class="c"># Tell antigen that you&#39;re done.</span>
+</span><span class='line'>antigen apply
 </span></code></pre></td></tr></table></div></figure>
 
-<h2>5. 参考</h2>
+<p>テーマは <a href="https://github.com/denysdovhan/spaceship-zsh-theme">denysdovhan/spaceship-zsh-theme</a> にした．</p>
 
-<blockquote>
-<p><a href="http://gongo.hatenablog.com/entry/2014/05/09/230836">Emacs のパッケージ管理を package.el + el-get から Cask + pallet に乗り換えました</a></p>
-</blockquote>
+<h2>Color theme</h2>
+
+<p>tommorow theme に幾つかカラーテーマがまとめられている．</p>
+
+<p><a href="https://github.com/chriskempson/tomorrow-theme">chriskempson/tomorrow-theme: Tomorrow Theme the precursor to Base16 Theme</a></p>
+
+<p>適当なフォルダに clone する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git clone https://github.com/chriskempson/tomorrow-theme.git
+</span></code></pre></td></tr></table></div></figure>
+
+<p>ターミナルの設定 &gt; 一般 を選択．カラーテーマ群が表示されているリストの下部に歯車マークがあるので、そこから「読み込む&#8230;」を選択する．その後，clone した tomorrow-theme/OS X Terminal/ 以下から好きなテーマを読み込む．すると，リストにテーマが追加されるので，テーマを選択した状態でリスト下部の「デフォルト」を選択すれば良い．</p>
+
+<p>おしまい．</p>
 </div>
 
 
@@ -200,12 +202,12 @@
 
 
 
-<time class='entry-date' datetime='2015-03-21T22:37:06+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>10:37 pm</span></time>
+<time class='entry-date' datetime='2016-02-16T11:20:22+09:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>11:20 am</span></time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/emacs/'>emacs</a>
+    <a class='category' href='/blog/categories/terminal/'>terminal</a>, <a class='category' href='/blog/categories/zsh/'>zsh</a>
   
 </span>
 
@@ -214,7 +216,7 @@
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2015/03/21/pallet/" data-via="" data-counturl="http://tasuwo.github.io/blog/2015/03/21/pallet/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2016/02/16/zsh-setting/" data-via="" data-counturl="http://tasuwo.github.io/blog/2016/02/16/zsh-setting/" >Tweet</a>
   
   
   
@@ -224,10 +226,8 @@
     <br />
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2015/03/19/harib-git/" title="Previous Post: 自作OSの途中経過(8/30)">&laquo; 自作OSの途中経過(8/30)</a>
+        <a class="basic-alignment left" href="/blog/2016/02/16/brew-open-cv/" title="Previous Post: OpenCV を Homebrew から導入し直して Xcode に設定し直した">&laquo; OpenCV を Homebrew から導入し直して Xcode に設定し直した</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2015/03/24/land-of-lisp/" title="Next Post: Lispメモ">Lispメモ &raquo;</a>
       
     </p>
   </footer>
@@ -310,8 +310,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://tasuwo.github.io/blog/2015/03/21/pallet/';
-        var disqus_url = 'http://tasuwo.github.io/blog/2015/03/21/pallet/';
+        var disqus_identifier = 'http://tasuwo.github.io/blog/2016/02/16/zsh-setting/';
+        var disqus_url = 'http://tasuwo.github.io/blog/2016/02/16/zsh-setting/';
         var disqus_script = 'embed.js';
       
     (function () {

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Terminal | tasuwo blog]]></title>
-  <link href="http://tasuwo.github.io/blog/categories/terminal/atom.xml" rel="self"/>
+  <title><![CDATA[Category: Zsh | tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/blog/categories/zsh/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
   <updated>2016-02-16T11:34:46+09:00</updated>
   <id>http://tasuwo.github.io/</id>
@@ -77,52 +77,6 @@ antigen apply
 <p>ターミナルの設定 &gt; 一般 を選択．カラーテーマ群が表示されているリストの下部に歯車マークがあるので、そこから「読み込む&#8230;」を選択する．その後，clone した tomorrow-theme/OS X Terminal/ 以下から好きなテーマを読み込む．すると，リストにテーマが追加されるので，テーマを選択した状態でリスト下部の「デフォルト」を選択すれば良い．</p>
 
 <p>おしまい．</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Emacs の色表示がおかしかったのでなおした]]></title>
-    <link href="http://tasuwo.github.io/blog/2015/08/16/title/"/>
-    <updated>2015-08-16T15:25:56+09:00</updated>
-    <id>http://tasuwo.github.io/blog/2015/08/16/title</id>
-    <content type="html"><![CDATA[<p>結論から言うと，悪いのは emacs ではなく， screen が 256 色表示に対応していなかったせいだった．</p>
-
-<!-- more -->
-
-<p>256色表示できているか確かめる(参考サイト参照)</p>
-
-<ul>
-<li>ターミナル上</li>
-</ul>
-
-<p><img src="/images/terminal_color.png" alt="terminal_color"></p>
-
-<ul>
-<li>screen上</li>
-</ul>
-
-<p><img src="/images/screen_color.png" alt="screen_color"></p>
-
-<p>screen のバージョン確認</p>
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>screen -v
-Screen version 4.00.03 <span class="o">(</span>FAU<span class="o">)</span> 23-Oct-06
-</code></pre></div>
-<p>homebrew で最新版を導入する</p>
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>brew tap homebrew/dupes
-<span class="nv">$ </span>brew install screen
-...
-<span class="nv">$ </span>screen -v
-Screen version 4.03.00 <span class="o">(</span>GNU<span class="o">)</span> 27-May-15
-</code></pre></div>
-<p>これでおk．</p>
-
-<h2>参考</h2>
-
-<blockquote>
-<p><a href="http://qiita.com/trapple/items/8ad1b0a7c4fa5b8341b0">OSXに256color対応Screenをインストールする - Qiita</a><br>
-<a href="http://kiyotakagoto.hatenablog.com/entry/2013/02/17/210834">Mac OS X + iTerm2 + tmux + emacs で256色表示 - 人生ずっと勉強</a><br>
-<a href="http://qiita.com/sesame/items/e752b53ebf478d0d081f">emacsclientを使用するとテーマのmode-lineが効かない - Qiita</a></p>
-</blockquote>
 ]]></content>
   </entry>
   
