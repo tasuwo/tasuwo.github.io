@@ -1,0 +1,348 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>OpenCV を Homebrew から導入し直して Xcode に設定し直した - tasuwo blog</title>
+  <meta name="author" content="tasuwo">
+
+  
+  <meta name="description" content="既に OpenCV を導入し Xcode から利用していたが、Homebrew で設定しなおす機会があったので、やったことをメモしておく。こうしたらできた！というメモなので、コマンド実行等は自己責任でお願いします。 環境は以下です． Max OS X 10.10.1 Yosemite
+Xcode &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tasuwo.github.io/blog/2016/02/16/brew-open-cv">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="tasuwo blog" type="application/atom+xml">
+  <link href="/stylesheets/data-table.css" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-60860415-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">tasuwo blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:tasuwo.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">OpenCV を Homebrew から導入し直して Xcode に設定し直した</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-02-16T10:19:02+09:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:19 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tasuwo.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>既に OpenCV を導入し Xcode から利用していたが、Homebrew で設定しなおす機会があったので、やったことをメモしておく。こうしたらできた！というメモなので、コマンド実行等は自己責任でお願いします。</p>
+
+<!-- more -->
+
+<p>環境は以下です．</p>
+
+<ul>
+<li>Max OS X 10.10.1 Yosemite</li>
+<li>Xcode 6.1.1</li>
+<li>OpenCV 2.4.12</li>
+</ul>
+
+<h2>導入</h2>
+
+<p>事前に <code>brew doctor</code> を解決しておくと良いかも。問題がなければ、opencv を導入する。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew tap homebrew/science
+</span><span class='line'><span class="nv">$ </span>brew install opencv
+</span></code></pre></td></tr></table></div></figure>
+
+<p>既に OpenCV を導入している場合、過去のファイル群は邪魔なので撤去しなくてはならない。<code>brew doctor</code> 時点で影響を及ぼしそうなファイルはリストアップされるので、それらを削除するなりバックアップをとるなりしてから、シンボリックリンクを貼ると良いかも。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew link opencv
+</span></code></pre></td></tr></table></div></figure>
+
+<p><code>--force</code> オプションをつけてね〜的な warning が出るかもしれない。その場合は付加すれば実行できる。ただし、既存の OpenCV のシンボリックリンクを上書きすることになるので、注意。</p>
+
+<h2>Xcode で使う</h2>
+
+<p>Homebrew で導入した OpenCV の場所は <code>/usr/local/Cellar/opencv</code> となる。Xcode から利用する場合は、適切な場所を参照するように設定を行う必要がある。以下、パス内のバージョンに関しては適宜置き換えること(今回の場合は2.4.12_2)。</p>
+
+<h3>ヘッダー及びライブラリの Search Paths</h3>
+
+<ul>
+<li><code>Build Settings</code> &gt; <code>Header Search Paths</code>
+
+<ul>
+<li><code>/usr/local/Cellar/opencv/2.4.12_2/include</code></li>
+<li><code>/usr/local/Cellar/opencv</code> にして、recursive に設定すると説明しているサイトがあったが、こちらの方が綺麗に見える</li>
+</ul></li>
+<li><code>Build Settings</code> &gt; <code>Library Search Paths</code>
+
+<ul>
+<li><code>/usr/local/Cellar/opencv/2.4.12_2/lib</code></li>
+</ul></li>
+</ul>
+
+<p>OpenCV 導入済み &amp; Xcode 設定済みだった場合は、既存の設定を削除するか、上記で設定したパスの優先度をあげる(リスト内で上方に移動する)と良いかもしれない。</p>
+
+<h3>ライブラリとのリンク</h3>
+
+<p>OpenCV をすでに導入し、Xcode で設定済みであった場合は、<code>Build Settings</code> &gt; <code>Linking</code> &gt; <code>Other Linker Flags</code> にいろいろ設定されているかもしれないが、全部消す(と、自分の環境ではエラーがなおった)。</p>
+
+<p>Homebrew で導入後にライブラリとのリンクを張るためには <code>Build Phases</code> &gt; <code>Link Binary With Libraries</code> に、<code>/usr/local/Cellar/opencv/2.4.12_2/lib</code> から必要なライブラリを追加する。<code>Shitf + Command + G</code> から <code>/usr/local/Cellar/opencv/2.4.12\_2/lib</code> と入力すれば楽。</p>
+
+<h2>トラブルシューティング</h2>
+
+<h3>Undefined symbols</h3>
+
+<p><code>Undefined symbols for architecture x86_64:</code> みたいなエラーがドバッと出ることがある。</p>
+
+<p><a href="http://stackoverflow.com/questions/24985713/opencv-undefined-symbols-for-architecture-x86-64-error">c++ - OpenCV Undefined symbols for architecture x86_64: error - Stack Overflow</a></p>
+
+<p>OpenCV に必要なライブラリがリンクされていないことによるエラーのため、Link Binary With Libraries で必要なライブラリがリンクされているか確認する。</p>
+
+<h3>dyld: Library not loaded</h3>
+
+<p>Xcode における Build &amp; Run 後に、以下のようなエラーが吐かれた。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>dyld: Library not loaded: /usr/local/opt/libpng16.16.dylib
+</span><span class='line'>  Referenced from: /usr/local/opt/opencv/lib/libopencv_highgui.2.4.dylib
+</span><span class='line'>  Reason: Incompatible library version: libopencv_highgui.2.4.dylib requires version 33.0.0 or later, but libpng16.16.dylib provides version 32.0.0
+</span><span class='line'>Trace/BPT <span class="nb">trap</span>: 5
+</span></code></pre></td></tr></table></div></figure>
+
+<p><code>/usr/local/opt</code> の libpng を読みに行ってるのが悪いのかな？そもそも <code>/usr/local/opt</code> の OpenCV 見に行ってるけどなんでかな？と思っていたが、どうやら試した環境では、 <code>/usr/local/opt</code> 内の libpng、 opencv は Cellar 以下の各ソフトウェアへのシンボリックリンクになってるらしかった。Homebrew がやってくれてるんだっけ？わからん&#8230;</p>
+
+<p>バージョンが低いと言われているので、<code>brew update &amp; brew upgrade</code> したら、とりあえず治ったけど、実際何が原因だったのかはわからなかった&#8230;</p>
+
+<p><a href="http://stackoverflow.com/questions/28124359/error-with-homebrew-opencv-libpng">c++ - Error with homebrew + opencv + libpng - Stack Overflow</a></p>
+
+<h2>その他参考</h2>
+
+<p><a href="http://nantekottai.com/2014/04/16/opencv-xcode5-homebrew/">HomebrewとXcode5でつくるOpenCVの環境 – なんてこったいブログ</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">tasuwo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-02-16T10:19:02+09:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:19 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/homebrew/'>homebrew</a>, <a class='category' href='/blog/categories/opencv/'>opencv</a>, <a class='category' href='/blog/categories/xcode/'>xcode</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2016/02/16/brew-open-cv/" data-via="" data-counturl="http://tasuwo.github.io/blog/2016/02/16/brew-open-cv/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <br />
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/02/14/fix-octopress/" title="Previous Post: El Capitan でブログを更新しようとしたらエラーを吐かれた">&laquo; El Capitan でブログを更新しようとしたらエラーを吐かれた</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h2 id="toc_0">Profile</h2>
+
+  <h3 id="toc_1">ME</h3>
+
+  <ul>
+  <li>情報系の学生</li>
+  <li>プログラミング初心者でMac初心者</li>
+  </ul>
+
+  <h3 id="toc_2">SNS</h3>
+
+  <ul>
+  <li>Twitter: <a href="https://twitter.com/tasuwo_">@tasuwo_</a></li>
+  <li>GiHub: <a href="https://github.com/tasuwo">tasuwo</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/02/16/brew-open-cv/">OpenCV を Homebrew から導入し直して Xcode に設定し直した</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/02/14/fix-octopress/">El Capitan でブログを更新しようとしたらエラーを吐かれた</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/02/02/failable-initializer/">クラスにおける Failable Initializerについて</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/01/10/ios-dev-setting/">iOSアプリ開発時の個人的に好みなディレクトリ構成とか Xib ファイルの使い方とか</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/09/28/cakephp/">cakePHPの導入からIDCFの仮想サーバでの立ち上げまでメモ</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - tasuwo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'tasuwoblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tasuwo.github.io/blog/2016/02/16/brew-open-cv/';
+        var disqus_url = 'http://tasuwo.github.io/blog/2016/02/16/brew-open-cv/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

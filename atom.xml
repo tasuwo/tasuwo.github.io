@@ -4,7 +4,7 @@
   <title><![CDATA[tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2016-02-14T13:10:08+09:00</updated>
+  <updated>2016-02-16T10:35:07+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -12,6 +12,105 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[OpenCV を Homebrew から導入し直して Xcode に設定し直した]]></title>
+    <link href="http://tasuwo.github.io/blog/2016/02/16/brew-open-cv/"/>
+    <updated>2016-02-16T10:19:02+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2016/02/16/brew-open-cv</id>
+    <content type="html"><![CDATA[<p>既に OpenCV を導入し Xcode から利用していたが、Homebrew で設定しなおす機会があったので、やったことをメモしておく。こうしたらできた！というメモなので、コマンド実行等は自己責任でお願いします。</p>
+
+<!-- more -->
+
+<p>環境は以下です．</p>
+
+<ul>
+<li>Max OS X 10.10.1 Yosemite</li>
+<li>Xcode 6.1.1</li>
+<li>OpenCV 2.4.12</li>
+</ul>
+
+<h2>導入</h2>
+
+<p>事前に <code>brew doctor</code> を解決しておくと良いかも。問題がなければ、opencv を導入する。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew tap homebrew/science
+</span><span class='line'><span class="nv">$ </span>brew install opencv
+</span></code></pre></td></tr></table></div></figure>
+
+<p>既に OpenCV を導入している場合、過去のファイル群は邪魔なので撤去しなくてはならない。<code>brew doctor</code> 時点で影響を及ぼしそうなファイルはリストアップされるので、それらを削除するなりバックアップをとるなりしてから、シンボリックリンクを貼ると良いかも。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew link opencv
+</span></code></pre></td></tr></table></div></figure>
+
+<p><code>--force</code> オプションをつけてね〜的な warning が出るかもしれない。その場合は付加すれば実行できる。ただし、既存の OpenCV のシンボリックリンクを上書きすることになるので、注意。</p>
+
+<h2>Xcode で使う</h2>
+
+<p>Homebrew で導入した OpenCV の場所は <code>/usr/local/Cellar/opencv</code> となる。Xcode から利用する場合は、適切な場所を参照するように設定を行う必要がある。以下、パス内のバージョンに関しては適宜置き換えること(今回の場合は2.4.12_2)。</p>
+
+<h3>ヘッダー及びライブラリの Search Paths</h3>
+
+<ul>
+<li><code>Build Settings</code> &gt; <code>Header Search Paths</code>
+
+<ul>
+<li><code>/usr/local/Cellar/opencv/2.4.12_2/include</code></li>
+<li><code>/usr/local/Cellar/opencv</code> にして、recursive に設定すると説明しているサイトがあったが、こちらの方が綺麗に見える</li>
+</ul></li>
+<li><code>Build Settings</code> &gt; <code>Library Search Paths</code>
+
+<ul>
+<li><code>/usr/local/Cellar/opencv/2.4.12_2/lib</code></li>
+</ul></li>
+</ul>
+
+<p>OpenCV 導入済み &amp; Xcode 設定済みだった場合は、既存の設定を削除するか、上記で設定したパスの優先度をあげる(リスト内で上方に移動する)と良いかもしれない。</p>
+
+<h3>ライブラリとのリンク</h3>
+
+<p>OpenCV をすでに導入し、Xcode で設定済みであった場合は、<code>Build Settings</code> &gt; <code>Linking</code> &gt; <code>Other Linker Flags</code> にいろいろ設定されているかもしれないが、全部消す(と、自分の環境ではエラーがなおった)。</p>
+
+<p>Homebrew で導入後にライブラリとのリンクを張るためには <code>Build Phases</code> &gt; <code>Link Binary With Libraries</code> に、<code>/usr/local/Cellar/opencv/2.4.12_2/lib</code> から必要なライブラリを追加する。<code>Shitf + Command + G</code> から <code>/usr/local/Cellar/opencv/2.4.12\_2/lib</code> と入力すれば楽。</p>
+
+<h2>トラブルシューティング</h2>
+
+<h3>Undefined symbols</h3>
+
+<p><code>Undefined symbols for architecture x86_64:</code> みたいなエラーがドバッと出ることがある。</p>
+
+<p><a href="http://stackoverflow.com/questions/24985713/opencv-undefined-symbols-for-architecture-x86-64-error">c++ - OpenCV Undefined symbols for architecture x86_64: error - Stack Overflow</a></p>
+
+<p>OpenCV に必要なライブラリがリンクされていないことによるエラーのため、Link Binary With Libraries で必要なライブラリがリンクされているか確認する。</p>
+
+<h3>dyld: Library not loaded</h3>
+
+<p>Xcode における Build &amp; Run 後に、以下のようなエラーが吐かれた。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>dyld: Library not loaded: /usr/local/opt/libpng16.16.dylib
+</span><span class='line'>  Referenced from: /usr/local/opt/opencv/lib/libopencv_highgui.2.4.dylib
+</span><span class='line'>  Reason: Incompatible library version: libopencv_highgui.2.4.dylib requires version 33.0.0 or later, but libpng16.16.dylib provides version 32.0.0
+</span><span class='line'>Trace/BPT <span class="nb">trap</span>: 5
+</span></code></pre></td></tr></table></div></figure>
+
+<p><code>/usr/local/opt</code> の libpng を読みに行ってるのが悪いのかな？そもそも <code>/usr/local/opt</code> の OpenCV 見に行ってるけどなんでかな？と思っていたが、どうやら試した環境では、 <code>/usr/local/opt</code> 内の libpng、 opencv は Cellar 以下の各ソフトウェアへのシンボリックリンクになってるらしかった。Homebrew がやってくれてるんだっけ？わからん&#8230;</p>
+
+<p>バージョンが低いと言われているので、<code>brew update &amp; brew upgrade</code> したら、とりあえず治ったけど、実際何が原因だったのかはわからなかった&#8230;</p>
+
+<p><a href="http://stackoverflow.com/questions/28124359/error-with-homebrew-opencv-libpng">c++ - Error with homebrew + opencv + libpng - Stack Overflow</a></p>
+
+<h2>その他参考</h2>
+
+<p><a href="http://nantekottai.com/2014/04/16/opencv-xcode5-homebrew/">HomebrewとXcode5でつくるOpenCVの環境 – なんてこったいブログ</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[El Capitan でブログを更新しようとしたらエラーを吐かれた]]></title>
@@ -3318,107 +3417,6 @@ Gitはローカルでの操作だけでなく，リモートリポジトリか�
 <a href="http://qiita.com/usamik26/items/28be7d2c221a7a53c2c3">git push の反対は git pull ではない</a><br>
 <a href="http://qiita.com/osamu1203/items/cb94ef9da02e1ec3e921">git fetchの理解からgit mergeとpullの役割</a></p>
 </blockquote>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[コマンド構文の表記規則についてメモ]]></title>
-    <link href="http://tasuwo.github.io/blog/2015/03/18/biao-ji-gui-ze/"/>
-    <updated>2015-03-18T16:57:24+09:00</updated>
-    <id>http://tasuwo.github.io/blog/2015/03/18/biao-ji-gui-ze</id>
-    <content type="html"><![CDATA[<p>ちょっとしたメモ</p>
-
-<!-- more -->
-
-<p>コマンドの説明の例．</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># これとか</span>
-</span><span class='line'><span class="nv">$ </span>git remote add <span class="o">[</span>shortname<span class="o">]</span> <span class="o">[</span>url<span class="o">]</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># これとか</span>
-</span><span class='line'><span class="nv">$ </span>git add &lt;file&gt;...
-</span></code></pre></td></tr></table></div></figure>
-
-<p>括弧が「[]」と「&lt;&gt;」で異なっている．<br>
-今までイマイチ気にしていなかったので，少し調べてみる．</p>
-
-<p>調べればごろごろ出てくる．</p>
-
-<blockquote>
-<p><a href="http://publib.boulder.ibm.com/tividd/td/TRM/GC32-1320-00/ja_JA/HTML/cmdref18.htm">コマンド構文規則 - IBM</a><br>
-<a href="https://docs.oracle.com/cd/E37520_01/b69426/vmutl-preface-syntax.html">4. コマンド構文</a><br>
-<a href="http://itdoc.hitachi.co.jp/manuals/3020/30203R3331/PCRE0058.HTM">コマンドの記載形式</a><br>
-<a href="http://support.ca.com/cadocs/0/CA%20ARCserve%20%20Backup%20r16-JPN/Bookshelf_Files/HTML/cmndline/index.htm?toc.htm?cl_cmd_line_syntax_char.htm">コマンド ライン構文の文字 - CA ARCserve® Backup for &#8230;</a><br>
-<a href="http://otndnld.oracle.co.jp/document/products/oracleVM/220/generic/B57076-01/preface.htm">表記規則 - 日本オラクル</a></p>
-</blockquote>
-
-<p>ここら辺を見れば意味はわかるんだけど，何が元になってるのか気になってもうちょっとうろうろしてみた．すると以下のような記載を発見．</p>
-
-<blockquote>
-<p>ってかこれって統一文法みたいなのがあるのか？UNIXのmanコマンド表記がベースになってるのかな？<br>
-<a href="http://yakinikunotare.boo.jp/orebase/index.php?%A5%B3%A5%DE%A5%F3%A5%C9%C9%BD%B5%AD%CB%A1">コマンド表記法 - 俺の基地</a></p>
-</blockquote>
-
-<p>UNIXの<code>man</code>コマンドを知らなかったので調べてみる．</p>
-
-<blockquote>
-<p><a href="http://www.cc.kyoto-su.ac.jp/%7Ehirai/text/unixcommand.html">基本的なUNIXコマンド</a><br>
-<a href="http://www.k-tanaka.net/unix/man.php">UNIXコマンド - man (Linux/FreeBSD/Solaris) - k-tanaka.net</a><br>
-<a href="http://ja.wikipedia.org/wiki/Man%E3%83%9A%E3%83%BC%E3%82%B8">manページ - Wikipedia</a></p>
-</blockquote>
-
-<p><code>man</code>コマンドは，UNIXコマンドのマニュアルを表示するコマンドのようだ．その前身ともいえる UNIX Programmer&#39;s Manual は1971年に出版され，その後オンラインのmanページが1971年に執筆された．そのレイアウトは以下のような構成になっている．</p>
-
-<ul>
-<li>NAME(名前)</li>
-<li>SYNOPSIS(書式)</li>
-<li>DESCRIPTION(説明)</li>
-<li>EXAMPLES(使用例)</li>
-<li>SEE ALSO(関連項目)</li>
-</ul>
-
-<p>このうち，<strong>SYNOPSIS</strong>に構文規則を用いた表記法が用いられているので，これが元なのではないかということ．実際にこれが元かはわからないけど，とりあえず<del>無駄</del>知識を増やすことができたので満足した．暇があったらまた調べてみよう．</p>
-
-<p>とりあえず，代表的なものをまとめておく．</p>
-
-<table><thead>
-<tr>
-<th>表記法</th>
-<th>概要</th>
-<th>例</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>[]</td>
-<td>なくてもよい</td>
-<td>hoge [-h]：<code>-h</code>はなくてもよい</td>
-</tr>
-<tr>
-<td>{}, &lt;&gt;</td>
-<td>必須</td>
-<td>hoge &lt;<em>filename</em>&gt;：<code>filename</code>は必ず記載</td>
-</tr>
-<tr>
-<td>斜体</td>
-<td>変数</td>
-<td>hoge &lt;<em>filename</em>&gt;：<code>filename</code>は変数．適切な値を記述する</td>
-</tr>
-<tr>
-<td>&#124;</td>
-<td>エレメントの選択</td>
-<td>hote [-a&#124;-b]：<code>-a</code>か<code>-b</code>を選択</td>
-</tr>
-<tr>
-<td>&#8230;</td>
-<td>繰り返し</td>
-<td>hoge &lt;<em>file</em>&gt;&#8230; ：<code>hoge file1 file2 file3</code>と使用できる</td>
-</tr>
-</tbody></table>
 ]]></content>
   </entry>
   

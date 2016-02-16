@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Opencv | tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/blog/categories/opencv/atom.xml" rel="self"/>
+  <link href="http://tasuwo.github.io/"/>
+  <updated>2016-02-16T10:35:07+09:00</updated>
+  <id>http://tasuwo.github.io/</id>
+  <author>
+    <name><![CDATA[tasuwo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[OpenCV を Homebrew から導入し直して Xcode に設定し直した]]></title>
+    <link href="http://tasuwo.github.io/blog/2016/02/16/brew-open-cv/"/>
+    <updated>2016-02-16T10:19:02+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2016/02/16/brew-open-cv</id>
+    <content type="html"><![CDATA[<p>既に OpenCV を導入し Xcode から利用していたが、Homebrew で設定しなおす機会があったので、やったことをメモしておく。こうしたらできた！というメモなので、コマンド実行等は自己責任でお願いします。</p>
+
+<!-- more -->
+
+<p>環境は以下です．</p>
+
+<ul>
+<li>Max OS X 10.10.1 Yosemite</li>
+<li>Xcode 6.1.1</li>
+<li>OpenCV 2.4.12</li>
+</ul>
+
+<h2>導入</h2>
+
+<p>事前に <code>brew doctor</code> を解決しておくと良いかも。問題がなければ、opencv を導入する。</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>brew tap homebrew/science
+<span class="nv">$ </span>brew install opencv
+</code></pre></div>
+<p>既に OpenCV を導入している場合、過去のファイル群は邪魔なので撤去しなくてはならない。<code>brew doctor</code> 時点で影響を及ぼしそうなファイルはリストアップされるので、それらを削除するなりバックアップをとるなりしてから、シンボリックリンクを貼ると良いかも。</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>brew link opencv
+</code></pre></div>
+<p><code>--force</code> オプションをつけてね〜的な warning が出るかもしれない。その場合は付加すれば実行できる。ただし、既存の OpenCV のシンボリックリンクを上書きすることになるので、注意。</p>
+
+<h2>Xcode で使う</h2>
+
+<p>Homebrew で導入した OpenCV の場所は <code>/usr/local/Cellar/opencv</code> となる。Xcode から利用する場合は、適切な場所を参照するように設定を行う必要がある。以下、パス内のバージョンに関しては適宜置き換えること(今回の場合は2.4.12_2)。</p>
+
+<h3>ヘッダー及びライブラリの Search Paths</h3>
+
+<ul>
+<li><code>Build Settings</code> &gt; <code>Header Search Paths</code>
+
+<ul>
+<li><code>/usr/local/Cellar/opencv/2.4.12_2/include</code></li>
+<li><code>/usr/local/Cellar/opencv</code> にして、recursive に設定すると説明しているサイトがあったが、こちらの方が綺麗に見える</li>
+</ul></li>
+<li><code>Build Settings</code> &gt; <code>Library Search Paths</code>
+
+<ul>
+<li><code>/usr/local/Cellar/opencv/2.4.12_2/lib</code></li>
+</ul></li>
+</ul>
+
+<p>OpenCV 導入済み &amp; Xcode 設定済みだった場合は、既存の設定を削除するか、上記で設定したパスの優先度をあげる(リスト内で上方に移動する)と良いかもしれない。</p>
+
+<h3>ライブラリとのリンク</h3>
+
+<p>OpenCV をすでに導入し、Xcode で設定済みであった場合は、<code>Build Settings</code> &gt; <code>Linking</code> &gt; <code>Other Linker Flags</code> にいろいろ設定されているかもしれないが、全部消す(と、自分の環境ではエラーがなおった)。</p>
+
+<p>Homebrew で導入後にライブラリとのリンクを張るためには <code>Build Phases</code> &gt; <code>Link Binary With Libraries</code> に、<code>/usr/local/Cellar/opencv/2.4.12_2/lib</code> から必要なライブラリを追加する。<code>Shitf + Command + G</code> から <code>/usr/local/Cellar/opencv/2.4.12\_2/lib</code> と入力すれば楽。</p>
+
+<h2>トラブルシューティング</h2>
+
+<h3>Undefined symbols</h3>
+
+<p><code>Undefined symbols for architecture x86_64:</code> みたいなエラーがドバッと出ることがある。</p>
+
+<p><a href="http://stackoverflow.com/questions/24985713/opencv-undefined-symbols-for-architecture-x86-64-error">c++ - OpenCV Undefined symbols for architecture x86_64: error - Stack Overflow</a></p>
+
+<p>OpenCV に必要なライブラリがリンクされていないことによるエラーのため、Link Binary With Libraries で必要なライブラリがリンクされているか確認する。</p>
+
+<h3>dyld: Library not loaded</h3>
+
+<p>Xcode における Build &amp; Run 後に、以下のようなエラーが吐かれた。</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">dyld: Library not loaded: /usr/local/opt/libpng16.16.dylib
+  Referenced from: /usr/local/opt/opencv/lib/libopencv_highgui.2.4.dylib
+  Reason: Incompatible library version: libopencv_highgui.2.4.dylib requires version 33.0.0 or later, but libpng16.16.dylib provides version 32.0.0
+Trace/BPT <span class="nb">trap</span>: 5
+</code></pre></div>
+<p><code>/usr/local/opt</code> の libpng を読みに行ってるのが悪いのかな？そもそも <code>/usr/local/opt</code> の OpenCV 見に行ってるけどなんでかな？と思っていたが、どうやら試した環境では、 <code>/usr/local/opt</code> 内の libpng、 opencv は Cellar 以下の各ソフトウェアへのシンボリックリンクになってるらしかった。Homebrew がやってくれてるんだっけ？わからん&#8230;</p>
+
+<p>バージョンが低いと言われているので、<code>brew update &amp; brew upgrade</code> したら、とりあえず治ったけど、実際何が原因だったのかはわからなかった&#8230;</p>
+
+<p><a href="http://stackoverflow.com/questions/28124359/error-with-homebrew-opencv-libpng">c++ - Error with homebrew + opencv + libpng - Stack Overflow</a></p>
+
+<h2>その他参考</h2>
+
+<p><a href="http://nantekottai.com/2014/04/16/opencv-xcode5-homebrew/">HomebrewとXcode5でつくるOpenCVの環境 – なんてこったいブログ</a></p>
+]]></content>
+  </entry>
+  
+</feed>
