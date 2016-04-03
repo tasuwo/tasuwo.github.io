@@ -1,0 +1,736 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: C++ | tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
+  <link href="http://tasuwo.github.io/"/>
+  <updated>2016-04-03T21:17:07+09:00</updated>
+  <id>http://tasuwo.github.io/</id>
+  <author>
+    <name><![CDATA[tasuwo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[TCPサーバ/クライアントを車輪の再発明する]]></title>
+    <link href="http://tasuwo.github.io/blog/2016/04/02/tcp-server/"/>
+    <updated>2016-04-02T12:51:38+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2016/04/02/tcp-server</id>
+    <content type="html"><![CDATA[<p>TCP Server/Client を車輪の再発明することで，ネットワーク通信の下の方を勉強してみようという試み．ついでに用語の整理もしてみます．</p>
+
+<!-- more -->
+
+<h2>Stream</h2>
+
+<p><em>stream</em> を使用しない場合のデータのよみ出しは，<code>read_block()</code> というシステムコールによって以下のように行える．</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">256</span><span class="p">];</span>
+<span class="n">read_block</span><span class="p">(</span><span class="s">&quot;hello.c&quot;</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">256</span><span class="p">);</span>
+</code></pre></div>
+<p>上記では，<code>hello.c</code> の先頭から32byte目から256bytes分読み込まれる．つまり，固定の範囲(ブロック)でデータにランダムにアクセスできる．</p>
+
+<p>上記方法は，扱う対象がメモリやハードディスク上であれば同様の処理で十分だが，例えばキーボードからの入力等を読み込む場合には適さない．前者のようなデバイスを <strong><em>block device</em></strong> ．後者のようなデバイスを <strong><em>character device</em></strong> という．</p>
+
+<ul>
+<li><strong><em>block device</em></strong>
+
+<ul>
+<li>データにブロック単位でアクセス可能なデバイス．データのバッファリングやランダムアクセスが可能．</li>
+<li>例: メモリ，ハードディスク</li>
+</ul></li>
+<li><strong><em>character device</em></strong>
+
+<ul>
+<li>データにbyte単位でアクセス可能なデバイス．データはバッファリングされず，ランダムアクセスもできない．</li>
+<li>例: キーボード，マウス</li>
+</ul></li>
+</ul>
+
+<p>2つのデバイスを同じシステムコールで扱うためには，使用するシステムコールを <em>character device</em> に合わせておけば良い．ここで使われている抽象化が <strong><em>stream</em></strong> である．</p>
+
+<ul>
+<li><strong><em>stream</em></strong>
+
+<ul>
+<li>データの供給元(ex: ハードディスク)と受け手(ex: プログラム)の間に入り，データの一時保存を行う抽象データ構造</li>
+<li>1byte単位でデータを受け取り，FIFO方式で受け手に渡す</li>
+</ul></li>
+</ul>
+
+<p><em>stream</em> の良いところは，<strong>供給元と受け手の転送量の違いを吸収できる</strong>部分．供給元は一度に100byteのデータを送信したいが受け手は一度に10byteしか受け取れない場合， <em>stream</em> は余った90byteを一時的に保存できる．</p>
+
+<p><em>stream</em> を使用したデータのよみ出しは以下のように行える．open システムコールによって OS によみ出し開始を通知し，同時に <em>stream</em> の識別子である file descriptor を得る．それ以降は file descriptor を使用して read，write システムコールによって読み書きを行い，close によって終了する．</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="kt">char</span> <span class="n">buffer0</span><span class="p">[</span><span class="mi">32</span><span class="p">];</span>
+<span class="kt">char</span> <span class="n">buffer1</span><span class="p">[</span><span class="mi">256</span><span class="p">];</span>
+<span class="kt">int</span> <span class="n">fd</span><span class="p">;</span>
+
+<span class="n">fd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="s">&quot;hello.c&quot;</span><span class="p">,</span> <span class="n">O_RDONLY</span><span class="p">,</span> <span class="mh">0x666</span><span class="p">);</span>
+<span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">buffer0</span><span class="p">,</span> <span class="mi">32</span><span class="p">);</span>
+<span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">buffer1</span><span class="p">,</span> <span class="mi">256</span><span class="p">);</span>
+<span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">);</span>
+</code></pre></div>
+<h2>Socket</h2>
+
+<p>TCP/IPによるネットワーク通信も，結局はデータのやりとりなので， <em>stream</em> の概念を流用できるとわかりやすい．しかしそのまま適用はできなかったので，特別な <em>stream</em> として <strong><em>socket</em></strong> を定義した．socket は通常の <em>stream</em> と異なり，作成時には open ではなく socket システムコールを使用する．また，作成時の処理が多少複雑になっている．</p>
+
+<h2>TCP socket</h2>
+
+<p>TCPによる通信では以下の約束事がある．</p>
+
+<ul>
+<li>メッセージが届いたかチェックし，届いてなければ再送する</li>
+<li>到着順序は保障されている</li>
+<li>それが失敗した場合はエラーになることが保障されている</li>
+</ul>
+
+<p>TCP通信用の socket の作成方法は以下の通り．</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="n">socket_df</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</code></pre></div>
+<p>第一引数は<strong>アドレスファミリ</strong>を表している．アドレスファミリとは，socket が使用するアドレス体系のこと．よく使用されるのは以下．</p>
+
+<table><thead>
+<tr>
+<th>アドレスファミリ</th>
+<th>内容</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>AF_INET</td>
+<td>IPv4用</td>
+</tr>
+<tr>
+<td>AF_INET6</td>
+<td>IPv6用</td>
+</tr>
+<tr>
+<td>AF_UNIX</td>
+<td>ローカルなプロセス間通信用</td>
+</tr>
+<tr>
+<td>AF_PACKET</td>
+<td>デバイスレベルのパケットインタフェース</td>
+</tr>
+</tbody></table>
+
+<p>第二引数は<strong>ソケットタイプ</strong>を表している．ソケットタイプはソケットの性質を表しており，Linuxで使用可能な代表的なものは以下．</p>
+
+<table><thead>
+<tr>
+<th>ソケットタイプ</th>
+<th>解説</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>SOCK_STREAM</td>
+<td>順序性，信頼性を備え双方向接続された byte stream を提供する</td>
+</tr>
+<tr>
+<td>SOCK_DGRAM</td>
+<td>データグラム(接続，信頼性なし，固定最大長メッセージ)をサポートする</td>
+</tr>
+</tbody></table>
+
+<p>第三引数は使用するプロトコルを表す．0にしておくとデフォルトのものが使用される．基本的には上記二つの組み合わせによって通信方式が決定される．例えば，以下のように．</p>
+
+<table><thead>
+<tr>
+<th>アドレスファミリ</th>
+<th>ソケットタイプ</th>
+<th>通信方式</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>AF_INET</td>
+<td>SOCK_STREAM</td>
+<td>IPv4 + TCP</td>
+</tr>
+<tr>
+<td>AF_INET6</td>
+<td>SOCK_DGRAM</td>
+<td>IPv6 + UDP</td>
+</tr>
+</tbody></table>
+
+<h2>通信手順</h2>
+
+<p>クライアントとサーバがそれぞれ以下の手順でシステムコールを呼び出し，通信する．クライアントサーバモデルは，同期方法が非対称的であり，サーバ側とクライアント側でプログラムが異なる．これは電話の呼び出し方式と似ている．</p>
+
+<table><thead>
+<tr>
+<th>No</th>
+<th>Client</th>
+<th>Server</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>1</td>
+<td>socket(ソケット生成)</td>
+<td>socket(ソケット生成)</td>
+</tr>
+<tr>
+<td>2</td>
+<td></td>
+<td>bind(ポート指定)</td>
+</tr>
+<tr>
+<td>3</td>
+<td></td>
+<td>listen(待ち受け)</td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td>accept(接続待ち)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>connect(ソケット接続要求)</td>
+<td></td>
+</tr>
+<tr>
+<td>6</td>
+<td>send(送信)</td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td></td>
+<td>recv(受信)</td>
+</tr>
+<tr>
+<td>8</td>
+<td></td>
+<td>send(送信)</td>
+</tr>
+<tr>
+<td>9</td>
+<td>recv(受信)</td>
+<td></td>
+</tr>
+<tr>
+<td>10</td>
+<td>shutdown(切断)</td>
+<td>shutdown(切断)</td>
+</tr>
+<tr>
+<td>11</td>
+<td>close(ソケット切断)</td>
+<td>close(ソケット切断)</td>
+</tr>
+</tbody></table>
+
+<p>Client 側は socket 作成後，connect で同期を行う．この時，通信相手のサーバを引数(host名，port番号)で指定する．</p>
+
+<p>Server 側は socket 作成後が多少複雑．socket は作成時点ではアドレスが割り当てられていないので，bindによってアドレスを割りあてる．この操作は伝統的に「ソケットに名前をつける」と呼ばれる．</p>
+
+<p>ここでいうアドレスは，接続に必要なネットワーク層レベルの情報を保持する構造体として定義されている．保持する情報と定義は以下の通り．</p>
+
+<ul>
+<li>通信プロトコル</li>
+<li>アドレス</li>
+<li>ポート番号</li>
+</ul>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="p">{</span>
+   <span class="kt">sa_family_t</span>    <span class="n">sin_family</span><span class="p">;</span> <span class="cm">/* address family: AF_INET */</span>
+   <span class="kt">u_int16_t</span>      <span class="n">sin_port</span><span class="p">;</span>   <span class="cm">/* port in network byte order */</span>
+   <span class="k">struct</span> <span class="n">in_addr</span>  <span class="n">sin_addr</span><span class="p">;</span>  <span class="cm">/* internet address */</span>
+<span class="p">};</span>
+
+<span class="cm">/* Internet address. */</span>
+<span class="k">struct</span> <span class="n">in_addr</span> <span class="p">{</span>
+   <span class="kt">u_int32_t</span>      <span class="n">s_addr</span><span class="p">;</span>     <span class="cm">/* address in network byte order */</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>bind 後，socket を passive socket(接続待ちソケット)，すなわちサーバ側の socket であることをOSに通知する．ここでいう passive socket とは，accept による接続要求を受け付けるのに使用するソケットのこと．accept では passive socket から接続要求を取り出し，それを元に接続済みソケットを作成し，その socket を参照する新しい file descriptor を返す．</p>
+
+<p>なぜわざわざ passive socket を用意しているのかというと，通常サーバに対してクライアントは複数存在し，その要求をさばくためには接続要求をためておく stream が必要であるため．</p>
+
+<p>通信終了時には close 処理を行うが，多少注意が必要．sockt は送信データが正しく受信したことを確認しないと破棄されないので，close しても即座に破棄はされない．一般には，サーバよりも先にクライアントを close すればよい．サーバ側から強制的に close したい時には，close の直前に以下を呼べば良い．</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="n">shutdown</span><span class="p">(</span><span class="n">socket</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+</code></pre></div>
+<p>もしくは bind の前に以下を設定する．</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="kt">int</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="n">setsockopt</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="n">SOL_SOCKET</span><span class="p">,</span> <span class="n">SO_REUSEADDR</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">value</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">value</span><span class="p">));</span>
+</code></pre></div>
+<p><code>setsockopt</code> は，与えられた socket のオプションを設定するもので，以下のように定義されている．</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="kt">int</span> <span class="nf">setsockopt</span><span class="p">(</span><span class="kt">int</span> <span class="n">sockfd</span><span class="p">,</span> <span class="kt">int</span> <span class="n">level</span><span class="p">,</span> <span class="kt">int</span> <span class="n">optname</span><span class="p">,</span>
+               <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">optval</span><span class="p">,</span> <span class="kt">socklen_t</span> <span class="n">optlen</span><span class="p">);</span>
+</code></pre></div>
+<p>よく使われるオプションは <code>SO_REUSEADDR</code> であり，これを設定することで再度同じポート番号で bind できる．</p>
+
+<h2>実装</h2>
+
+<p>ネット上のいろいろを参考に TCP サーバを C++ で書いた．C++は全然書いたことない初心者なのでひどいコードになっているかもしれない&#8230;飽くまで学習用なので，あしからず．</p>
+
+<script src="https://gist.github.com/tasuwo/18fa141e82da1f87901419eb78353f2a.js"></script>
+
+<p>Server，Client の順で起動し，サーバ側から文字列を送信できる．実行結果は以下のような感じ</p>
+
+<p><img src="/images/tcp_connect.png" alt="tcp"></p>
+
+<h2>参考</h2>
+
+<p><a href="http://www.csg.ci.i.u-tokyo.ac.jp/%7Echiba/lecture/web/web01.html">Lecture Notes</a><br>
+<a href="http://bg1.hatenablog.com/entry/2015/08/19/210000">setsockopt - 車輪のx発明 ~B.G&#39;s Blog~</a><br>
+<a href="http://www.amazon.co.jp/Linux%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0-%E3%81%82%E3%81%8D%E3%81%BF%E3%81%A1/dp/4797354526">Linuxネットワークプログラミング : あきみち : 本 : Amazon.co.jp</a><br>
+<a href="http://kotaroito.hatenablog.com/entry/2014/01/31/224138">socket(2), bind(2), listen(2), accept(2) - kotaroito&#39;s notes</a><br>
+<a href="http://myenigma.hatenablog.com/entry/20140308/1394252286">LinuxにおけるTCPソケット通信を利用したプロセス間通信(C++) - MyEnigma</a></p>
+
+<!-- [TCP接続する時に使ういろいろな構造体の整理 - Qiita](http://qiita.com/0xfffffff7/items/6ffb317df8345070d0b5) -->
+
+<!-- [Structure](http://www-cms.phys.s.u-tokyo.ac.jp/~naoki/CIPINTRO/NETWORK/struct.html) -->
+
+<!-- [7.1 デバイス・ファイルについて](https://docs.oracle.com/cd/E39368_01/e48214/ol_about_devices.html) -->
+
+<!-- [システムコールを理解する | UNIX world](http://curtaincall.weblike.jp/portfolio-unix/api.html) -->
+
+<!-- [知ってトクするシステムコール（2）：システムコールと標準ライブラリ関数の違いを知る (1/2) - ＠IT](http://www.atmarkit.co.jp/ait/articles/1112/13/news117.html) -->
+
+<!-- [ソケット通信メモ(Hishidama's TCP/UDP Socket Memo)](http://www.ne.jp/asahi/hishidama/home/tech/socket/) -->
+
+<!-- [ソケット](http://research.nii.ac.jp/~ichiro/syspro98/socket.html) -->
+
+<!-- [3 システムコール](http://akita-nct.jp/yamamoto/lecture/2007/2E/17th/html/node3.html) -->
+
+<!-- [Linuxシステムコールの勉強(その１６) - Webプログラミングをしてみよう!!](http://d.hatena.ne.jp/web_develop/20071205/1196875088) -->
+
+<!-- [socket - システムコールの説明 - Linux コマンド集 一覧表](http://kazmax.zpp.jp/cmd/s/socket.2.html) -->
+
+<!-- [socket関数とプロトコル](http://www.fireproject.jp/feature/c-language/socket/basic.html) -->
+
+<!-- [C言語:ソケット(Socket)でネットワークプログラム入門](http://www.geocities.jp/sugachan1973/doc/funto45.html) -->
+
+<!-- [Lecture Notes](http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/lecture/web/web03.html) -->
+
+<!-- [絵で見てわかるファイルディスクリプタ・パイプ・リダイレクト - あしのあしあと](http://d.hatena.ne.jp/higher_tomorrow/20110426/1303830417) -->
+
+<!-- [C++と Pthreads でミニマルなHTTPサーバを書く - bkブログ](http://0xcc.net/blog/archives/000178.html) -->
+
+<!-- http://yuuki.hatenablog.com/entry/2015-webserver-architecture -->
+
+<!-- http://mattn.kaoriya.net/software/lang/c/20090729235933.htm -->
+
+<!-- http://myenigma.hatenablog.com/entry/20140308/1394252286 -->
+
+<!-- [socket() で使用するアドレス・ファミリー・プロトコル](https://publib.boulder.ibm.com/html/as400/v4r5/ic2962/info/RZAB6ADDFAM.HTM) -->
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[EmacsにおけるC,C++の環境を整える]]></title>
+    <link href="http://tasuwo.github.io/blog/2016/03/04/c-c-plus-plus/"/>
+    <updated>2016-03-04T21:47:12+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2016/03/04/c-c-plus-plus</id>
+    <content type="html"><![CDATA[<p>大昔に取り組んでいた自作OS、せっかくなので再挑戦してみようと考えた．CLionとかそこらへんのIDEを使用しても良かったけれど，せっかくだからEmacs で C, C++ の環境を整えるたいので，メモしとく．<br>
+基本的に<a href="https://tuhdo.github.io/c-ide.html">C/C++ Development Environment for Emacs</a>に全部書いてあったのでつまんでみる．</p>
+
+<!-- more -->
+
+<p>helm+helm-gtags もしくは ggtags を使う．<br>
+自分は helm-gtags を使うことになるだろう．</p>
+
+<h1>1.GTAGS</h1>
+
+<p>プロジェクトのルートディレクトリで gtags コマンドを実行すると，以下のファイル群が生成されるはず．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cd</span> /path/to/project/root
+<span class="nv">$ </span>gtags
+<span class="nv">$ </span>ls G*
+GPATH   GRTAGS  GTAGS
+</code></pre></div>
+<p>それぞれ以下の情報を保持している．</p>
+
+<ul>
+<li><strong>GTAGS</strong>  : 定義</li>
+<li><strong>GRTAGS</strong> : 参照</li>
+<li><strong>GPATH</strong>  : パス名</li>
+</ul>
+
+<h1>2.基本操作</h1>
+
+<p>作業を快適にするために把握しておくべきEmacsにおける基本操作は以下</p>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>コマンド名</th>
+<th>概要</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>C-M-f</td>
+<td>forward-sexp</td>
+<td>閉じカッコの前に行く</td>
+</tr>
+<tr>
+<td>C-M-b</td>
+<td>backward-sexp</td>
+<td>閉じカッコの後ろに行く</td>
+</tr>
+<tr>
+<td>C-M-k</td>
+<td>kill-sexp</td>
+<td>閉じカッコ内を削除する</td>
+</tr>
+<tr>
+<td>C-M-<SPC>,C-M-@</td>
+<td>mark-sexp</td>
+<td>閉じカッコ内を選択する</td>
+</tr>
+<tr>
+<td>C-M-a</td>
+<td>beginning-of-defun</td>
+<td>関数の前に行く</td>
+</tr>
+<tr>
+<td>C-M-e</td>
+<td>end-of-defun</td>
+<td>関数の後ろに行く</td>
+</tr>
+<tr>
+<td>C-M-h</td>
+<td>mark-defun</td>
+<td>関数を選択する</td>
+</tr>
+</tbody></table>
+
+<h1>3.定義参照</h1>
+
+<h2>3.1.バッファ内参照</h2>
+
+<h3>ggtags-mode</h3>
+
+<p>Imenuを使用する<br>
+<code>(setq-local imenu-create-index-function #&#39;ggtags-build-imenu-index)</code></p>
+
+<h3>helm</h3>
+
+<p>moo-jump-localを使用する</p>
+
+<h2>3.2.プロジェクト内参照</h2>
+
+<h3>ggtags-mode</h3>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>コマンド名</th>
+<th>概要</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>M-.</td>
+<td>ggtags-finde-tag-dwim</td>
+<td>・定義にポイントしていれば参照先を表示する<br>・参照にポイントしてれば定義を表示する<br>・include ヘッダーをポイントしていればそのヘッダーを表示する<br>・その他の場所であれば定義，参照一覧が表示され，絞り込みができる</td>
+</tr>
+<tr>
+<td>M-,</td>
+<td>pop-tag-mark</td>
+<td>ジャンプ元へ戻る</td>
+</tr>
+<tr>
+<td>M-n, M-p</td>
+<td></td>
+<td>候補内移動</td>
+</tr>
+<tr>
+<td>M-g s</td>
+<td></td>
+<td>候補内検索</td>
+</tr>
+</tbody></table>
+
+<h3>helm-mode</h3>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>コマンド名</th>
+<th>概要</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>M-.</td>
+<td>helm-gtags-dwim</td>
+<td>ggtags-find-tag-dwim と一緒</td>
+</tr>
+<tr>
+<td>M-,</td>
+<td>tags-loop-continue</td>
+<td>pop-tag-mark と一緒</td>
+</tr>
+<tr>
+<td>C-j</td>
+<td>helm-gtags-select</td>
+<td>空白部分で M-. するのと一緒．定義や山椒を一覧から絞り込み&amp;ジャンプできる</td>
+</tr>
+</tbody></table>
+
+<h1>4.参照元ジャンプ</h1>
+
+<h3>gtags-mode</h3>
+
+<p>ggtags-find-reference, ggtags-find-tag-dwimを使う</p>
+
+<h3>helm-gtags</h3>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>コマンド名</th>
+<th>概要</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>C-c g r</td>
+<td>helm-gtags-find-rtag</td>
+<td>・関数内で呼び出したら，その関数についての参照先を検索する<br>・関数名上で呼び出したら，参照先のリストを表示する<br>・変数名にポイントしていたら，なにもしない</td>
+</tr>
+<tr>
+<td>C-c g s</td>
+<td>htlm-gtags-find-symbol</td>
+<td>変数名ポイント時に参照元を検索する</td>
+</tr>
+<tr>
+<td>C-c g a</td>
+<td>htlm-gtags-tagas-in-this-function</td>
+<td>現在の関数が参照する関数一覧</td>
+</tr>
+</tbody></table>
+
+<h1>5.ファイル検索</h1>
+
+<h3>ggtags-mode</h3>
+
+<p>ggtags-find-file</p>
+
+<h3>helm-gtags</h3>
+
+<p>helm-gtags-find-files</p>
+
+<p>正直Projectile使ったほうが良いとのこと．</p>
+
+<h1>6.過去に訪れたタグへジャンプ</h1>
+
+<h3>ggatgs-mode</h3>
+
+<p>ggtags-view-tag-history(C-c g h)</p>
+
+<h3>helm-gtags</h3>
+
+<p>helm-gtags-show-stack</p>
+
+<h1>7.Speedbar</h1>
+
+<p>ソースツリーを見れるパッケージ．ただのソースツリーではなくて，戻り値や関数なども一覧できるのが便利っぽい．</p>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>操作</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>SPC</td>
+<td>子ノードを開く</td>
+</tr>
+<tr>
+<td>RET</td>
+<td>ノードを別ウインドウで開く</td>
+</tr>
+<tr>
+<td>U</td>
+<td>親ノードへ移動</td>
+</tr>
+<tr>
+<td>n,p</td>
+<td>ノードを上下移動</td>
+</tr>
+<tr>
+<td>M-n,M-p</td>
+<td>現在の階層内でノードを上下移動</td>
+</tr>
+<tr>
+<td>b</td>
+<td>Speedbarのバッファリストに戻る</td>
+</tr>
+<tr>
+<td>f</td>
+<td>ファイルリストに戻る</td>
+</tr>
+</tbody></table>
+
+<h2>7.1.sr-speedbar</h2>
+
+<p>Speedbarを便利にするパッケージ．</p>
+
+<ul>
+<li>起動/終了
+
+<ul>
+<li>sr-speedbar-open, sr-speedbar-toggle : 開く</li>
+<li>sr-speedbar-cloe, sr-speedbar-toggle : 閉じる</li>
+</ul></li>
+<li>改善点
+
+<ul>
+<li>フレームの代わりにEmacs windowを使用する</li>
+<li><code>C-x 1</code>でSpeedbarを除くすべてのウインドウを削除する</li>
+<li><code>C-x o</code>でSpeedbarに移動するのを防ぐ(sr-speedbar-skip-other-window-pをtにする)</li>
+</ul></li>
+</ul>
+
+<h1>8.Company-mode (補完)</h1>
+
+<p>company-mode を使う．company-mode はEmacsのための補完フレームワーク．<br>
+<code><br>
+(require &#39;company)<br>
+(add-hook &#39;after-init-hook &#39;global-company-mode)<br>
+</code></p>
+
+<h2>8.2.使い方</h2>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>操作</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>M-n,M-p</td>
+<td>候補移動</td>
+</tr>
+<tr>
+<td>RET,TAB</td>
+<td>候補決定</td>
+</tr>
+<tr>
+<td>C-s,C-r,C-o</td>
+<td>候補検索</td>
+</tr>
+<tr>
+<td>M-(数値)</td>
+<td>候補簡易選択</td>
+</tr>
+<tr>
+<td><f1></td>
+<td>選択中候補のドキュメントを表示</td>
+</tr>
+<tr>
+<td>C-w</td>
+<td>選択中候補のソースコード表示</td>
+</tr>
+</tbody></table>
+
+<p><code>company-backends</code>で候補に使用するリソースを指定する．</p>
+
+<h2>8.3.C言語の補完</h2>
+
+<p>C言語でcompanyの補完を利用するためには，以下を記述する．<br>
+<code>bash<br>
+(delete &#39;company-semantic company-backends)<br>
+(define-key c-mode-map  [(tab)] &#39;company-complete)<br>
+(define-key c++-mode-map  [(tab)] &#39;company-complete)<br>
+</code><br>
+上記の設定では，<code>company-semantic</code>を削除している．理由は後述．<code>company-semantic</code>についてはCEDITの項で詳しく説明する．</p>
+
+<p>companyの補完として，以下の二つが働く．</p>
+
+<h3>8.3.1.company-clang</h3>
+
+<p>補完候補の取得のために<code>clang</code>を使用する．プロジェクトではなく，ヘッダファイルによって補完を行う．デフォルトでは<code>company-clang</code>は<code>company-semantic</code>のサブセットであるため，上記設定を行っていれば他に特別な設定はいらない．<br>
+上記せて血で<code>company-semantic</code>を削除したのは，そうしないと<code>company-complete</code>が<code>company-clang</code>ではなく<code>company-semantic</code>を使用してしまうため．これは，<code>company-backends</code>内の優先度がそうなっているため生じる．<br>
+補完候補をプロジェクト内から取得するためには，<code>.dir-locals.el</code>をプロジェクトルートに配置する必要がある．</p>
+<div class="highlight"><pre><code class="language-emacs-lisp" data-lang="emacs-lisp"><span class="p">((</span><span class="no">nil</span> <span class="o">.</span> <span class="p">((</span><span class="nv">company-clang-arguments</span> <span class="o">.</span> <span class="p">(</span><span class="s">&quot;-I/home/&lt;user&gt;/project_root/include1/&quot;</span>
+                                     <span class="s">&quot;-I/home/&lt;user&gt;/project_root/include2/&quot;</span><span class="p">)))))</span>
+</code></pre></div>
+<p>helmを使っているなら，<code>C-x C-f</code>によるファイル検索中に，対象ファイル選択状態から<code>C-c i</code>によって絶対パスを挿入できる．<br>
+<code>nil</code>を指定すると設定をすべてのサブディレクトリ，ファイルに適用し，<code>non-nil</code>であれば設定を適用するメジャーモードを指定できる．<code>company-clang-arguments</code>はインクルードパスを指定するリストである．</p>
+
+<h3>8.3.2comapny-gtags</h3>
+
+<p><code>GNU Global</code>の<code>GTAGS</code>から補完候補を取得する．プロジェクトによる補完を行うことができる．</p>
+
+<h2>8.4.ヘッダーの補完</h2>
+
+<p>プロジェクト内のヘッダーを補完したいなら，<code>company-c-headers</code>を使用する．以下のように<code>company-backends</code>に追加すれば良い．</p>
+<div class="highlight"><pre><code class="language-emacs-lisp" data-lang="emacs-lisp"><span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;company-backends</span> <span class="ss">&#39;company-c-headers</span><span class="p">)</span>
+</code></pre></div>
+<p>C++でヘッダーの補完を行いたいならば，パスを追加する必要がある．<code>company-c-header</code>はシステムのインクルードパスとして<code>/usr/include/</code>と<code>/usr/local/include/</code>しか含んでいない．例としては以下のように追加する．</p>
+<div class="highlight"><pre><code class="language-emacs-lisp" data-lang="emacs-lisp"><span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;company-c-headers-path-system</span> <span class="s">&quot;/usr/include/c++/4.8/&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h1>9.CEDET</h1>
+
+<p>CEDETはCollection of Emacs Development Environment Toolsの略称．CEDETのデメリットは，Emacs Lispで書かれているため，Emacsのパフォーマンスに影響すること．23.2以降のEmacsにはマージされているので，インストールの必要はない．<br>
+最新版は以下のようにダウンロードすれば良い．<br>
+<code>bash<br>
+$ git clone http://git.code.sf.net/p/cedet/git cedet<br>
+$ cd cedet<br>
+$ make # wait for it to complete<br>
+$ cd contrib<br>
+$ make<br>
+</code><br>
+Emacs からロードする．<br>
+<code>emacs-lisp<br>
+(load-file (concat user-emacs-directory &quot;/cedet/cedet-devel-load.el&quot;))<br>
+(load-file (concat user-emacs-directory &quot;cedet/contrib/cedet-contrib-load.el&quot;))<br>
+</code></p>
+
+<h2>9.1.Semanticマイナーモード</h2>
+
+<p><code>Semantic</code>は，ソースコードパーサを利用して構文を考慮した補完を行ってくれるパッケージ．</p>
+
+<h3>9.1.1セットアップ</h3>
+<div class="highlight"><pre><code class="language-emacs-lisp" data-lang="emacs-lisp"><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;cc-mode</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;semantic</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nv">global-semanticdb-minor-mode</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">global-semantic-idle-scheduler-mode</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nv">semantic-mode</span> <span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+<h3>9.1.2.<code>semantic-mode</code></h3>
+
+<p>Semantic-modeでは，Emacsは現在のバッファをパースする．シンボルにカーソルを合わせるとsemanticはすべてのincludeファイルを読みに行くので，たまに時間がかかる．しかし一回パースすれば終わりなので，問題はない．</p>
+
+<h3>9.1.3.パスの追加</h3>
+
+<p>Semantic のデフォルトのインクルードパスは<code>semantic-dependency-system-include-path</code>に格納されており，追加したい場合は以下のようにする．</p>
+<div class="highlight"><pre><code class="language-emacs-lisp" data-lang="emacs-lisp"><span class="p">(</span><span class="nv">semantic-add-system-include</span> <span class="s">&quot;/usr/include/boost&quot;</span> <span class="ss">&#39;c++-mode</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">semantic-add-system-include</span> <span class="s">&quot;~/linux/kernel&quot;</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">semantic-add-system-include</span> <span class="s">&quot;~/linux/include&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3>9.1.4.<code>company-mode</code>におけるSemantic-mode</h3>
+
+<p><code>company-mode</code>には<code>company-semantic</code>コマンドがあり，これがSemanticDBを補完候補の取得に利用する．<code>company-semantic</code>の良いところは，<code>semantic-ia-complete-symbol</code>が改善されているところ．元は1文字以上タイプしていなければ補完を検索してくれなかったが，<code>company-semantic</code>ではプレフィクスなしで補完してくれる．</p>
+
+<ul>
+<li><code>global-sematicdb-minor-mode</code>
+
+<ul>
+<li>パース結果をキャッシュする．キャッシュ結果は<code>semanticdb-default-save-directory</code>変数内のパスに保存されるが，デフォルトでは<code>~/.emacs.d/semanticdb</code>いかに保持される</li>
+</ul></li>
+<li><code>global-semantic-idle-scheduler-mode</code>
+
+<ul>
+<li>このモードが有効になっていると，バッファーが期限切れになっていた時，ユーザがタイプしていない間にパーサをし直す．これがオフだと，バッファはコマンドによって手動でパースし直さなければならない</li>
+</ul></li>
+</ul>
+
+<h2>9.2.CEDETのその他の機能</h2>
+
+<p>Semanticがソースコードをパースし作成したデータベースは，コードの補完の他にも様々な使い道がある．コードナビゲーションや定義元・参照元ジャンプなど．</p>
+
+<h3>9.2.1.Senator</h3>
+
+<p>CEDETの一部で，SEmainticNAvigaTORの略称．</p>
+
+<h3>9.2.2.デバッグ</h3>
+
+<p>GDBとかGUDとかがあるらしい．</p>
+
+<p>あとは気が向いたら．</p>
+]]></content>
+  </entry>
+  
+</feed>

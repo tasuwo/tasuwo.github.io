@@ -1,0 +1,593 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>TCPサーバ/クライアントを車輪の再発明する - tasuwo blog</title>
+  <meta name="author" content="tasuwo">
+
+  
+  <meta name="description" content="TCP Server/Client を車輪の再発明することで，ネットワーク通信の下の方を勉強してみようという試み．ついでに用語の整理もしてみます． Stream stream を使用しない場合のデータのよみ出しは，read_block() というシステムコールによって以下のように行える． 1
+2 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tasuwo.github.io/blog/2016/04/02/tcp-server">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="tasuwo blog" type="application/atom+xml">
+  <link href="/stylesheets/data-table.css" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-60860415-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">tasuwo blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:tasuwo.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">TCPサーバ/クライアントを車輪の再発明する</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-04-02T12:51:38+09:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>12:51 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tasuwo.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>TCP Server/Client を車輪の再発明することで，ネットワーク通信の下の方を勉強してみようという試み．ついでに用語の整理もしてみます．</p>
+
+<!-- more -->
+
+<h2>Stream</h2>
+
+<p><em>stream</em> を使用しない場合のデータのよみ出しは，<code>read_block()</code> というシステムコールによって以下のように行える．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">256</span><span class="p">];</span>
+</span><span class='line'><span class="n">read_block</span><span class="p">(</span><span class="s">&quot;hello.c&quot;</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">256</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>上記では，<code>hello.c</code> の先頭から32byte目から256bytes分読み込まれる．つまり，固定の範囲(ブロック)でデータにランダムにアクセスできる．</p>
+
+<p>上記方法は，扱う対象がメモリやハードディスク上であれば同様の処理で十分だが，例えばキーボードからの入力等を読み込む場合には適さない．前者のようなデバイスを <strong><em>block device</em></strong> ．後者のようなデバイスを <strong><em>character device</em></strong> という．</p>
+
+<ul>
+<li><strong><em>block device</em></strong>
+
+<ul>
+<li>データにブロック単位でアクセス可能なデバイス．データのバッファリングやランダムアクセスが可能．</li>
+<li>例: メモリ，ハードディスク</li>
+</ul></li>
+<li><strong><em>character device</em></strong>
+
+<ul>
+<li>データにbyte単位でアクセス可能なデバイス．データはバッファリングされず，ランダムアクセスもできない．</li>
+<li>例: キーボード，マウス</li>
+</ul></li>
+</ul>
+
+<p>2つのデバイスを同じシステムコールで扱うためには，使用するシステムコールを <em>character device</em> に合わせておけば良い．ここで使われている抽象化が <strong><em>stream</em></strong> である．</p>
+
+<ul>
+<li><strong><em>stream</em></strong>
+
+<ul>
+<li>データの供給元(ex: ハードディスク)と受け手(ex: プログラム)の間に入り，データの一時保存を行う抽象データ構造</li>
+<li>1byte単位でデータを受け取り，FIFO方式で受け手に渡す</li>
+</ul></li>
+</ul>
+
+<p><em>stream</em> の良いところは，<strong>供給元と受け手の転送量の違いを吸収できる</strong>部分．供給元は一度に100byteのデータを送信したいが受け手は一度に10byteしか受け取れない場合， <em>stream</em> は余った90byteを一時的に保存できる．</p>
+
+<p><em>stream</em> を使用したデータのよみ出しは以下のように行える．open システムコールによって OS によみ出し開始を通知し，同時に <em>stream</em> の識別子である file descriptor を得る．それ以降は file descriptor を使用して read，write システムコールによって読み書きを行い，close によって終了する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="kt">char</span> <span class="n">buffer0</span><span class="p">[</span><span class="mi">32</span><span class="p">];</span>
+</span><span class='line'><span class="kt">char</span> <span class="n">buffer1</span><span class="p">[</span><span class="mi">256</span><span class="p">];</span>
+</span><span class='line'><span class="kt">int</span> <span class="n">fd</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">fd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="s">&quot;hello.c&quot;</span><span class="p">,</span> <span class="n">O_RDONLY</span><span class="p">,</span> <span class="mh">0x666</span><span class="p">);</span>
+</span><span class='line'><span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">buffer0</span><span class="p">,</span> <span class="mi">32</span><span class="p">);</span>
+</span><span class='line'><span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">buffer1</span><span class="p">,</span> <span class="mi">256</span><span class="p">);</span>
+</span><span class='line'><span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h2>Socket</h2>
+
+<p>TCP/IPによるネットワーク通信も，結局はデータのやりとりなので， <em>stream</em> の概念を流用できるとわかりやすい．しかしそのまま適用はできなかったので，特別な <em>stream</em> として <strong><em>socket</em></strong> を定義した．socket は通常の <em>stream</em> と異なり，作成時には open ではなく socket システムコールを使用する．また，作成時の処理が多少複雑になっている．</p>
+
+<h2>TCP socket</h2>
+
+<p>TCPによる通信では以下の約束事がある．</p>
+
+<ul>
+<li>メッセージが届いたかチェックし，届いてなければ再送する</li>
+<li>到着順序は保障されている</li>
+<li>それが失敗した場合はエラーになることが保障されている</li>
+</ul>
+
+<p>TCP通信用の socket の作成方法は以下の通り．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="n">socket_df</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>第一引数は<strong>アドレスファミリ</strong>を表している．アドレスファミリとは，socket が使用するアドレス体系のこと．よく使用されるのは以下．</p>
+
+<table><thead>
+<tr>
+<th>アドレスファミリ</th>
+<th>内容</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>AF_INET</td>
+<td>IPv4用</td>
+</tr>
+<tr>
+<td>AF_INET6</td>
+<td>IPv6用</td>
+</tr>
+<tr>
+<td>AF_UNIX</td>
+<td>ローカルなプロセス間通信用</td>
+</tr>
+<tr>
+<td>AF_PACKET</td>
+<td>デバイスレベルのパケットインタフェース</td>
+</tr>
+</tbody></table>
+
+<p>第二引数は<strong>ソケットタイプ</strong>を表している．ソケットタイプはソケットの性質を表しており，Linuxで使用可能な代表的なものは以下．</p>
+
+<table><thead>
+<tr>
+<th>ソケットタイプ</th>
+<th>解説</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>SOCK_STREAM</td>
+<td>順序性，信頼性を備え双方向接続された byte stream を提供する</td>
+</tr>
+<tr>
+<td>SOCK_DGRAM</td>
+<td>データグラム(接続，信頼性なし，固定最大長メッセージ)をサポートする</td>
+</tr>
+</tbody></table>
+
+<p>第三引数は使用するプロトコルを表す．0にしておくとデフォルトのものが使用される．基本的には上記二つの組み合わせによって通信方式が決定される．例えば，以下のように．</p>
+
+<table><thead>
+<tr>
+<th>アドレスファミリ</th>
+<th>ソケットタイプ</th>
+<th>通信方式</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>AF_INET</td>
+<td>SOCK_STREAM</td>
+<td>IPv4 + TCP</td>
+</tr>
+<tr>
+<td>AF_INET6</td>
+<td>SOCK_DGRAM</td>
+<td>IPv6 + UDP</td>
+</tr>
+</tbody></table>
+
+<h2>通信手順</h2>
+
+<p>クライアントとサーバがそれぞれ以下の手順でシステムコールを呼び出し，通信する．クライアントサーバモデルは，同期方法が非対称的であり，サーバ側とクライアント側でプログラムが異なる．これは電話の呼び出し方式と似ている．</p>
+
+<table><thead>
+<tr>
+<th>No</th>
+<th>Client</th>
+<th>Server</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>1</td>
+<td>socket(ソケット生成)</td>
+<td>socket(ソケット生成)</td>
+</tr>
+<tr>
+<td>2</td>
+<td></td>
+<td>bind(ポート指定)</td>
+</tr>
+<tr>
+<td>3</td>
+<td></td>
+<td>listen(待ち受け)</td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td>accept(接続待ち)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>connect(ソケット接続要求)</td>
+<td></td>
+</tr>
+<tr>
+<td>6</td>
+<td>send(送信)</td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td></td>
+<td>recv(受信)</td>
+</tr>
+<tr>
+<td>8</td>
+<td></td>
+<td>send(送信)</td>
+</tr>
+<tr>
+<td>9</td>
+<td>recv(受信)</td>
+<td></td>
+</tr>
+<tr>
+<td>10</td>
+<td>shutdown(切断)</td>
+<td>shutdown(切断)</td>
+</tr>
+<tr>
+<td>11</td>
+<td>close(ソケット切断)</td>
+<td>close(ソケット切断)</td>
+</tr>
+</tbody></table>
+
+<p>Client 側は socket 作成後，connect で同期を行う．この時，通信相手のサーバを引数(host名，port番号)で指定する．</p>
+
+<p>Server 側は socket 作成後が多少複雑．socket は作成時点ではアドレスが割り当てられていないので，bindによってアドレスを割りあてる．この操作は伝統的に「ソケットに名前をつける」と呼ばれる．</p>
+
+<p>ここでいうアドレスは，接続に必要なネットワーク層レベルの情報を保持する構造体として定義されている．保持する情報と定義は以下の通り．</p>
+
+<ul>
+<li>通信プロトコル</li>
+<li>アドレス</li>
+<li>ポート番号</li>
+</ul>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="p">{</span>
+</span><span class='line'>   <span class="kt">sa_family_t</span>    <span class="n">sin_family</span><span class="p">;</span> <span class="cm">/* address family: AF_INET */</span>
+</span><span class='line'>   <span class="kt">u_int16_t</span>      <span class="n">sin_port</span><span class="p">;</span>   <span class="cm">/* port in network byte order */</span>
+</span><span class='line'>   <span class="k">struct</span> <span class="n">in_addr</span>  <span class="n">sin_addr</span><span class="p">;</span>  <span class="cm">/* internet address */</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/* Internet address. */</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">in_addr</span> <span class="p">{</span>
+</span><span class='line'>   <span class="kt">u_int32_t</span>      <span class="n">s_addr</span><span class="p">;</span>     <span class="cm">/* address in network byte order */</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>bind 後，socket を passive socket(接続待ちソケット)，すなわちサーバ側の socket であることをOSに通知する．ここでいう passive socket とは，accept による接続要求を受け付けるのに使用するソケットのこと．accept では passive socket から接続要求を取り出し，それを元に接続済みソケットを作成し，その socket を参照する新しい file descriptor を返す．</p>
+
+<p>なぜわざわざ passive socket を用意しているのかというと，通常サーバに対してクライアントは複数存在し，その要求をさばくためには接続要求をためておく stream が必要であるため．</p>
+
+<p>通信終了時には close 処理を行うが，多少注意が必要．sockt は送信データが正しく受信したことを確認しないと破棄されないので，close しても即座に破棄はされない．一般には，サーバよりも先にクライアントを close すればよい．サーバ側から強制的に close したい時には，close の直前に以下を呼べば良い．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="n">shutdown</span><span class="p">(</span><span class="n">socket</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>もしくは bind の前に以下を設定する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="kt">int</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'><span class="n">setsockopt</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="n">SOL_SOCKET</span><span class="p">,</span> <span class="n">SO_REUSEADDR</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">value</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">value</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p><code>setsockopt</code> は，与えられた socket のオプションを設定するもので，以下のように定義されている．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="kt">int</span> <span class="nf">setsockopt</span><span class="p">(</span><span class="kt">int</span> <span class="n">sockfd</span><span class="p">,</span> <span class="kt">int</span> <span class="n">level</span><span class="p">,</span> <span class="kt">int</span> <span class="n">optname</span><span class="p">,</span>
+</span><span class='line'>               <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">optval</span><span class="p">,</span> <span class="kt">socklen_t</span> <span class="n">optlen</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>よく使われるオプションは <code>SO_REUSEADDR</code> であり，これを設定することで再度同じポート番号で bind できる．</p>
+
+<h2>実装</h2>
+
+<p>ネット上のいろいろを参考に TCP サーバを C++ で書いた．C++は全然書いたことない初心者なのでひどいコードになっているかもしれない&#8230;飽くまで学習用なので，あしからず．</p>
+
+<script src="https://gist.github.com/tasuwo/18fa141e82da1f87901419eb78353f2a.js"></script>
+
+<p>Server，Client の順で起動し，サーバ側から文字列を送信できる．実行結果は以下のような感じ</p>
+
+<p><img src="/images/tcp_connect.png" alt="tcp"></p>
+
+<h2>参考</h2>
+
+<p><a href="http://www.csg.ci.i.u-tokyo.ac.jp/%7Echiba/lecture/web/web01.html">Lecture Notes</a><br>
+<a href="http://bg1.hatenablog.com/entry/2015/08/19/210000">setsockopt - 車輪のx発明 ~B.G&#39;s Blog~</a><br>
+<a href="http://www.amazon.co.jp/Linux%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0-%E3%81%82%E3%81%8D%E3%81%BF%E3%81%A1/dp/4797354526">Linuxネットワークプログラミング : あきみち : 本 : Amazon.co.jp</a><br>
+<a href="http://kotaroito.hatenablog.com/entry/2014/01/31/224138">socket(2), bind(2), listen(2), accept(2) - kotaroito&#39;s notes</a><br>
+<a href="http://myenigma.hatenablog.com/entry/20140308/1394252286">LinuxにおけるTCPソケット通信を利用したプロセス間通信(C++) - MyEnigma</a></p>
+
+<!-- [TCP接続する時に使ういろいろな構造体の整理 - Qiita](http://qiita.com/0xfffffff7/items/6ffb317df8345070d0b5) -->
+
+<!-- [Structure](http://www-cms.phys.s.u-tokyo.ac.jp/~naoki/CIPINTRO/NETWORK/struct.html) -->
+
+<!-- [7.1 デバイス・ファイルについて](https://docs.oracle.com/cd/E39368_01/e48214/ol_about_devices.html) -->
+
+<!-- [システムコールを理解する | UNIX world](http://curtaincall.weblike.jp/portfolio-unix/api.html) -->
+
+<!-- [知ってトクするシステムコール（2）：システムコールと標準ライブラリ関数の違いを知る (1/2) - ＠IT](http://www.atmarkit.co.jp/ait/articles/1112/13/news117.html) -->
+
+<!-- [ソケット通信メモ(Hishidama's TCP/UDP Socket Memo)](http://www.ne.jp/asahi/hishidama/home/tech/socket/) -->
+
+<!-- [ソケット](http://research.nii.ac.jp/~ichiro/syspro98/socket.html) -->
+
+<!-- [3 システムコール](http://akita-nct.jp/yamamoto/lecture/2007/2E/17th/html/node3.html) -->
+
+<!-- [Linuxシステムコールの勉強(その１６) - Webプログラミングをしてみよう!!](http://d.hatena.ne.jp/web_develop/20071205/1196875088) -->
+
+<!-- [socket - システムコールの説明 - Linux コマンド集 一覧表](http://kazmax.zpp.jp/cmd/s/socket.2.html) -->
+
+<!-- [socket関数とプロトコル](http://www.fireproject.jp/feature/c-language/socket/basic.html) -->
+
+<!-- [C言語:ソケット(Socket)でネットワークプログラム入門](http://www.geocities.jp/sugachan1973/doc/funto45.html) -->
+
+<!-- [Lecture Notes](http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/lecture/web/web03.html) -->
+
+<!-- [絵で見てわかるファイルディスクリプタ・パイプ・リダイレクト - あしのあしあと](http://d.hatena.ne.jp/higher_tomorrow/20110426/1303830417) -->
+
+<!-- [C++と Pthreads でミニマルなHTTPサーバを書く - bkブログ](http://0xcc.net/blog/archives/000178.html) -->
+
+<!-- http://yuuki.hatenablog.com/entry/2015-webserver-architecture -->
+
+<!-- http://mattn.kaoriya.net/software/lang/c/20090729235933.htm -->
+
+<!-- http://myenigma.hatenablog.com/entry/20140308/1394252286 -->
+
+<!-- [socket() で使用するアドレス・ファミリー・プロトコル](https://publib.boulder.ibm.com/html/as400/v4r5/ic2962/info/RZAB6ADDFAM.HTM) -->
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">tasuwo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-04-02T12:51:38+09:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>12:51 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/c-plus-plus/'>c++</a>, <a class='category' href='/blog/categories/network/'>network</a>, <a class='category' href='/blog/categories/socket/'>socket</a>, <a class='category' href='/blog/categories/tcp/'>tcp</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2016/04/02/tcp-server/" data-via="" data-counturl="http://tasuwo.github.io/blog/2016/04/02/tcp-server/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <br />
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/03/04/c-c-plus-plus/" title="Previous Post: EmacsにおけるC,C++の環境を整える">&laquo; EmacsにおけるC,C++の環境を整える</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h2 id="toc_0">Profile</h2>
+
+  <h3 id="toc_1">ME</h3>
+
+  <ul>
+  <li>情報系の学生</li>
+  <li>プログラミング初心者でMac初心者</li>
+  </ul>
+
+  <h3 id="toc_2">SNS</h3>
+
+  <ul>
+  <li>Twitter: <a href="https://twitter.com/tasuwo_">@tasuwo_</a></li>
+  <li>GiHub: <a href="https://github.com/tasuwo">tasuwo</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/02/tcp-server/">TCPサーバ/クライアントを車輪の再発明する</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/04/c-c-plus-plus/">EmacsにおけるC,C++の環境を整える</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/02/16/zsh-setting/">OS X でターミナルをきれいにする</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/02/16/brew-open-cv/">OpenCV を Homebrew から導入し直して Xcode に設定し直した</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/02/14/fix-octopress/">El Capitan でブログを更新しようとしたらエラーを吐かれた</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - tasuwo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'tasuwoblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tasuwo.github.io/blog/2016/04/02/tcp-server/';
+        var disqus_url = 'http://tasuwo.github.io/blog/2016/04/02/tcp-server/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

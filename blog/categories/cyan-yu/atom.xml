@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: C言語 | tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/blog/categories/cyan-yu/atom.xml" rel="self"/>
+  <link href="http://tasuwo.github.io/"/>
+  <updated>2016-04-03T21:17:07+09:00</updated>
+  <id>http://tasuwo.github.io/</id>
+  <author>
+    <name><![CDATA[tasuwo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[EmacsにおけるC,C++の環境を整える]]></title>
+    <link href="http://tasuwo.github.io/blog/2016/03/04/c-c-plus-plus/"/>
+    <updated>2016-03-04T21:47:12+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2016/03/04/c-c-plus-plus</id>
+    <content type="html"><![CDATA[<p>大昔に取り組んでいた自作OS、せっかくなので再挑戦してみようと考えた．CLionとかそこらへんのIDEを使用しても良かったけれど，せっかくだからEmacs で C, C++ の環境を整えるたいので，メモしとく．<br>
+基本的に<a href="https://tuhdo.github.io/c-ide.html">C/C++ Development Environment for Emacs</a>に全部書いてあったのでつまんでみる．</p>
+
+<!-- more -->
+
+<p>helm+helm-gtags もしくは ggtags を使う．<br>
+自分は helm-gtags を使うことになるだろう．</p>
+
+<h1>1.GTAGS</h1>
+
+<p>プロジェクトのルートディレクトリで gtags コマンドを実行すると，以下のファイル群が生成されるはず．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cd</span> /path/to/project/root
+<span class="nv">$ </span>gtags
+<span class="nv">$ </span>ls G*
+GPATH   GRTAGS  GTAGS
+</code></pre></div>
+<p>それぞれ以下の情報を保持している．</p>
+
+<ul>
+<li><strong>GTAGS</strong>  : 定義</li>
+<li><strong>GRTAGS</strong> : 参照</li>
+<li><strong>GPATH</strong>  : パス名</li>
+</ul>
+
+<h1>2.基本操作</h1>
+
+<p>作業を快適にするために把握しておくべきEmacsにおける基本操作は以下</p>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>コマンド名</th>
+<th>概要</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>C-M-f</td>
+<td>forward-sexp</td>
+<td>閉じカッコの前に行く</td>
+</tr>
+<tr>
+<td>C-M-b</td>
+<td>backward-sexp</td>
+<td>閉じカッコの後ろに行く</td>
+</tr>
+<tr>
+<td>C-M-k</td>
+<td>kill-sexp</td>
+<td>閉じカッコ内を削除する</td>
+</tr>
+<tr>
+<td>C-M-<SPC>,C-M-@</td>
+<td>mark-sexp</td>
+<td>閉じカッコ内を選択する</td>
+</tr>
+<tr>
+<td>C-M-a</td>
+<td>beginning-of-defun</td>
+<td>関数の前に行く</td>
+</tr>
+<tr>
+<td>C-M-e</td>
+<td>end-of-defun</td>
+<td>関数の後ろに行く</td>
+</tr>
+<tr>
+<td>C-M-h</td>
+<td>mark-defun</td>
+<td>関数を選択する</td>
+</tr>
+</tbody></table>
+
+<h1>3.定義参照</h1>
+
+<h2>3.1.バッファ内参照</h2>
+
+<h3>ggtags-mode</h3>
+
+<p>Imenuを使用する<br>
+<code>(setq-local imenu-create-index-function #&#39;ggtags-build-imenu-index)</code></p>
+
+<h3>helm</h3>
+
+<p>moo-jump-localを使用する</p>
+
+<h2>3.2.プロジェクト内参照</h2>
+
+<h3>ggtags-mode</h3>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>コマンド名</th>
+<th>概要</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>M-.</td>
+<td>ggtags-finde-tag-dwim</td>
+<td>・定義にポイントしていれば参照先を表示する<br>・参照にポイントしてれば定義を表示する<br>・include ヘッダーをポイントしていればそのヘッダーを表示する<br>・その他の場所であれば定義，参照一覧が表示され，絞り込みができる</td>
+</tr>
+<tr>
+<td>M-,</td>
+<td>pop-tag-mark</td>
+<td>ジャンプ元へ戻る</td>
+</tr>
+<tr>
+<td>M-n, M-p</td>
+<td></td>
+<td>候補内移動</td>
+</tr>
+<tr>
+<td>M-g s</td>
+<td></td>
+<td>候補内検索</td>
+</tr>
+</tbody></table>
+
+<h3>helm-mode</h3>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>コマンド名</th>
+<th>概要</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>M-.</td>
+<td>helm-gtags-dwim</td>
+<td>ggtags-find-tag-dwim と一緒</td>
+</tr>
+<tr>
+<td>M-,</td>
+<td>tags-loop-continue</td>
+<td>pop-tag-mark と一緒</td>
+</tr>
+<tr>
+<td>C-j</td>
+<td>helm-gtags-select</td>
+<td>空白部分で M-. するのと一緒．定義や山椒を一覧から絞り込み&amp;ジャンプできる</td>
+</tr>
+</tbody></table>
+
+<h1>4.参照元ジャンプ</h1>
+
+<h3>gtags-mode</h3>
+
+<p>ggtags-find-reference, ggtags-find-tag-dwimを使う</p>
+
+<h3>helm-gtags</h3>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>コマンド名</th>
+<th>概要</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>C-c g r</td>
+<td>helm-gtags-find-rtag</td>
+<td>・関数内で呼び出したら，その関数についての参照先を検索する<br>・関数名上で呼び出したら，参照先のリストを表示する<br>・変数名にポイントしていたら，なにもしない</td>
+</tr>
+<tr>
+<td>C-c g s</td>
+<td>htlm-gtags-find-symbol</td>
+<td>変数名ポイント時に参照元を検索する</td>
+</tr>
+<tr>
+<td>C-c g a</td>
+<td>htlm-gtags-tagas-in-this-function</td>
+<td>現在の関数が参照する関数一覧</td>
+</tr>
+</tbody></table>
+
+<h1>5.ファイル検索</h1>
+
+<h3>ggtags-mode</h3>
+
+<p>ggtags-find-file</p>
+
+<h3>helm-gtags</h3>
+
+<p>helm-gtags-find-files</p>
+
+<p>正直Projectile使ったほうが良いとのこと．</p>
+
+<h1>6.過去に訪れたタグへジャンプ</h1>
+
+<h3>ggatgs-mode</h3>
+
+<p>ggtags-view-tag-history(C-c g h)</p>
+
+<h3>helm-gtags</h3>
+
+<p>helm-gtags-show-stack</p>
+
+<h1>7.Speedbar</h1>
+
+<p>ソースツリーを見れるパッケージ．ただのソースツリーではなくて，戻り値や関数なども一覧できるのが便利っぽい．</p>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>操作</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>SPC</td>
+<td>子ノードを開く</td>
+</tr>
+<tr>
+<td>RET</td>
+<td>ノードを別ウインドウで開く</td>
+</tr>
+<tr>
+<td>U</td>
+<td>親ノードへ移動</td>
+</tr>
+<tr>
+<td>n,p</td>
+<td>ノードを上下移動</td>
+</tr>
+<tr>
+<td>M-n,M-p</td>
+<td>現在の階層内でノードを上下移動</td>
+</tr>
+<tr>
+<td>b</td>
+<td>Speedbarのバッファリストに戻る</td>
+</tr>
+<tr>
+<td>f</td>
+<td>ファイルリストに戻る</td>
+</tr>
+</tbody></table>
+
+<h2>7.1.sr-speedbar</h2>
+
+<p>Speedbarを便利にするパッケージ．</p>
+
+<ul>
+<li>起動/終了
+
+<ul>
+<li>sr-speedbar-open, sr-speedbar-toggle : 開く</li>
+<li>sr-speedbar-cloe, sr-speedbar-toggle : 閉じる</li>
+</ul></li>
+<li>改善点
+
+<ul>
+<li>フレームの代わりにEmacs windowを使用する</li>
+<li><code>C-x 1</code>でSpeedbarを除くすべてのウインドウを削除する</li>
+<li><code>C-x o</code>でSpeedbarに移動するのを防ぐ(sr-speedbar-skip-other-window-pをtにする)</li>
+</ul></li>
+</ul>
+
+<h1>8.Company-mode (補完)</h1>
+
+<p>company-mode を使う．company-mode はEmacsのための補完フレームワーク．<br>
+<code><br>
+(require &#39;company)<br>
+(add-hook &#39;after-init-hook &#39;global-company-mode)<br>
+</code></p>
+
+<h2>8.2.使い方</h2>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>操作</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>M-n,M-p</td>
+<td>候補移動</td>
+</tr>
+<tr>
+<td>RET,TAB</td>
+<td>候補決定</td>
+</tr>
+<tr>
+<td>C-s,C-r,C-o</td>
+<td>候補検索</td>
+</tr>
+<tr>
+<td>M-(数値)</td>
+<td>候補簡易選択</td>
+</tr>
+<tr>
+<td><f1></td>
+<td>選択中候補のドキュメントを表示</td>
+</tr>
+<tr>
+<td>C-w</td>
+<td>選択中候補のソースコード表示</td>
+</tr>
+</tbody></table>
+
+<p><code>company-backends</code>で候補に使用するリソースを指定する．</p>
+
+<h2>8.3.C言語の補完</h2>
+
+<p>C言語でcompanyの補完を利用するためには，以下を記述する．<br>
+<code>bash<br>
+(delete &#39;company-semantic company-backends)<br>
+(define-key c-mode-map  [(tab)] &#39;company-complete)<br>
+(define-key c++-mode-map  [(tab)] &#39;company-complete)<br>
+</code><br>
+上記の設定では，<code>company-semantic</code>を削除している．理由は後述．<code>company-semantic</code>についてはCEDITの項で詳しく説明する．</p>
+
+<p>companyの補完として，以下の二つが働く．</p>
+
+<h3>8.3.1.company-clang</h3>
+
+<p>補完候補の取得のために<code>clang</code>を使用する．プロジェクトではなく，ヘッダファイルによって補完を行う．デフォルトでは<code>company-clang</code>は<code>company-semantic</code>のサブセットであるため，上記設定を行っていれば他に特別な設定はいらない．<br>
+上記せて血で<code>company-semantic</code>を削除したのは，そうしないと<code>company-complete</code>が<code>company-clang</code>ではなく<code>company-semantic</code>を使用してしまうため．これは，<code>company-backends</code>内の優先度がそうなっているため生じる．<br>
+補完候補をプロジェクト内から取得するためには，<code>.dir-locals.el</code>をプロジェクトルートに配置する必要がある．</p>
+<div class="highlight"><pre><code class="language-emacs-lisp" data-lang="emacs-lisp"><span class="p">((</span><span class="no">nil</span> <span class="o">.</span> <span class="p">((</span><span class="nv">company-clang-arguments</span> <span class="o">.</span> <span class="p">(</span><span class="s">&quot;-I/home/&lt;user&gt;/project_root/include1/&quot;</span>
+                                     <span class="s">&quot;-I/home/&lt;user&gt;/project_root/include2/&quot;</span><span class="p">)))))</span>
+</code></pre></div>
+<p>helmを使っているなら，<code>C-x C-f</code>によるファイル検索中に，対象ファイル選択状態から<code>C-c i</code>によって絶対パスを挿入できる．<br>
+<code>nil</code>を指定すると設定をすべてのサブディレクトリ，ファイルに適用し，<code>non-nil</code>であれば設定を適用するメジャーモードを指定できる．<code>company-clang-arguments</code>はインクルードパスを指定するリストである．</p>
+
+<h3>8.3.2comapny-gtags</h3>
+
+<p><code>GNU Global</code>の<code>GTAGS</code>から補完候補を取得する．プロジェクトによる補完を行うことができる．</p>
+
+<h2>8.4.ヘッダーの補完</h2>
+
+<p>プロジェクト内のヘッダーを補完したいなら，<code>company-c-headers</code>を使用する．以下のように<code>company-backends</code>に追加すれば良い．</p>
+<div class="highlight"><pre><code class="language-emacs-lisp" data-lang="emacs-lisp"><span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;company-backends</span> <span class="ss">&#39;company-c-headers</span><span class="p">)</span>
+</code></pre></div>
+<p>C++でヘッダーの補完を行いたいならば，パスを追加する必要がある．<code>company-c-header</code>はシステムのインクルードパスとして<code>/usr/include/</code>と<code>/usr/local/include/</code>しか含んでいない．例としては以下のように追加する．</p>
+<div class="highlight"><pre><code class="language-emacs-lisp" data-lang="emacs-lisp"><span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;company-c-headers-path-system</span> <span class="s">&quot;/usr/include/c++/4.8/&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h1>9.CEDET</h1>
+
+<p>CEDETはCollection of Emacs Development Environment Toolsの略称．CEDETのデメリットは，Emacs Lispで書かれているため，Emacsのパフォーマンスに影響すること．23.2以降のEmacsにはマージされているので，インストールの必要はない．<br>
+最新版は以下のようにダウンロードすれば良い．<br>
+<code>bash<br>
+$ git clone http://git.code.sf.net/p/cedet/git cedet<br>
+$ cd cedet<br>
+$ make # wait for it to complete<br>
+$ cd contrib<br>
+$ make<br>
+</code><br>
+Emacs からロードする．<br>
+<code>emacs-lisp<br>
+(load-file (concat user-emacs-directory &quot;/cedet/cedet-devel-load.el&quot;))<br>
+(load-file (concat user-emacs-directory &quot;cedet/contrib/cedet-contrib-load.el&quot;))<br>
+</code></p>
+
+<h2>9.1.Semanticマイナーモード</h2>
+
+<p><code>Semantic</code>は，ソースコードパーサを利用して構文を考慮した補完を行ってくれるパッケージ．</p>
+
+<h3>9.1.1セットアップ</h3>
+<div class="highlight"><pre><code class="language-emacs-lisp" data-lang="emacs-lisp"><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;cc-mode</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;semantic</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nv">global-semanticdb-minor-mode</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">global-semantic-idle-scheduler-mode</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nv">semantic-mode</span> <span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+<h3>9.1.2.<code>semantic-mode</code></h3>
+
+<p>Semantic-modeでは，Emacsは現在のバッファをパースする．シンボルにカーソルを合わせるとsemanticはすべてのincludeファイルを読みに行くので，たまに時間がかかる．しかし一回パースすれば終わりなので，問題はない．</p>
+
+<h3>9.1.3.パスの追加</h3>
+
+<p>Semantic のデフォルトのインクルードパスは<code>semantic-dependency-system-include-path</code>に格納されており，追加したい場合は以下のようにする．</p>
+<div class="highlight"><pre><code class="language-emacs-lisp" data-lang="emacs-lisp"><span class="p">(</span><span class="nv">semantic-add-system-include</span> <span class="s">&quot;/usr/include/boost&quot;</span> <span class="ss">&#39;c++-mode</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">semantic-add-system-include</span> <span class="s">&quot;~/linux/kernel&quot;</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">semantic-add-system-include</span> <span class="s">&quot;~/linux/include&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3>9.1.4.<code>company-mode</code>におけるSemantic-mode</h3>
+
+<p><code>company-mode</code>には<code>company-semantic</code>コマンドがあり，これがSemanticDBを補完候補の取得に利用する．<code>company-semantic</code>の良いところは，<code>semantic-ia-complete-symbol</code>が改善されているところ．元は1文字以上タイプしていなければ補完を検索してくれなかったが，<code>company-semantic</code>ではプレフィクスなしで補完してくれる．</p>
+
+<ul>
+<li><code>global-sematicdb-minor-mode</code>
+
+<ul>
+<li>パース結果をキャッシュする．キャッシュ結果は<code>semanticdb-default-save-directory</code>変数内のパスに保存されるが，デフォルトでは<code>~/.emacs.d/semanticdb</code>いかに保持される</li>
+</ul></li>
+<li><code>global-semantic-idle-scheduler-mode</code>
+
+<ul>
+<li>このモードが有効になっていると，バッファーが期限切れになっていた時，ユーザがタイプしていない間にパーサをし直す．これがオフだと，バッファはコマンドによって手動でパースし直さなければならない</li>
+</ul></li>
+</ul>
+
+<h2>9.2.CEDETのその他の機能</h2>
+
+<p>Semanticがソースコードをパースし作成したデータベースは，コードの補完の他にも様々な使い道がある．コードナビゲーションや定義元・参照元ジャンプなど．</p>
+
+<h3>9.2.1.Senator</h3>
+
+<p>CEDETの一部で，SEmainticNAvigaTORの略称．</p>
+
+<h3>9.2.2.デバッグ</h3>
+
+<p>GDBとかGUDとかがあるらしい．</p>
+
+<p>あとは気が向いたら．</p>
+]]></content>
+  </entry>
+  
+</feed>

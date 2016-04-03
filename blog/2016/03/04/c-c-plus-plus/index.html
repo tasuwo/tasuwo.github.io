@@ -1,0 +1,705 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>EmacsにおけるC,C++の環境を整える - tasuwo blog</title>
+  <meta name="author" content="tasuwo">
+
+  
+  <meta name="description" content="大昔に取り組んでいた自作OS、せっかくなので再挑戦してみようと考えた．CLionとかそこらへんのIDEを使用しても良かったけれど，せっかくだからEmacs で C, C++ の環境を整えるたいので，メモしとく．
+基本的にC/C++ Development Environment for &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tasuwo.github.io/blog/2016/03/04/c-c-plus-plus">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="tasuwo blog" type="application/atom+xml">
+  <link href="/stylesheets/data-table.css" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-60860415-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">tasuwo blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:tasuwo.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">EmacsにおけるC,C++の環境を整える</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-03-04T21:47:12+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:47 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tasuwo.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>大昔に取り組んでいた自作OS、せっかくなので再挑戦してみようと考えた．CLionとかそこらへんのIDEを使用しても良かったけれど，せっかくだからEmacs で C, C++ の環境を整えるたいので，メモしとく．<br>
+基本的に<a href="https://tuhdo.github.io/c-ide.html">C/C++ Development Environment for Emacs</a>に全部書いてあったのでつまんでみる．</p>
+
+<!-- more -->
+
+<p>helm+helm-gtags もしくは ggtags を使う．<br>
+自分は helm-gtags を使うことになるだろう．</p>
+
+<h1>1.GTAGS</h1>
+
+<p>プロジェクトのルートディレクトリで gtags コマンドを実行すると，以下のファイル群が生成されるはず．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span><span class="nb">cd</span> /path/to/project/root
+</span><span class='line'><span class="nv">$ </span>gtags
+</span><span class='line'><span class="nv">$ </span>ls G*
+</span><span class='line'>GPATH   GRTAGS  GTAGS
+</span></code></pre></td></tr></table></div></figure>
+
+<p>それぞれ以下の情報を保持している．</p>
+
+<ul>
+<li><strong>GTAGS</strong>  : 定義</li>
+<li><strong>GRTAGS</strong> : 参照</li>
+<li><strong>GPATH</strong>  : パス名</li>
+</ul>
+
+<h1>2.基本操作</h1>
+
+<p>作業を快適にするために把握しておくべきEmacsにおける基本操作は以下</p>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>コマンド名</th>
+<th>概要</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>C-M-f</td>
+<td>forward-sexp</td>
+<td>閉じカッコの前に行く</td>
+</tr>
+<tr>
+<td>C-M-b</td>
+<td>backward-sexp</td>
+<td>閉じカッコの後ろに行く</td>
+</tr>
+<tr>
+<td>C-M-k</td>
+<td>kill-sexp</td>
+<td>閉じカッコ内を削除する</td>
+</tr>
+<tr>
+<td>C-M-<SPC>,C-M-@</td>
+<td>mark-sexp</td>
+<td>閉じカッコ内を選択する</td>
+</tr>
+<tr>
+<td>C-M-a</td>
+<td>beginning-of-defun</td>
+<td>関数の前に行く</td>
+</tr>
+<tr>
+<td>C-M-e</td>
+<td>end-of-defun</td>
+<td>関数の後ろに行く</td>
+</tr>
+<tr>
+<td>C-M-h</td>
+<td>mark-defun</td>
+<td>関数を選択する</td>
+</tr>
+</tbody></table>
+
+<h1>3.定義参照</h1>
+
+<h2>3.1.バッファ内参照</h2>
+
+<h3>ggtags-mode</h3>
+
+<p>Imenuを使用する<br>
+<code>(setq-local imenu-create-index-function #&#39;ggtags-build-imenu-index)</code></p>
+
+<h3>helm</h3>
+
+<p>moo-jump-localを使用する</p>
+
+<h2>3.2.プロジェクト内参照</h2>
+
+<h3>ggtags-mode</h3>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>コマンド名</th>
+<th>概要</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>M-.</td>
+<td>ggtags-finde-tag-dwim</td>
+<td>・定義にポイントしていれば参照先を表示する<br>・参照にポイントしてれば定義を表示する<br>・include ヘッダーをポイントしていればそのヘッダーを表示する<br>・その他の場所であれば定義，参照一覧が表示され，絞り込みができる</td>
+</tr>
+<tr>
+<td>M-,</td>
+<td>pop-tag-mark</td>
+<td>ジャンプ元へ戻る</td>
+</tr>
+<tr>
+<td>M-n, M-p</td>
+<td></td>
+<td>候補内移動</td>
+</tr>
+<tr>
+<td>M-g s</td>
+<td></td>
+<td>候補内検索</td>
+</tr>
+</tbody></table>
+
+<h3>helm-mode</h3>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>コマンド名</th>
+<th>概要</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>M-.</td>
+<td>helm-gtags-dwim</td>
+<td>ggtags-find-tag-dwim と一緒</td>
+</tr>
+<tr>
+<td>M-,</td>
+<td>tags-loop-continue</td>
+<td>pop-tag-mark と一緒</td>
+</tr>
+<tr>
+<td>C-j</td>
+<td>helm-gtags-select</td>
+<td>空白部分で M-. するのと一緒．定義や山椒を一覧から絞り込み&amp;ジャンプできる</td>
+</tr>
+</tbody></table>
+
+<h1>4.参照元ジャンプ</h1>
+
+<h3>gtags-mode</h3>
+
+<p>ggtags-find-reference, ggtags-find-tag-dwimを使う</p>
+
+<h3>helm-gtags</h3>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>コマンド名</th>
+<th>概要</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>C-c g r</td>
+<td>helm-gtags-find-rtag</td>
+<td>・関数内で呼び出したら，その関数についての参照先を検索する<br>・関数名上で呼び出したら，参照先のリストを表示する<br>・変数名にポイントしていたら，なにもしない</td>
+</tr>
+<tr>
+<td>C-c g s</td>
+<td>htlm-gtags-find-symbol</td>
+<td>変数名ポイント時に参照元を検索する</td>
+</tr>
+<tr>
+<td>C-c g a</td>
+<td>htlm-gtags-tagas-in-this-function</td>
+<td>現在の関数が参照する関数一覧</td>
+</tr>
+</tbody></table>
+
+<h1>5.ファイル検索</h1>
+
+<h3>ggtags-mode</h3>
+
+<p>ggtags-find-file</p>
+
+<h3>helm-gtags</h3>
+
+<p>helm-gtags-find-files</p>
+
+<p>正直Projectile使ったほうが良いとのこと．</p>
+
+<h1>6.過去に訪れたタグへジャンプ</h1>
+
+<h3>ggatgs-mode</h3>
+
+<p>ggtags-view-tag-history(C-c g h)</p>
+
+<h3>helm-gtags</h3>
+
+<p>helm-gtags-show-stack</p>
+
+<h1>7.Speedbar</h1>
+
+<p>ソースツリーを見れるパッケージ．ただのソースツリーではなくて，戻り値や関数なども一覧できるのが便利っぽい．</p>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>操作</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>SPC</td>
+<td>子ノードを開く</td>
+</tr>
+<tr>
+<td>RET</td>
+<td>ノードを別ウインドウで開く</td>
+</tr>
+<tr>
+<td>U</td>
+<td>親ノードへ移動</td>
+</tr>
+<tr>
+<td>n,p</td>
+<td>ノードを上下移動</td>
+</tr>
+<tr>
+<td>M-n,M-p</td>
+<td>現在の階層内でノードを上下移動</td>
+</tr>
+<tr>
+<td>b</td>
+<td>Speedbarのバッファリストに戻る</td>
+</tr>
+<tr>
+<td>f</td>
+<td>ファイルリストに戻る</td>
+</tr>
+</tbody></table>
+
+<h2>7.1.sr-speedbar</h2>
+
+<p>Speedbarを便利にするパッケージ．</p>
+
+<ul>
+<li>起動/終了
+
+<ul>
+<li>sr-speedbar-open, sr-speedbar-toggle : 開く</li>
+<li>sr-speedbar-cloe, sr-speedbar-toggle : 閉じる</li>
+</ul></li>
+<li>改善点
+
+<ul>
+<li>フレームの代わりにEmacs windowを使用する</li>
+<li><code>C-x 1</code>でSpeedbarを除くすべてのウインドウを削除する</li>
+<li><code>C-x o</code>でSpeedbarに移動するのを防ぐ(sr-speedbar-skip-other-window-pをtにする)</li>
+</ul></li>
+</ul>
+
+<h1>8.Company-mode (補完)</h1>
+
+<p>company-mode を使う．company-mode はEmacsのための補完フレームワーク．<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+<span class='line-number'>2</span><br>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">(</span>require <span class="s1">&#39;company)</span><br>
+</span><span class='line'><span class="s1">(add-hook &#39;</span>after-init-hook <span class="err">&#39;</span>global-company-mode<span class="o">)</span><br>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>8.2.使い方</h2>
+
+<table><thead>
+<tr>
+<th>コマンド</th>
+<th>操作</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>M-n,M-p</td>
+<td>候補移動</td>
+</tr>
+<tr>
+<td>RET,TAB</td>
+<td>候補決定</td>
+</tr>
+<tr>
+<td>C-s,C-r,C-o</td>
+<td>候補検索</td>
+</tr>
+<tr>
+<td>M-(数値)</td>
+<td>候補簡易選択</td>
+</tr>
+<tr>
+<td><f1></td>
+<td>選択中候補のドキュメントを表示</td>
+</tr>
+<tr>
+<td>C-w</td>
+<td>選択中候補のソースコード表示</td>
+</tr>
+</tbody></table>
+
+<p><code>company-backends</code>で候補に使用するリソースを指定する．</p>
+
+<h2>8.3.C言語の補完</h2>
+
+<p>C言語でcompanyの補完を利用するためには，以下を記述する．<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+<span class='line-number'>2</span><br>
+<span class='line-number'>3</span><br>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">(</span>delete <span class="s1">&#39;company-semantic company-backends)</span><br>
+</span><span class='line'><span class="s1">(define-key c-mode-map  [(tab)] &#39;</span>company-complete<span class="o">)</span><br>
+</span><span class='line'><span class="o">(</span>define-key c++-mode-map  <span class="o">[(</span>tab<span class="o">)]</span> <span class="err">&#39;</span>company-complete<span class="o">)</span><br>
+</span></code></pre></td></tr></table></div></figure><br>
+上記の設定では，<code>company-semantic</code>を削除している．理由は後述．<code>company-semantic</code>についてはCEDITの項で詳しく説明する．</p>
+
+<p>companyの補完として，以下の二つが働く．</p>
+
+<h3>8.3.1.company-clang</h3>
+
+<p>補完候補の取得のために<code>clang</code>を使用する．プロジェクトではなく，ヘッダファイルによって補完を行う．デフォルトでは<code>company-clang</code>は<code>company-semantic</code>のサブセットであるため，上記設定を行っていれば他に特別な設定はいらない．<br>
+上記せて血で<code>company-semantic</code>を削除したのは，そうしないと<code>company-complete</code>が<code>company-clang</code>ではなく<code>company-semantic</code>を使用してしまうため．これは，<code>company-backends</code>内の優先度がそうなっているため生じる．<br>
+補完候補をプロジェクト内から取得するためには，<code>.dir-locals.el</code>をプロジェクトルートに配置する必要がある．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='emacs-lisp'><span class='line'><span class="p">((</span><span class="no">nil</span> <span class="o">.</span> <span class="p">((</span><span class="nv">company-clang-arguments</span> <span class="o">.</span> <span class="p">(</span><span class="s">&quot;-I/home/&lt;user&gt;/project_root/include1/&quot;</span>
+</span><span class='line'>                                     <span class="s">&quot;-I/home/&lt;user&gt;/project_root/include2/&quot;</span><span class="p">)))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>helmを使っているなら，<code>C-x C-f</code>によるファイル検索中に，対象ファイル選択状態から<code>C-c i</code>によって絶対パスを挿入できる．<br>
+<code>nil</code>を指定すると設定をすべてのサブディレクトリ，ファイルに適用し，<code>non-nil</code>であれば設定を適用するメジャーモードを指定できる．<code>company-clang-arguments</code>はインクルードパスを指定するリストである．</p>
+
+<h3>8.3.2comapny-gtags</h3>
+
+<p><code>GNU Global</code>の<code>GTAGS</code>から補完候補を取得する．プロジェクトによる補完を行うことができる．</p>
+
+<h2>8.4.ヘッダーの補完</h2>
+
+<p>プロジェクト内のヘッダーを補完したいなら，<code>company-c-headers</code>を使用する．以下のように<code>company-backends</code>に追加すれば良い．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='emacs-lisp'><span class='line'><span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;company-backends</span> <span class="ss">&#39;company-c-headers</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>C++でヘッダーの補完を行いたいならば，パスを追加する必要がある．<code>company-c-header</code>はシステムのインクルードパスとして<code>/usr/include/</code>と<code>/usr/local/include/</code>しか含んでいない．例としては以下のように追加する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='emacs-lisp'><span class='line'><span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">&#39;company-c-headers-path-system</span> <span class="s">&quot;/usr/include/c++/4.8/&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h1>9.CEDET</h1>
+
+<p>CEDETはCollection of Emacs Development Environment Toolsの略称．CEDETのデメリットは，Emacs Lispで書かれているため，Emacsのパフォーマンスに影響すること．23.2以降のEmacsにはマージされているので，インストールの必要はない．<br>
+最新版は以下のようにダウンロードすれば良い．<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+<span class='line-number'>2</span><br>
+<span class='line-number'>3</span><br>
+<span class='line-number'>4</span><br>
+<span class='line-number'>5</span><br>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git clone <a href="http://git.code.sf.net/p/cedet/git">http://git.code.sf.net/p/cedet/git</a> cedet<br>
+</span><span class='line'><span class="nv">$ </span><span class="nb">cd </span>cedet<br>
+</span><span class='line'><span class="nv">$ </span>make <span class="c"># wait for it to complete</span><br>
+</span><span class='line'><span class="nv">$ </span><span class="nb">cd </span>contrib<br>
+</span><span class='line'><span class="nv">$ </span>make<br>
+</span></code></pre></td></tr></table></div></figure><br>
+Emacs からロードする．<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+<span class='line-number'>2</span><br>
+</pre></td><td class='code'><pre><code class='emacs-lisp'><span class='line'><span class="p">(</span><span class="nv">load-file</span> <span class="p">(</span><span class="nv">concat</span> <span class="nv">user-emacs-directory</span> <span class="s">&quot;/cedet/cedet-devel-load.el&quot;</span><span class="p">))</span><br>
+</span><span class='line'><span class="p">(</span><span class="nv">load-file</span> <span class="p">(</span><span class="nv">concat</span> <span class="nv">user-emacs-directory</span> <span class="s">&quot;cedet/contrib/cedet-contrib-load.el&quot;</span><span class="p">))</span><br>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>9.1.Semanticマイナーモード</h2>
+
+<p><code>Semantic</code>は，ソースコードパーサを利用して構文を考慮した補完を行ってくれるパッケージ．</p>
+
+<h3>9.1.1セットアップ</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='emacs-lisp'><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;cc-mode</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nb">require</span> <span class="ss">&#39;semantic</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="nv">global-semanticdb-minor-mode</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">global-semantic-idle-scheduler-mode</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="nv">semantic-mode</span> <span class="mi">1</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h3>9.1.2.<code>semantic-mode</code></h3>
+
+<p>Semantic-modeでは，Emacsは現在のバッファをパースする．シンボルにカーソルを合わせるとsemanticはすべてのincludeファイルを読みに行くので，たまに時間がかかる．しかし一回パースすれば終わりなので，問題はない．</p>
+
+<h3>9.1.3.パスの追加</h3>
+
+<p>Semantic のデフォルトのインクルードパスは<code>semantic-dependency-system-include-path</code>に格納されており，追加したい場合は以下のようにする．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='emacs-lisp'><span class='line'><span class="p">(</span><span class="nv">semantic-add-system-include</span> <span class="s">&quot;/usr/include/boost&quot;</span> <span class="ss">&#39;c++-mode</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">semantic-add-system-include</span> <span class="s">&quot;~/linux/kernel&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nv">semantic-add-system-include</span> <span class="s">&quot;~/linux/include&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<h3>9.1.4.<code>company-mode</code>におけるSemantic-mode</h3>
+
+<p><code>company-mode</code>には<code>company-semantic</code>コマンドがあり，これがSemanticDBを補完候補の取得に利用する．<code>company-semantic</code>の良いところは，<code>semantic-ia-complete-symbol</code>が改善されているところ．元は1文字以上タイプしていなければ補完を検索してくれなかったが，<code>company-semantic</code>ではプレフィクスなしで補完してくれる．</p>
+
+<ul>
+<li><code>global-sematicdb-minor-mode</code>
+
+<ul>
+<li>パース結果をキャッシュする．キャッシュ結果は<code>semanticdb-default-save-directory</code>変数内のパスに保存されるが，デフォルトでは<code>~/.emacs.d/semanticdb</code>いかに保持される</li>
+</ul></li>
+<li><code>global-semantic-idle-scheduler-mode</code>
+
+<ul>
+<li>このモードが有効になっていると，バッファーが期限切れになっていた時，ユーザがタイプしていない間にパーサをし直す．これがオフだと，バッファはコマンドによって手動でパースし直さなければならない</li>
+</ul></li>
+</ul>
+
+<h2>9.2.CEDETのその他の機能</h2>
+
+<p>Semanticがソースコードをパースし作成したデータベースは，コードの補完の他にも様々な使い道がある．コードナビゲーションや定義元・参照元ジャンプなど．</p>
+
+<h3>9.2.1.Senator</h3>
+
+<p>CEDETの一部で，SEmainticNAvigaTORの略称．</p>
+
+<h3>9.2.2.デバッグ</h3>
+
+<p>GDBとかGUDとかがあるらしい．</p>
+
+<p>あとは気が向いたら．</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">tasuwo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-03-04T21:47:12+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:47 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/c-plus-plus/'>c++</a>, <a class='category' href='/blog/categories/cyan-yu/'>c言語</a>, <a class='category' href='/blog/categories/emacs/'>emacs</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2016/03/04/c-c-plus-plus/" data-via="" data-counturl="http://tasuwo.github.io/blog/2016/03/04/c-c-plus-plus/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <br />
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/02/16/zsh-setting/" title="Previous Post: OS X でターミナルをきれいにする">&laquo; OS X でターミナルをきれいにする</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2016/04/02/tcp-server/" title="Next Post: TCPサーバ/クライアントを車輪の再発明する">TCPサーバ/クライアントを車輪の再発明する &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h2 id="toc_0">Profile</h2>
+
+  <h3 id="toc_1">ME</h3>
+
+  <ul>
+  <li>情報系の学生</li>
+  <li>プログラミング初心者でMac初心者</li>
+  </ul>
+
+  <h3 id="toc_2">SNS</h3>
+
+  <ul>
+  <li>Twitter: <a href="https://twitter.com/tasuwo_">@tasuwo_</a></li>
+  <li>GiHub: <a href="https://github.com/tasuwo">tasuwo</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/02/tcp-server/">TCPサーバ/クライアントを車輪の再発明する</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/04/c-c-plus-plus/">EmacsにおけるC,C++の環境を整える</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/02/16/zsh-setting/">OS X でターミナルをきれいにする</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/02/16/brew-open-cv/">OpenCV を Homebrew から導入し直して Xcode に設定し直した</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/02/14/fix-octopress/">El Capitan でブログを更新しようとしたらエラーを吐かれた</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - tasuwo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'tasuwoblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tasuwo.github.io/blog/2016/03/04/c-c-plus-plus/';
+        var disqus_url = 'http://tasuwo.github.io/blog/2016/03/04/c-c-plus-plus/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
