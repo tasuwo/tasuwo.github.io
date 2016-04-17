@@ -4,7 +4,7 @@
   <title><![CDATA[tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2016-04-03T21:17:07+09:00</updated>
+  <updated>2016-04-17T22:54:30+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -12,6 +12,489 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[PythonでHTMLのテーブル情報を取得する]]></title>
+    <link href="http://tasuwo.github.io/blog/2016/04/17/python-crowling/"/>
+    <updated>2016-04-17T10:37:30+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2016/04/17/python-crowling</id>
+    <content type="html"><![CDATA[<p>研究室内で今までHTMLのテーブルでデータを管理していたものを，ちゃんとDBつくって管理したくなったので，Pythonを使ってcrawlingしてみようという試み．</p>
+
+<p><strong><em>!!注意!! : 筆者はPython初心者です．コードの表現等は適切でない場合があります&#8230;おかしな部分がありましたらぜひコメントで指摘をお願いします&#8230;</em></strong></p>
+
+<!-- more -->
+
+<h2>やりたいことと問題点</h2>
+
+<p>以下のようなテーブルが存在した時，その内容を抽出してDBに格納したい．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;table</span> <span class="na">width=</span><span class="s">&quot;95%&quot;</span> <span class="na">border=</span><span class="s">&quot;1&quot;</span> <span class="na">cellspacing=</span><span class="s">&quot;0&quot;</span> <span class="na">cellpadding=</span><span class="s">&quot;2&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;tr</span> <span class="na">align=</span><span class="s">&quot;center&quot;</span> <span class="na">bgcolor=</span><span class="s">&quot;yellow&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;td</span> <span class="na">width=</span><span class="s">&quot;80&quot;</span><span class="nt">&gt;</span>日付<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;td</span> <span class="na">width=</span><span class="s">&quot;80&quot;</span><span class="nt">&gt;</span>記録<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;td</span> <span class="na">width=</span><span class="s">&quot;80&quot;</span><span class="nt">&gt;</span>担当<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;td&gt;</span>題目<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/tr&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;tr</span> <span class="na">align=</span><span class="s">&quot;center&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;td</span> <span class="na">rowspan=</span><span class="s">&quot;2&quot;</span><span class="nt">&gt;</span>2XX5/12/24<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;td</span> <span class="na">rowspan=</span><span class="s">&quot;2&quot;</span><span class="nt">&gt;</span>記録者名1<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;td</span> <span class="na">nowrap</span><span class="nt">&gt;</span>担当者名1<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;td</span> <span class="na">align=</span><span class="s">&quot;left&quot;</span><span class="nt">&gt;</span>論文情報1<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/tr&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;tr</span> <span class="na">align=</span><span class="s">&quot;center&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;td&gt;</span>担当者名2<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;td</span> <span class="na">align=</span><span class="s">&quot;left&quot;</span><span class="nt">&gt;</span>論文情報2<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/tr&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;tr</span> <span class="na">align=</span><span class="s">&quot;center&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;td</span> <span class="na">rowspan=</span><span class="s">&quot;2&quot;</span><span class="nt">&gt;</span>2XX5/12/25<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;td</span> <span class="na">rowspan=</span><span class="s">&quot;2&quot;</span><span class="nt">&gt;</span>記録者名2<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;td</span> <span class="na">nowrap</span><span class="nt">&gt;</span>担当者名3<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;td</span> <span class="na">align=</span><span class="s">&quot;left&quot;</span><span class="nt">&gt;</span>論文情報3<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/tr&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;tr</span> <span class="na">align=</span><span class="s">&quot;center&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;td&gt;</span>担当者名4<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;td</span> <span class="na">align=</span><span class="s">&quot;left&quot;</span><span class="nt">&gt;</span>論文情報4<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/tr&gt;</span>
+</span><span class='line'><span class="nt">&lt;/table&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>上記のHTML記述は以下のように描画される．</p>
+
+<table>
+  <tr align="center" bgcolor="yellow">
+    <td width="80">日付</td>
+    <td width="80">記録</td>
+    <td width="80">担当</td>
+    <td>題目</td>
+  </tr>
+  <tr align="center">
+    <td rowspan="2">2XX5/12/24</td>
+    <td rowspan="2">記録者名</td>
+    <td nowrap>担当者名1</td>
+    <td align="left">論文情報1</td>
+  </tr>
+  <tr align="center">
+    <td>担当者名2</td>
+    <td align="left">論文情報2</td>
+  </tr>
+  <tr align="center">
+    <td rowspan="2">2XX5/12/25</td>
+    <td rowspan="2">記録者名2</td>
+    <td nowrap>担当者名3</td>
+    <td align="left">論文情報3</td>
+  </tr>
+  <tr align="center">
+    <td>担当者名4</td>
+    <td align="left">論文情報4</td>
+  </tr>
+</table>
+
+<p>問題は，<strong><code>rowspan</code>オプションを使用しているため，日付&amp;記録とtrタグが1:1になっていない</strong>という部分．調べてみると，<a href="http://stackoverflow.com/questions/28763891/what-should-i-do-when-tr-has-rowspan">各trタグがもつtdタグと，rowspanオプションを持つtdタグをあらかじめ保存しておき，後者の情報から前者を更新する方法</a>があるらしい．しかし，<strong>今回はとりあえず論文情報だけ取得できればよかったので，<code>align</code>オプションを持つtdタグのみを抽出する．</strong></p>
+
+<p>また，論文情報は以下の形式をとる．ここから各種情報を抽出してDBに格納したい．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>著者名(所属), ... : 原文題目[翻訳題目], 論文誌名, Vol.番号, No.番号, pp.開始頁-終了頁 (発行年/月)
+</span></code></pre></td></tr></table></div></figure>
+
+<p>ここでの問題は，<strong><code>,</code>や<code>:</code>が全角の場合と半角の場合が入り混じっている(!?)</strong>という部分(各論文情報間だけでなく，なんと一つの論文情報内に全角/半角が混ざっている場合もある&#8230;)．みんなが適当に更新したから仕方ないね&#8230;さらに，論文誌名やVol.，No.等はあったりなかったりするので，<strong>今回はとりあえず著者名と題目のみ取得する．</strong></p>
+
+<h2>やるべきこと</h2>
+
+<p>手順としては以下のようになる．対象ページはBasic認証が必要なので対応する．</p>
+
+<ul>
+<li>Basic認証して対象ページのHTMLを取得する</li>
+<li>HTMLにおけるテーブルから特定のオプションが負荷されたtdタグを抽出する</li>
+<li>得られた論文情報から著者名と題目の情報を抽出する</li>
+</ul>
+
+<h2>実装する</h2>
+
+<h3>HTMLの取得</h3>
+
+<p>ライブラリは簡単そうだったので<code>requests</code>を使用した．Basic認証を行うためには引数で<code>auth</code>を指定する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">requests</span>
+</span><span class='line'><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span class='line'>  <span class="n">URL</span> <span class="o">=</span> <span class="s">&#39;http://...&#39;</span>
+</span><span class='line'>  <span class="n">USER_NAME</span> <span class="o">=</span> <span class="s">&quot;your_user_name&quot;</span>
+</span><span class='line'>  <span class="n">PASS_WORD</span> <span class="o">=</span> <span class="s">&quot;your_pass_word&quot;</span>
+</span><span class='line'>  <span class="n">PAGES_DATA</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">URL</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="p">(</span><span class="n">USER_NAME</span><span class="p">,</span> <span class="n">PASS_WORD</span><span class="p">))</span>
+</span><span class='line'>  <span class="n">CORRECT_ENCODING</span> <span class="o">=</span> <span class="n">PAGES_DATA</span><span class="o">.</span><span class="n">apparent_encoding</span>
+</span><span class='line'>  <span class="n">PAGES_DATA</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">CORRECT_ENCODING</span>
+</span><span class='line'>  <span class="n">HTML</span> <span class="o">=</span> <span class="n">PAGES_DATA</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">CORRECT_ENCODING</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">print</span> <span class="n">HTML</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p><code>apparent_encoding</code>を取得したデータのencodingに設定し直しているのは，<code>requests</code>が正しくエンコード情報を取得してくれない場合があるかららしい．さらに，データに含まれるテキストを正しくエンコードすると，日本語を文字化けさせずにデータを取得できた．</p>
+
+<blockquote>
+<p><a href="http://blog.aoshiman.org/entry/118/">[Python]requestsが正しくエンコード情報を返してくれない場合は apparent_encoding を使うとよいかもしれない | aoshiman.org</a></p>
+</blockquote>
+
+<h3>HTMLのパース</h3>
+
+<p>ライブラリは<code>BeautifulSoup</code>を使用した．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">SOUP</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">HTML</span><span class="p">,</span> <span class="s">&quot;lxml&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="n">TABLES</span> <span class="o">=</span> <span class="n">SOUP</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s">&#39;table&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">TABLES</span><span class="p">:</span>
+</span><span class='line'>  <span class="n">tmp</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s">&#39;tr&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">ALL_ROWS</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+</span><span class='line'>  <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">tr_tag</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ALL_ROWS</span><span class="p">):</span>
+</span><span class='line'>      <span class="n">scholar_strings</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span class='line'>      <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tr_tag</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s">&#39;td&#39;</span><span class="p">)):</span>
+</span><span class='line'>          <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">has_attr</span><span class="p">(</span><span class="s">&quot;align&quot;</span><span class="p">):</span>
+</span><span class='line'>              <span class="n">scholar_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get_text</span><span class="p">())</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>基本的には，<code>find_all</code>でタグを検索し，<code>has_attr</code>で指定オプションを持つかどうかを判定する，という流れ．これで論文情報の文字列群は取得できる．</p>
+
+<h3>文字列の分割</h3>
+
+<p>論文情報は<code>執筆者名:論文情報</code>の形式で区切られており，さらに論文情報は<code>論文題目,その他の情報,...</code>のような形式で区切られている．さらに，<code>:</code>及び<code>,</code>は半角と全角が混在している．また，論文題目に<code>:</code>が含まれる場合も存在するし，論文題目以外の論文情報には抜けや漏れが存在する可能性がある．<br>
+そこで，以下のように分割処理を行う．</p>
+
+<ol>
+<li>一番左端の<code>:</code>(半角/全角)で分割し，執筆者情報と論文情報に分割する</li>
+<li>執筆者情報を<code>,</code>(半角/全角)で分割し，各執筆者の除法を取得する</li>
+<li>論文情報を<code>,</code>(半角/全角)で分割し，論文題目のみ取得する</li>
+</ol>
+
+<p>文字列を複数のデリミタで区切る，もしくは指定回数のみ分割するには，<code>re</code>モジュールを使用して以下のようにする．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">re</span>
+</span><span class='line'><span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;delimter1|delimiter2|...&quot;</span><span class="p">,</span> <span class="s">&quot;分割対象の文字列&quot;</span><span class="p">,</span> <span class="err">分割回数</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>デリミタ群をリストで渡したかったので，以下のような関数を作成した．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">def</span> <span class="nf">split_by_delimiters</span><span class="p">(</span><span class="n">delimiter_list</span><span class="p">,</span> <span class="n">target_string</span><span class="p">,</span> <span class="n">split_num</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+</span><span class='line'>  <span class="sd">u&quot;&quot;&quot;</span>
+</span><span class='line'><span class="sd"> Return a list of the words, using words in delimiter_list as</span>
+</span><span class='line'><span class="sd"> the delimiter strings</span>
+</span><span class='line'><span class="sd"> &quot;&quot;&quot;</span>
+</span><span class='line'>  <span class="c"># Prepare delimiter string</span>
+</span><span class='line'>  <span class="n">delimiter_str</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+</span><span class='line'>  <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">delimiter_list</span><span class="p">:</span>
+</span><span class='line'>      <span class="n">delimiter_str</span> <span class="o">=</span> <span class="n">delimiter_str</span> <span class="o">+</span> <span class="n">pattern</span> <span class="o">+</span> <span class="s">&#39;|&#39;</span>
+</span><span class='line'>  <span class="n">delimiter_str</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;|&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="c"># Split target_string</span>
+</span><span class='line'>  <span class="k">if</span> <span class="n">split_num</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span class='line'>      <span class="n">splited_str_list</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">delimiter_str</span><span class="p">,</span> <span class="n">target_string</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">else</span><span class="p">:</span>
+</span><span class='line'>      <span class="n">splited_str_list</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">delimiter_str</span><span class="p">,</span> <span class="n">target_string</span><span class="p">,</span> <span class="n">split_num</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">splited_str_list</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">splited_str_list</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">target_string</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>これを使用して，論文情報の文字列から著者情報と題目情報を抽出する関数を作った．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">COLON_DLIMITERS</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;</span><span class="se">\xef\xbc\x9a</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">&quot;:&quot;</span><span class="p">]</span>
+</span><span class='line'><span class="n">COMMA_DELIMITERS</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;</span><span class="se">\xef\xbc\x8c</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">&quot;,&quot;</span><span class="p">]</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">get_scholar_json_model</span><span class="p">(</span><span class="n">scholr_info_str</span><span class="p">):</span>
+</span><span class='line'>  <span class="sd">u&quot;&quot;&quot;Return json model for scholar information&quot;&quot;&quot;</span>
+</span><span class='line'>  <span class="n">scholr_info_str</span> <span class="o">=</span> <span class="n">scholr_info_str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scholr_info_str</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">15</span><span class="p">:</span>
+</span><span class='line'>      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</span><span class='line'>  <span class="c"># Split the string into authors and other informations</span>
+</span><span class='line'>  <span class="n">author_others_info</span> <span class="o">=</span> <span class="n">split_by_delimiters</span><span class="p">(</span><span class="n">COLON_DLIMITERS</span><span class="p">,</span> <span class="n">scholr_info_str</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">author_others_info</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+</span><span class='line'>      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</span><span class='line'>  <span class="c"># Split the string into scholar&#39;s title and other informations</span>
+</span><span class='line'>  <span class="n">title_others_info</span> <span class="o">=</span> <span class="n">split_by_delimiters</span><span class="p">(</span><span class="n">COMMA_DELIMITERS</span><span class="p">,</span> <span class="n">author_others_info</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</span><span class='line'>  <span class="c"># Create JSON model</span>
+</span><span class='line'>  <span class="n">authors</span> <span class="o">=</span> <span class="n">split_by_delimiters</span><span class="p">(</span><span class="n">COMMA_DELIMITERS</span><span class="p">,</span> <span class="n">author_others_info</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span><span class='line'>  <span class="n">authors_model</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span class='line'>  <span class="k">for</span> <span class="n">author</span> <span class="ow">in</span> <span class="n">authors</span><span class="p">:</span>
+</span><span class='line'>      <span class="n">authors_model</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="n">author</span><span class="o">.</span><span class="n">strip</span><span class="p">()})</span>
+</span><span class='line'>  <span class="n">title</span> <span class="o">=</span> <span class="n">title_others_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span class='line'>  <span class="n">scholar_model</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;authors&quot;</span><span class="p">:</span> <span class="n">authors_model</span><span class="p">,</span> <span class="s">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="o">.</span><span class="n">strip</span><span class="p">()}</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">scholar_model</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p><code>scholar_info_str</code>が15より小さいか比較している部分は，nbspとか[未登録]みたいな文字列を取得してしまった際に無視するため(よくない)．</p>
+
+<p>最終的なコードは以下．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c"># -*- coding: utf-8 -*-</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">re</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">requests</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="n">AuthInfo</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;AuthInfo&#39;</span><span class="p">,</span> <span class="s">&#39;user_name, pass_word&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">get_html_from</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">auth_info</span><span class="p">):</span>
+</span><span class='line'>  <span class="sd">u&quot;&quot;&quot;Get html in url&quot;&quot;&quot;</span>
+</span><span class='line'>  <span class="n">user_name</span> <span class="o">=</span> <span class="n">auth_info</span><span class="o">.</span><span class="n">user_name</span>
+</span><span class='line'>  <span class="n">pass_word</span> <span class="o">=</span> <span class="n">auth_info</span><span class="o">.</span><span class="n">pass_word</span>
+</span><span class='line'>  <span class="n">pages_data</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="p">(</span><span class="n">user_name</span><span class="p">,</span> <span class="n">pass_word</span><span class="p">))</span>
+</span><span class='line'>  <span class="n">pages_data</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">pages_data</span><span class="o">.</span><span class="n">apparent_encoding</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">pages_data</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="n">COLON_DLIMITERS</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;</span><span class="se">\xef\xbc\x9a</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">&quot;:&quot;</span><span class="p">]</span>
+</span><span class='line'><span class="n">COMMA_DELIMITERS</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;</span><span class="se">\xef\xbc\x8c</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">&quot;,&quot;</span><span class="p">]</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">get_scholar_json_model</span><span class="p">(</span><span class="n">scholar_info_str</span><span class="p">):</span>
+</span><span class='line'>  <span class="sd">u&quot;&quot;&quot;Return json model for scholar information&quot;&quot;&quot;</span>
+</span><span class='line'>  <span class="n">scholar_info_str</span> <span class="o">=</span> <span class="n">scholar_info_str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scholar_info_str</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">15</span><span class="p">:</span>
+</span><span class='line'>      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</span><span class='line'>  <span class="c"># Split the string into authors and other informations</span>
+</span><span class='line'>  <span class="n">author_others_info</span> <span class="o">=</span> <span class="n">split_by_delimiters</span><span class="p">(</span><span class="n">COLON_DLIMITERS</span><span class="p">,</span> <span class="n">scholar_info_str</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">author_others_info</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+</span><span class='line'>      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</span><span class='line'>  <span class="c"># Split the string into scholar&#39;s title and other informations</span>
+</span><span class='line'>  <span class="n">title_others_info</span> <span class="o">=</span> <span class="n">split_by_delimiters</span><span class="p">(</span><span class="n">COMMA_DELIMITERS</span><span class="p">,</span> <span class="n">author_others_info</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</span><span class='line'>  <span class="c"># Create JSON model</span>
+</span><span class='line'>  <span class="n">authors</span> <span class="o">=</span> <span class="n">split_by_delimiters</span><span class="p">(</span><span class="n">COMMA_DELIMITERS</span><span class="p">,</span> <span class="n">author_others_info</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span><span class='line'>  <span class="n">authors_model</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span class='line'>  <span class="k">for</span> <span class="n">author</span> <span class="ow">in</span> <span class="n">authors</span><span class="p">:</span>
+</span><span class='line'>      <span class="n">authors_model</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="n">author</span><span class="o">.</span><span class="n">strip</span><span class="p">()})</span>
+</span><span class='line'>  <span class="n">title</span> <span class="o">=</span> <span class="n">title_others_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span class='line'>  <span class="n">scholar_model</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;authors&quot;</span><span class="p">:</span> <span class="n">authors_model</span><span class="p">,</span> <span class="s">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="o">.</span><span class="n">strip</span><span class="p">()}</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">scholar_model</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">split_by_delimiters</span><span class="p">(</span><span class="n">delimiter_list</span><span class="p">,</span> <span class="n">target_string</span><span class="p">,</span> <span class="n">split_num</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+</span><span class='line'>  <span class="sd">u&quot;&quot;&quot;</span>
+</span><span class='line'><span class="sd"> Return a list of the words, using words in delimiter_list as</span>
+</span><span class='line'><span class="sd"> the delimiter strings</span>
+</span><span class='line'><span class="sd"> &quot;&quot;&quot;</span>
+</span><span class='line'>  <span class="c"># Prepare delimiter string</span>
+</span><span class='line'>  <span class="n">delimiter_str</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+</span><span class='line'>  <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">delimiter_list</span><span class="p">:</span>
+</span><span class='line'>      <span class="n">delimiter_str</span> <span class="o">=</span> <span class="n">delimiter_str</span> <span class="o">+</span> <span class="n">pattern</span> <span class="o">+</span> <span class="s">&#39;|&#39;</span>
+</span><span class='line'>  <span class="n">delimiter_str</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;|&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="c"># Split target_string</span>
+</span><span class='line'>  <span class="k">if</span> <span class="n">split_num</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span class='line'>      <span class="n">splited_str_list</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">delimiter_str</span><span class="p">,</span> <span class="n">target_string</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">else</span><span class="p">:</span>
+</span><span class='line'>      <span class="n">splited_str_list</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">delimiter_str</span><span class="p">,</span> <span class="n">target_string</span><span class="p">,</span> <span class="n">split_num</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">splited_str_list</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">splited_str_list</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">target_string</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">get_scholars_json_model</span><span class="p">(</span><span class="n">html</span><span class="p">):</span>
+</span><span class='line'>  <span class="sd">u&quot;&quot;&quot;Return JSON model for scholars information&quot;&quot;&quot;</span>
+</span><span class='line'>  <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="s">&quot;lxml&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">table</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s">&#39;table&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</span><span class='line'>  <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">tr_tag</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s">&#39;tr&#39;</span><span class="p">)):</span>
+</span><span class='line'>      <span class="n">scholar_strings</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span class='line'>      <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tr_tag</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s">&#39;td&#39;</span><span class="p">)):</span>
+</span><span class='line'>          <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">has_attr</span><span class="p">(</span><span class="s">&quot;align&quot;</span><span class="p">):</span>
+</span><span class='line'>              <span class="n">scholar_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get_text</span><span class="p">())</span>
+</span><span class='line'>      <span class="k">for</span> <span class="n">scholar_string</span> <span class="ow">in</span> <span class="n">scholar_strings</span><span class="p">:</span>
+</span><span class='line'>          <span class="n">info</span> <span class="o">=</span> <span class="n">get_scholar_json_model</span><span class="p">(</span><span class="n">scholar_string</span><span class="p">)</span>
+</span><span class='line'>          <span class="k">if</span> <span class="n">info</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+</span><span class='line'>              <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">results</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span class='line'>  <span class="n">URL</span> <span class="o">=</span> <span class="s">&#39;http://...&#39;&#39;</span>
+</span><span class='line'>  <span class="n">AUTH_INFO</span> <span class="o">=</span> <span class="n">AuthInfo</span><span class="p">(</span><span class="n">user_name</span><span class="o">=</span><span class="s">&#39;your user name&#39;</span><span class="p">,</span> <span class="n">pass_word</span><span class="o">=</span><span class="s">&#39;your password&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">HTML</span> <span class="o">=</span> <span class="n">get_html_from</span><span class="p">(</span><span class="n">URL</span><span class="p">,</span> <span class="n">AUTH_INFO</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">SCHOLARS</span> <span class="o">=</span> <span class="n">get_scholars_json_model</span><span class="p">(</span><span class="n">HTML</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">for</span> <span class="n">scholar</span> <span class="ow">in</span> <span class="n">SCHOLARS</span><span class="p">:</span>
+</span><span class='line'>      <span class="k">print</span> <span class="n">scholar</span><span class="p">[</span><span class="s">&quot;title&quot;</span><span class="p">]</span>
+</span><span class='line'>      <span class="k">for</span> <span class="n">author</span> <span class="ow">in</span> <span class="n">scholar</span><span class="p">[</span><span class="s">&quot;authors&quot;</span><span class="p">]:</span>
+</span><span class='line'>          <span class="k">print</span> <span class="n">author</span><span class="p">[</span><span class="s">&quot;name&quot;</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>本当はDBに格納するところまでやりたかったけど，今回はここまで．</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[TCPサーバ/クライアントを車輪の再発明する]]></title>
@@ -3578,85 +4061,6 @@ UP は有名な反復型プロセス(イテレーション + インクリメン�
 <h1>雑記</h1>
 
 <p>ずっと iOS アプリの勉強をしていたら，他のことが進んでいない．組み込みの知識をつけたいので，自作OSの方も頑張っていこう．</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Lispメモ]]></title>
-    <link href="http://tasuwo.github.io/blog/2015/03/24/land-of-lisp/"/>
-    <updated>2015-03-24T12:49:43+09:00</updated>
-    <id>http://tasuwo.github.io/blog/2015/03/24/land-of-lisp</id>
-    <content type="html"><![CDATA[<p>Land of Lisp を読んでいるのでメモ．<br>
-本ブログは自己啓発の意味合いもあるため，定期的に何かしらはブログにアップすることを目標にする．<br>
-そのうち綺麗にまとめます．</p>
-
-<!-- more -->
-
-<ul>
-<li><p>関数型プログラミング</p>
-
-<ul>
-<li>関数は，引数か関数内で宣言された変数しか参照せず，また値を返す以外の動作をしない．</li>
-</ul></li>
-<li><p>比較についてのルール</p>
-
-<ul>
-<li>シンボル同士は<strong>EQ</strong>で比較する</li>
-<li>それ以外は<strong>EQUAL</strong>で比較する</li>
-</ul></li>
-<li><p>Common Lispでは，空リスト( &#39;(),(),&#39;nil,nil )が<strong>唯一の</strong>偽値</p></li>
-<li><p>リストはコンスセルがつながってできている</p></li>
-<li><p>コンスセルは<code>cons</code>コマンドで作られる</p></li>
-<li><p><code>car</code>と<code>cdr</code>でリストの中身を調べることができる</p></li>
-<li><p>Lispには<strong>コードモード</strong>と<strong>データモード</strong>がある</p>
-
-<ul>
-<li>デフォルトではコードモード</li>
-<li>REPLへの入力は<strong>フォーム</strong>の形式でなくてはならない
-
-<ul>
-<li><code>(command bla bla bla bla ...)</code></li>
-</ul></li>
-<li><code>&#39;</code>(シングルクオート)を式に付加すると，データモードで扱われる(<strong>クオートする</strong>)</li>
-<li>準クオート
-
-<ul>
-<li><strong>`</strong>(バッククオート)を付加した式の中で<code>,</code>(コンマ)を使用すると，一部分だけコードモードに戻すことができる(<strong>アンクオートする</strong>)</li>
-</ul></li>
-</ul></li>
-<li><p>関数</p>
-
-<ul>
-<li><code>assoc</code>：キーをもとに要素を抜き出す</li>
-<li><code>mapcar</code>：関数とリストを引数とする．リストの要素1つ1つに対し，関数を実行する</li>
-<li><code>append</code>：リストをつなげて1つのリストにする</li>
-<li><code>apply</code>：関数とリストを引数とする．リストの各要素を引数として関数を呼び出したかのように動作する</li>
-<li><code>remove-if-not</code>：関数とリストを受け取る．リストの各要素に関数を適用し，真でなかったものを除いたリストを返す</li>
-</ul></li>
-<li><p>高階関数：他の関数を引数として受け取る関数</p>
-
-<ul>
-<li><code>#&#39;</code>：functionオペレータの略記．関数を値として扱う場合にそれを明示する必要がある(Common Lispでは)</li>
-</ul></li>
-<li><p>典型的なLispコードスタイル</p>
-
-<ul>
-<li><code>(apply #&#39;append (mapcar #&#39;describe-path (cdr (assoc location edges))))</code></li>
-<li>複雑なデータの塊を幾つかのステップで受け渡しながら処理を進める</li>
-<li>高階関数も頻繁に使われる</li>
-</ul></li>
-<li><p>関数末尾のp</p>
-
-<ul>
-<li>nilか真を返す場合，Common Lisp では関数名の最後に<strong>p</strong>をつける</li>
-<li>真偽値を確かめる関数は<strong>述語(predicate)</strong>と呼ばれるため</li>
-</ul></li>
-</ul>
-
-<h3>雑記</h3>
-
-<p>一週間ほど海外なので，更新はないです．<br>
-自作OSは飛行機の中やホテルでの夜にも進める予定だけど，リモートにpushするのは帰国してからかも．</p>
 ]]></content>
   </entry>
   
