@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Heroku | tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/blog/categories/heroku/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2016-05-09T22:18:07+09:00</updated>
+  <updated>2016-05-10T06:44:00+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -42,6 +42,14 @@
 <p>公式ドキュメントは以下．世に出回ってる hubot の記事は大抵古くて今では不要な手順が含まれていたりするからこちらを参考にするのが確実．</p>
 
 <p><a href="https://hubot.github.com/docs/">HUBOT</a></p>
+
+<p>また，無料版の heroku だと 1日6時間の間sleepさせる必要があるので，うまくやる．<br>
+起き続けさせるためには hubot-heroku-keepalive，寝たのを起こすためには何らかのアドオンを使用する．</p>
+
+<p><a href="https://iimuz.github.io/2015/11/11/hubotKeepalive.html">雑記帳@iimuz by iimuz</a><br>
+<a href="http://qiita.com/misopeso/items/8cde2ecbb82e7bfc01b4">Heroku 上で動く Hubot をうまく休ませる - Qiita</a></p>
+
+<p>アドオンは shceduler を使用した．</p>
 
 <h2>Hubot とは</h2>
 
