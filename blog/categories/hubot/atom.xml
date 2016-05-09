@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Hubot | tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/blog/categories/hubot/atom.xml" rel="self"/>
+  <link href="http://tasuwo.github.io/"/>
+  <updated>2016-05-09T22:18:07+09:00</updated>
+  <id>http://tasuwo.github.io/</id>
+  <author>
+    <name><![CDATA[tasuwo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Slack Bot を作成した]]></title>
+    <link href="http://tasuwo.github.io/blog/2016/05/09/slack-hubot/"/>
+    <updated>2016-05-09T21:19:47+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2016/05/09/slack-hubot</id>
+    <content type="html"><![CDATA[<p>Slack の bot を作った．<br>
+何を参考にしたのか聞かれたのでメモしておく．</p>
+
+<!-- more -->
+
+<p>研究室のゴミ当番表がアナログだったので，去年から導入した Slack を通して自動的に担当を割り振り&amp;通知する bot を作った．<br>
+成果物は↓</p>
+
+<p><a href="https://github.com/tasuwo/GomiManBot">tasuwo/GomiManBot: GomiMan slack bot written in coffee script with hubot.</a></p>
+
+<p>これから実際に使ってみてバグが見つかり次第修正していく予定．<br>
+英語力がゴミなのでおかしいところ発見次第修正していく予定．</p>
+
+<h2>メモ書き</h2>
+
+<p>hubot + slack bot + heroku に関するサイト量は飽和状態であまり書く気しなかったのだけど，中には「エラーは持ち前のスルースキルで無視します！」みたいな記事もあってげんなりしたので，何を参考にしたのかだけも一応書いておく．<br>
+導入については以下の記事を参考にした．</p>
+
+<p><a href="http://qiita.com/misopeso/items/1f418dd02e89234499b3">Slack で Hubot を使えるようにする - Qiita</a><br>
+<a href="http://qiita.com/tk3fftk/items/6ae172abc57f72eabeb2">Slackと連携させたHubotに毎朝今日の予定をお知らせしてもらう - Qiita</a></p>
+
+<p>公式ドキュメントは以下．世に出回ってる hubot の記事は大抵古くて今では不要な手順が含まれていたりするからこちらを参考にするのが確実．</p>
+
+<p><a href="https://hubot.github.com/docs/">HUBOT</a></p>
+
+<h2>Hubot とは</h2>
+
+<p>Hubot は Github 社が製作した bot 作成用のフレームワーク．<br>
+Node.js + CoffeeScript で書かれており，オープンソースである．<br>
+アダプターによって異なるチャット(Slack とか Chatworks とか)に対応できる．</p>
+
+<p><a href="https://hubot.github.com/">HUBOT</a></p>
+
+<h2>Heroku とは</h2>
+
+<p>AWS という IaaS 上に構築された PaaS．以下用語説明．</p>
+
+<ul>
+<li>IaaS : Infrastructure as a Service
+
+<ul>
+<li>情報システムの稼働に必要な仮想サーバとしたシュシュのインフラをインターネット上のサービスとして提供する</li>
+<li>Google Compute Engine, Amazon Elastic Compute Cloud(EC2)</li>
+</ul></li>
+<li>PaaS : Platform as a Service
+
+<ul>
+<li>アプリケーションの稼働に必要なハードウェアやOS等のプラットフォーム一式をインターネット上のサービスとして提供する</li>
+<li>例 : Google App Engine, Windows Azure</li>
+</ul></li>
+<li>SaaS : Software as a Service
+
+<ul>
+<li>パッケージ製品として提供されていたソフトウェアを，インターネット経由でサービスとして提供する</li>
+<li>例 : Google Apps, Salesforce</li>
+</ul></li>
+</ul>
+
+<p>Heroku は Web アプリを作成した時に，Git を使用して簡単に公開できる．<br>
+最初は Ruby のみだったが今では対応言語も多い．<br>
+ビルドパックを使用することで未対応の言語についてもデプロイが可能．</p>
+
+<p><a href="https://dashboard.heroku.com/">Heroku</a></p>
+
+<p>以上です．</p>
+]]></content>
+  </entry>
+  
+</feed>

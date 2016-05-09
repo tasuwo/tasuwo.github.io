@@ -1,0 +1,323 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Slack Bot を作成した - tasuwo blog</title>
+  <meta name="author" content="tasuwo">
+
+  
+  <meta name="description" content="Slack の bot を作った．
+何を参考にしたのか聞かれたのでメモしておく． 研究室のゴミ当番表がアナログだったので，去年から導入した Slack を通して自動的に担当を割り振り&amp;通知する bot を作った．
+成果物は↓ tasuwo/GomiManBot: GomiMan slack &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tasuwo.github.io/blog/2016/05/09/slack-hubot">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="tasuwo blog" type="application/atom+xml">
+  <link href="/stylesheets/data-table.css" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-60860415-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">tasuwo blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:tasuwo.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Slack Bot を作成した</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-05-09T21:19:47+09:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:19 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tasuwo.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Slack の bot を作った．<br>
+何を参考にしたのか聞かれたのでメモしておく．</p>
+
+<!-- more -->
+
+<p>研究室のゴミ当番表がアナログだったので，去年から導入した Slack を通して自動的に担当を割り振り&amp;通知する bot を作った．<br>
+成果物は↓</p>
+
+<p><a href="https://github.com/tasuwo/GomiManBot">tasuwo/GomiManBot: GomiMan slack bot written in coffee script with hubot.</a></p>
+
+<p>これから実際に使ってみてバグが見つかり次第修正していく予定．<br>
+英語力がゴミなのでおかしいところ発見次第修正していく予定．</p>
+
+<h2>メモ書き</h2>
+
+<p>hubot + slack bot + heroku に関するサイト量は飽和状態であまり書く気しなかったのだけど，中には「エラーは持ち前のスルースキルで無視します！」みたいな記事もあってげんなりしたので，何を参考にしたのかだけも一応書いておく．<br>
+導入については以下の記事を参考にした．</p>
+
+<p><a href="http://qiita.com/misopeso/items/1f418dd02e89234499b3">Slack で Hubot を使えるようにする - Qiita</a><br>
+<a href="http://qiita.com/tk3fftk/items/6ae172abc57f72eabeb2">Slackと連携させたHubotに毎朝今日の予定をお知らせしてもらう - Qiita</a></p>
+
+<p>公式ドキュメントは以下．世に出回ってる hubot の記事は大抵古くて今では不要な手順が含まれていたりするからこちらを参考にするのが確実．</p>
+
+<p><a href="https://hubot.github.com/docs/">HUBOT</a></p>
+
+<h2>Hubot とは</h2>
+
+<p>Hubot は Github 社が製作した bot 作成用のフレームワーク．<br>
+Node.js + CoffeeScript で書かれており，オープンソースである．<br>
+アダプターによって異なるチャット(Slack とか Chatworks とか)に対応できる．</p>
+
+<p><a href="https://hubot.github.com/">HUBOT</a></p>
+
+<h2>Heroku とは</h2>
+
+<p>AWS という IaaS 上に構築された PaaS．以下用語説明．</p>
+
+<ul>
+<li>IaaS : Infrastructure as a Service
+
+<ul>
+<li>情報システムの稼働に必要な仮想サーバとしたシュシュのインフラをインターネット上のサービスとして提供する</li>
+<li>Google Compute Engine, Amazon Elastic Compute Cloud(EC2)</li>
+</ul></li>
+<li>PaaS : Platform as a Service
+
+<ul>
+<li>アプリケーションの稼働に必要なハードウェアやOS等のプラットフォーム一式をインターネット上のサービスとして提供する</li>
+<li>例 : Google App Engine, Windows Azure</li>
+</ul></li>
+<li>SaaS : Software as a Service
+
+<ul>
+<li>パッケージ製品として提供されていたソフトウェアを，インターネット経由でサービスとして提供する</li>
+<li>例 : Google Apps, Salesforce</li>
+</ul></li>
+</ul>
+
+<p>Heroku は Web アプリを作成した時に，Git を使用して簡単に公開できる．<br>
+最初は Ruby のみだったが今では対応言語も多い．<br>
+ビルドパックを使用することで未対応の言語についてもデプロイが可能．</p>
+
+<p><a href="https://dashboard.heroku.com/">Heroku</a></p>
+
+<p>以上です．</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">tasuwo</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-05-09T21:19:47+09:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:19 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/heroku/'>heroku</a>, <a class='category' href='/blog/categories/hubot/'>hubot</a>, <a class='category' href='/blog/categories/slack/'>slack</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2016/05/09/slack-hubot/" data-via="" data-counturl="http://tasuwo.github.io/blog/2016/05/09/slack-hubot/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <br />
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/04/17/python-crowling/" title="Previous Post: PythonでHTMLのテーブル情報を取得する">&laquo; PythonでHTMLのテーブル情報を取得する</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h2 id="toc_0">Profile</h2>
+
+  <h3 id="toc_1">ME</h3>
+
+  <ul>
+  <li>情報系の学生</li>
+  <li>プログラミング初心者でMac初心者</li>
+  </ul>
+
+  <h3 id="toc_2">SNS</h3>
+
+  <ul>
+  <li>Twitter: <a href="https://twitter.com/tasuwo_">@tasuwo_</a></li>
+  <li>GiHub: <a href="https://github.com/tasuwo">tasuwo</a></li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/09/slack-hubot/">Slack Bot を作成した</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/17/python-crowling/">PythonでHTMLのテーブル情報を取得する</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/02/tcp-server/">TCPサーバ/クライアントを車輪の再発明する</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/04/c-c-plus-plus/">EmacsにおけるC,C++の環境を整える</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/02/16/zsh-setting/">OS X でターミナルをきれいにする</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - tasuwo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'tasuwoblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tasuwo.github.io/blog/2016/05/09/slack-hubot/';
+        var disqus_url = 'http://tasuwo.github.io/blog/2016/05/09/slack-hubot/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
