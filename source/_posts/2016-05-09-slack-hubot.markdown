@@ -33,6 +33,14 @@ hubot + slack bot + heroku に関するサイト量は飽和状態であまり�
 
 [HUBOT](https://hubot.github.com/docs/)
 
+また，無料版の heroku だと 1日6時間の間sleepさせる必要があるので，うまくやる．
+起き続けさせるためには hubot-heroku-keepalive，寝たのを起こすためには何らかのアドオンを使用する．
+
+[雑記帳@iimuz by iimuz](https://iimuz.github.io/2015/11/11/hubotKeepalive.html)
+[Heroku 上で動く Hubot をうまく休ませる - Qiita](http://qiita.com/misopeso/items/8cde2ecbb82e7bfc01b4)
+
+アドオンは shceduler を使用した．
+
 ## Hubot とは
 Hubot は Github 社が製作した bot 作成用のフレームワーク．
 Node.js + CoffeeScript で書かれており，オープンソースである．

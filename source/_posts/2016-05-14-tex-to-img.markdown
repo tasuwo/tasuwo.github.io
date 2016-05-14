@@ -1,0 +1,192 @@
+---
+layout: post
+title: "TeX2img で ghostscript cannot be exexuted ではまる"
+date: 2016-05-14 12:05:55 +0900
+comments: true
+categories: 
+- os x
+- tex2img
+- tex
+---
+
+TeX2img を使おうとしたらはまったのでメモしておく．
+具体的には，`tex2img : ghostscript cannot be executed.` ではまった．
+以下に解決までの道のりを示しておく．結果をいうと，**GhostScript のバージョンが古かった** というだけの話．
+実行時の環境は OS X Yosemite です．
+
+<!-- more -->
+
+##TeX2imgとは
+入力したTeXコードを画像に出力する．[TeX2img配布サイト](http://island.geocities.jp/loveinequality/#download) でダウンロードする．
+
+##テストしてみる
+``` tex
+\documentclass{jsarticle}
+\usepackage{amsmath}
+\pagestyle{empty}
+\begin{document}
+
+\section*{問題}
+線形写像~$f$に対し、
+\[
+\text{$f$~が単射である} \Leftrightarrow \ker(f)=\{0\}
+\]
+を証明せよ。
+
+\section*{解答}
+
+1.~$\Rightarrow$の対偶を示す。
+
+$f$~が線型写像なら$\ker(f) \ni 0$なので、$\ker(f)$に属する$0$~以外の元の存在を仮定し、それを$a$とする。
+このとき、$a \neq 0$かつ$f(a)=f(0)=0$なので$f$~は単射ではない。
+
+\medskip
+
+2.~$\Leftarrow$を背理法で示す。
+
+$\ker(f)=\{0\}$かつ$f$は単射ではないと仮定する。
+$f$~は単射でないので$a \neq b$かつ$f(a)=f(b)$という$a,b$が存在する。
+$f$~は線型写像だから$f(a)-f(b)=f(a-b)$となり、$f(a)=f(b)$から$f(a-b)=0$~がいえる。
+$f(a-b)=0$と$\ker(f)=\{0\}$から$a-b=0$がいえるが、これは$a \neq b$と矛盾する。
+
+\medskip
+
+以上1.と2.により、$\text{線型写像~$f$が単射である}\Leftrightarrow \ker(f)=\{0\}$が示された。\rule{5pt}{10pt}
+\end{document}
+```
+
+``` bash
+$ tex2img
+    --kanji utf8 
+    --left-margin 50
+    --right-margin 50
+    --top-margin 50
+    --bottom-margin 50
+    ker.tex ker.png
+```
+
+エラーが出た．
+
+``` bash
+dyld: Library not loaded: /usr/X11/lib/libXt.6.dylib
+  Referenced from: /usr/local/bin/gs
+  Reason: image not found
+$ /usr/local/bin/gs -dNOPAUSE -dBATCH -sDEVICE=eps2write -dNoOutputFonts -dFirstPage=1 -dLastPage=1 -r20016 -sOutputFile=temp87367-7E615928-10FE-48F8-B95F-C37F37DEBE76.eps temp87367-7E615928-10FE-48F8-B95F-C37F37DEBE76.pdf  2>&1
+dyld: Library not loaded: /usr/X11/lib/libXt.6.dylib
+  Referenced from: /usr/local/bin/gs
+  Reason: image not found
+sh: line 1: 87394 Trace/BPT trap: 5       /usr/local/bin/gs -dNOPAUSE -dBATCH -sDEVICE=eps2write -dNoOutputFonts -dFirstPage=1 -dLastPage=1 -r20016 -sOutputFile=temp87367-7E615928-10FE-48F8-B95F-C37F37DEBE76.eps temp87367-7E615928-10FE-48F8-B95F-C37F37DEBE76.pdf 2>&1
+tex2img : ghostscript cannot be executed.
+Check errors in the source code.
+```
+
+[graphics - Can't compile image after upgrading to OS X Yosemite - TeX - LaTeX Stack Exchange](http://tex.stackexchange.com/questions/208001/cant-compile-image-after-upgrading-to-os-x-yosemite) に似たようなエラーを確認．どうやら X11 のパスの問題らしい．自分の環境の場合，システム上に X11 が存在しないわけではないので，以下のようにシンボリックリンクを作成することで回避する．
+
+``` bash
+sudo ln -s /opt/X11 /usr/X11
+```
+
+しかし，まだ以下のようなエラーが出ていた．
+
+``` bash
+tex2img : ghostscript cannot be executed.
+```
+
+[TeX2img のコマンドライン版の使い方（改訂版） - Acetaminophen’s diary](http://acetaminophen.hatenablog.com/entry/tex2img-cui) の **Ghostscriptのエラー回避** の場所にあった`--quick`オプションを用いるととりあえずエラーメッセージは表示されなくなったが，結果がうまく出力されないので，何の解決にもなっていない．
+
+[TeX2img (Windows/Mac) の動作の詳細 - Acetaminophen’s diary](http://acetaminophen.hatenablog.com/entry/2014/10/18/214403) を参考にしてみると，内部処理は以下のようになっているらしい．
+
+**【JPEG/PNG出力(画質優先モード)の場合】**
+``` bash
+TeX →[platex]
+DVI →[dvipdfmx]
+PDF →[gs (eps(2)write)でアウトライン化＋クロップ]
+EPS →[epstopdf (gs)]
+PDF →[OS X の APIでビットマップ化＋余白付与]
+JPEG/PNG
+```
+
+**【JPEG/PNG出力(速度優先モードの場合)】**
+``` bash
+TeX →[platex]
+DVI →[dvipdfmx]
+PDF →[pdfcropでクロップ＋余白付与]
+PDF →[OS X のQuartz API]
+JPEG/PNG
+```
+
+さらに，
+
+>EPS ファイルへの余白付与は EPS の BoundingBox 情報を書き換えることによって実装されている
+
+とのこと．GhostScript を使っている手順，つまり，`eps(2)write`の部分がうまくいってないのではないか？と考えられる．そこでログを見てみると，以下のような記述を発見．
+
+``` bash
+$ /usr/local/bin/gs -dNOPAUSE -dBATCH -sDEVICE=epswrite -dFirstPage=1 -dLastPage=1 -r20016 -sOutputFile=temp93003-D85DBCB1-8F3C-4AC6-8FFC-B7ADB9615615.eps temp93003-D85DBCB1-8F3C-4AC6-8FFC-B7ADB9615615.pdf  2>&1
+ESP Ghostscript 7.07 (2003-07-12)
+Copyright 2003 artofcode LLC and Easy Software Products, all rights reserved.
+This software comes with NO WARRANTY: see the file PUBLIC for details.
+Error: /syntaxerror in readxref
+Operand stack:
+```
+
+`Error: /syntaxerror in readxref` とのこと．再現可能かどうか確かめてみるため，適当に`test.pdf`を用意してターミナルから以下を実行した．
+
+``` bash
+$ gs -dNOPAUSE -dBATCH -sDEVICE=epswrite -dFirstPage=1 -dLastPage=1 -r20016 -sOutputFile=test.eps test.pdf
+ESP Ghostscript 7.07 (2003-07-12)
+Copyright 2003 artofcode LLC and Easy Software Products, all rights reserved.
+This software comes with NO WARRANTY: see the file PUBLIC for details.
+Processing pages 1 through 1.
+Page 1
+```
+
+実行が終了しなかったので中断した．解像度を下げて実行してみる．解像度の指定は`-r`の部分．
+
+``` bash
+gs -dNOPAUSE -dBATCH -sDEVICE=epswrite -dFirstPage=1 -dLastPage=1 -r720 -sOutputFile=test.eps test.pdf
+ESP Ghostscript 7.07 (2003-07-12)
+Copyright 2003 artofcode LLC and Easy Software Products, all rights reserved.
+This software comes with NO WARRANTY: see the file PUBLIC for details.
+Processing pages 1 through 1.
+Page 1
+```
+
+実行できた．前回は解像度を高くしすぎたために実行に時間がかかっていただけのようだ．とりあえず，動くことはわかった．`/usr/local/bin/gs`は実行できるのでパスの問題ではないし，こうして動きもしたわけだから GS が悪いわけでもなさそう．
+さて，じゃぁ一体なんだよ！となるわけだが．[[hylafax-users] /syntaxerror in readxref - Google Groups](https://groups.google.com/forum/#!topic/fa.hylafax/z-qsRvVF8eY) を見てみると，先ほどのエラーはGSがPDFを扱うときに出力されるエラーらしい．GSのバージョンを最新にしてくれとかいてある．
+
+バージョンを調べる．
+
+``` bash
+$ gs -v
+ESP Ghostscript 7.07.1 (2003-07-12)
+Copyright 2003 artofcode LLC and Easy Software Products, all rights reserved.
+```
+
+ん？古い...Homebewでインストールした GhostScriptは...？
+
+``` bash
+$ brew install ghostscript
+Warning: ghostscript-9.15 already installed
+```
+
+**バージョンがちがう...**
+
+homebrewでインストールした以外にすでにghostscriptが入っていたのだと思われる．finderで検索をかけるとmacportsとsmにそれらしきものがヒット．おそらくやっていたのだろうけど覚えがない...MacTeXによるインストール時に一緒にインストールしてしまったのかな？
+とりあえず，元のgsを削除し以下のようにシンボリックリンクを貼り直す．
+
+``` bash
+$ ln -s /usr/local/Cellar/ghostscript/9.15/bin/gs /usr/local/bin/
+```
+
+確認．
+
+``` bash
+ gs -v
+GPL Ghostscript 9.15 (2014-09-22)
+Copyright (C) 2014 Artifex Software, Inc.  All rights reserved.
+```
+
+無事出力できました．
+
+[tex2imgを使って、LaTeXで書いた数式を画像に変換する例](http://qiita.com/hyuki/items/692105eb72e3c8174999)
