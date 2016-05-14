@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Tex | tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/blog/categories/tex/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2016-05-14T12:08:29+09:00</updated>
+  <updated>2016-05-14T12:32:46+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -181,6 +181,10 @@ Copyright <span class="o">(</span>C<span class="o">)</span> <span class="m">2014
 <p><a href="http://qiita.com/hideaki_polisci/items/3afd204449c6cdd995c9">El Capitan に 0 から TeX 環境を導入する人用</a></p>
 
 <p><a href="http://abenori.blogspot.com/2015/10/el-capitantexplatex-dvipdfmxpdflatexmac.html">Yosemite 時代から TeX を導入しており El Capitan になった人用</a></p>
+
+<p>また，El Capitan から TeX 関連プログラムへのパスが <code>/usr/texbin</code> ではなく <code>/Library/TeX/texbin</code> に変更になっている．</p>
+
+<p><a href="https://texwiki.texjp.org/?TeX%20Live%2FMac#i8a16a2b">TeX Live/Mac - TeX Wiki</a></p>
 
 <!-- more -->
 
