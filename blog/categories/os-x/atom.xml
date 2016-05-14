@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Os X | tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/blog/categories/os-x/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2016-05-14T11:41:45+09:00</updated>
+  <updated>2016-05-14T12:08:29+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -12,6 +12,163 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[TeX2img で Ghostscript Cannot Be Exexuted ではまる]]></title>
+    <link href="http://tasuwo.github.io/blog/2016/05/14/tex-to-img/"/>
+    <updated>2016-05-14T12:05:55+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2016/05/14/tex-to-img</id>
+    <content type="html"><![CDATA[<p>TeX2img を使おうとしたらはまったのでメモしておく．<br>
+具体的には，<code>tex2img : ghostscript cannot be executed.</code> ではまった．<br>
+以下に解決までの道のりを示しておく．結果をいうと，<strong>GhostScript のバージョンが古かった</strong> というだけの話．<br>
+実行時の環境は OS X Yosemite です．</p>
+
+<!-- more -->
+
+<h2>TeX2imgとは</h2>
+
+<p>入力したTeXコードを画像に出力する．<a href="http://island.geocities.jp/loveinequality/#download">TeX2img配布サイト</a> でダウンロードする．</p>
+
+<h2>テストしてみる</h2>
+<div class="highlight"><pre><code class="language-tex" data-lang="tex"><span class="k">\documentclass</span><span class="nb">{</span>jsarticle<span class="nb">}</span>
+<span class="k">\usepackage</span><span class="nb">{</span>amsmath<span class="nb">}</span>
+<span class="k">\pagestyle</span><span class="nb">{</span>empty<span class="nb">}</span>
+<span class="k">\begin</span><span class="nb">{</span>document<span class="nb">}</span>
+
+<span class="k">\section*</span><span class="nb">{</span>問題<span class="nb">}</span>
+線形写像~<span class="s">$</span><span class="nb">f</span><span class="s">$</span>に対し、
+<span class="sb">\[</span><span class="nb"></span>
+<span class="nv">\text</span><span class="nb">{$f$~が単射である} </span><span class="nv">\Leftrightarrow</span><span class="nb"> </span><span class="nv">\ker</span><span class="o">(</span><span class="nb">f</span><span class="o">)=</span><span class="nv">\{</span><span class="m">0</span><span class="nv">\}</span><span class="nb"></span>
+<span class="s">\]</span>
+を証明せよ。
+
+<span class="k">\section*</span><span class="nb">{</span>解答<span class="nb">}</span>
+
+1.~<span class="s">$</span><span class="nv">\Rightarrow</span><span class="s">$</span>の対偶を示す。
+
+<span class="s">$</span><span class="nb">f</span><span class="s">$</span>~が線型写像なら<span class="s">$</span><span class="nv">\ker</span><span class="o">(</span><span class="nb">f</span><span class="o">)</span><span class="nb"> </span><span class="nv">\ni</span><span class="nb"> </span><span class="m">0</span><span class="s">$</span>なので、<span class="s">$</span><span class="nv">\ker</span><span class="o">(</span><span class="nb">f</span><span class="o">)</span><span class="s">$</span>に属する<span class="s">$</span><span class="m">0</span><span class="s">$</span>~以外の元の存在を仮定し、それを<span class="s">$</span><span class="nb">a</span><span class="s">$</span>とする。
+このとき、<span class="s">$</span><span class="nb">a </span><span class="nv">\neq</span><span class="nb"> </span><span class="m">0</span><span class="s">$</span>かつ<span class="s">$</span><span class="nb">f</span><span class="o">(</span><span class="nb">a</span><span class="o">)=</span><span class="nb">f</span><span class="o">(</span><span class="m">0</span><span class="o">)=</span><span class="m">0</span><span class="s">$</span>なので<span class="s">$</span><span class="nb">f</span><span class="s">$</span>~は単射ではない。
+
+<span class="k">\medskip</span>
+
+2.~<span class="s">$</span><span class="nv">\Leftarrow</span><span class="s">$</span>を背理法で示す。
+
+<span class="s">$</span><span class="nv">\ker</span><span class="o">(</span><span class="nb">f</span><span class="o">)=</span><span class="nv">\{</span><span class="m">0</span><span class="nv">\}</span><span class="s">$</span>かつ<span class="s">$</span><span class="nb">f</span><span class="s">$</span>は単射ではないと仮定する。
+<span class="s">$</span><span class="nb">f</span><span class="s">$</span>~は単射でないので<span class="s">$</span><span class="nb">a </span><span class="nv">\neq</span><span class="nb"> b</span><span class="s">$</span>かつ<span class="s">$</span><span class="nb">f</span><span class="o">(</span><span class="nb">a</span><span class="o">)=</span><span class="nb">f</span><span class="o">(</span><span class="nb">b</span><span class="o">)</span><span class="s">$</span>という<span class="s">$</span><span class="nb">a,b</span><span class="s">$</span>が存在する。
+<span class="s">$</span><span class="nb">f</span><span class="s">$</span>~は線型写像だから<span class="s">$</span><span class="nb">f</span><span class="o">(</span><span class="nb">a</span><span class="o">)-</span><span class="nb">f</span><span class="o">(</span><span class="nb">b</span><span class="o">)=</span><span class="nb">f</span><span class="o">(</span><span class="nb">a</span><span class="o">-</span><span class="nb">b</span><span class="o">)</span><span class="s">$</span>となり、<span class="s">$</span><span class="nb">f</span><span class="o">(</span><span class="nb">a</span><span class="o">)=</span><span class="nb">f</span><span class="o">(</span><span class="nb">b</span><span class="o">)</span><span class="s">$</span>から<span class="s">$</span><span class="nb">f</span><span class="o">(</span><span class="nb">a</span><span class="o">-</span><span class="nb">b</span><span class="o">)=</span><span class="m">0</span><span class="s">$</span>~がいえる。
+<span class="s">$</span><span class="nb">f</span><span class="o">(</span><span class="nb">a</span><span class="o">-</span><span class="nb">b</span><span class="o">)=</span><span class="m">0</span><span class="s">$</span>と<span class="s">$</span><span class="nv">\ker</span><span class="o">(</span><span class="nb">f</span><span class="o">)=</span><span class="nv">\{</span><span class="m">0</span><span class="nv">\}</span><span class="s">$</span>から<span class="s">$</span><span class="nb">a</span><span class="o">-</span><span class="nb">b</span><span class="o">=</span><span class="m">0</span><span class="s">$</span>がいえるが、これは<span class="s">$</span><span class="nb">a </span><span class="nv">\neq</span><span class="nb"> b</span><span class="s">$</span>と矛盾する。
+
+<span class="k">\medskip</span>
+
+以上1.と2.により、<span class="s">$</span><span class="nv">\text</span><span class="nb">{線型写像~</span><span class="s">$</span>f<span class="s">$</span><span class="nb">が単射である}</span><span class="nv">\Leftrightarrow</span><span class="nb"> </span><span class="nv">\ker</span><span class="o">(</span><span class="nb">f</span><span class="o">)=</span><span class="nv">\{</span><span class="m">0</span><span class="nv">\}</span><span class="s">$</span>が示された。<span class="k">\rule</span><span class="nb">{</span>5pt<span class="nb">}{</span>10pt<span class="nb">}</span>
+<span class="k">\end</span><span class="nb">{</span>document<span class="nb">}</span>
+</code></pre></div><div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>tex2img
+    --kanji utf8 
+    --left-margin 50
+    --right-margin 50
+    --top-margin 50
+    --bottom-margin 50
+    ker.tex ker.png
+</code></pre></div>
+<p>エラーが出た．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">dyld: Library not loaded: /usr/X11/lib/libXt.6.dylib
+  Referenced from: /usr/local/bin/gs
+  Reason: image not found
+<span class="nv">$ </span>/usr/local/bin/gs -dNOPAUSE -dBATCH -sDEVICE<span class="o">=</span>eps2write -dNoOutputFonts -dFirstPage<span class="o">=</span><span class="m">1</span> -dLastPage<span class="o">=</span><span class="m">1</span> -r20016 -sOutputFile<span class="o">=</span>temp87367-7E615928-10FE-48F8-B95F-C37F37DEBE76.eps temp87367-7E615928-10FE-48F8-B95F-C37F37DEBE76.pdf  2&gt;<span class="p">&amp;</span>1
+dyld: Library not loaded: /usr/X11/lib/libXt.6.dylib
+  Referenced from: /usr/local/bin/gs
+  Reason: image not found
+sh: line 1: <span class="m">87394</span> Trace/BPT <span class="nb">trap</span>: <span class="m">5</span>       /usr/local/bin/gs -dNOPAUSE -dBATCH -sDEVICE<span class="o">=</span>eps2write -dNoOutputFonts -dFirstPage<span class="o">=</span><span class="m">1</span> -dLastPage<span class="o">=</span><span class="m">1</span> -r20016 -sOutputFile<span class="o">=</span>temp87367-7E615928-10FE-48F8-B95F-C37F37DEBE76.eps temp87367-7E615928-10FE-48F8-B95F-C37F37DEBE76.pdf 2&gt;<span class="p">&amp;</span>1
+tex2img : ghostscript cannot be executed.
+Check errors in the <span class="nb">source </span>code.
+</code></pre></div>
+<p><a href="http://tex.stackexchange.com/questions/208001/cant-compile-image-after-upgrading-to-os-x-yosemite">graphics - Can&#39;t compile image after upgrading to OS X Yosemite - TeX - LaTeX Stack Exchange</a> に似たようなエラーを確認．どうやら X11 のパスの問題らしい．自分の環境の場合，システム上に X11 が存在しないわけではないので，以下のようにシンボリックリンクを作成することで回避する．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">sudo ln -s /opt/X11 /usr/X11
+</code></pre></div>
+<p>しかし，まだ以下のようなエラーが出ていた．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">tex2img : ghostscript cannot be executed.
+</code></pre></div>
+<p><a href="http://acetaminophen.hatenablog.com/entry/tex2img-cui">TeX2img のコマンドライン版の使い方（改訂版） - Acetaminophen’s diary</a> の <strong>Ghostscriptのエラー回避</strong> の場所にあった<code>--quick</code>オプションを用いるととりあえずエラーメッセージは表示されなくなったが，結果がうまく出力されないので，何の解決にもなっていない．</p>
+
+<p><a href="http://acetaminophen.hatenablog.com/entry/2014/10/18/214403">TeX2img (Windows/Mac) の動作の詳細 - Acetaminophen’s diary</a> を参考にしてみると，内部処理は以下のようになっているらしい．</p>
+
+<p><strong>【JPEG/PNG出力(画質優先モード)の場合】</strong><br>
+<code>bash<br>
+TeX →[platex]<br>
+DVI →[dvipdfmx]<br>
+PDF →[gs (eps(2)write)でアウトライン化＋クロップ]<br>
+EPS →[epstopdf (gs)]<br>
+PDF →[OS X の APIでビットマップ化＋余白付与]<br>
+JPEG/PNG<br>
+</code></p>
+
+<p><strong>【JPEG/PNG出力(速度優先モードの場合)】</strong><br>
+<code>bash<br>
+TeX →[platex]<br>
+DVI →[dvipdfmx]<br>
+PDF →[pdfcropでクロップ＋余白付与]<br>
+PDF →[OS X のQuartz API]<br>
+JPEG/PNG<br>
+</code></p>
+
+<p>さらに，</p>
+
+<blockquote>
+<p>EPS ファイルへの余白付与は EPS の BoundingBox 情報を書き換えることによって実装されている</p>
+</blockquote>
+
+<p>とのこと．GhostScript を使っている手順，つまり，<code>eps(2)write</code>の部分がうまくいってないのではないか？と考えられる．そこでログを見てみると，以下のような記述を発見．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>/usr/local/bin/gs -dNOPAUSE -dBATCH -sDEVICE<span class="o">=</span>epswrite -dFirstPage<span class="o">=</span><span class="m">1</span> -dLastPage<span class="o">=</span><span class="m">1</span> -r20016 -sOutputFile<span class="o">=</span>temp93003-D85DBCB1-8F3C-4AC6-8FFC-B7ADB9615615.eps temp93003-D85DBCB1-8F3C-4AC6-8FFC-B7ADB9615615.pdf  2&gt;<span class="p">&amp;</span>1
+ESP Ghostscript 7.07 <span class="o">(</span>2003-07-12<span class="o">)</span>
+Copyright <span class="m">2003</span> artofcode LLC and Easy Software Products, all rights reserved.
+This software comes with NO WARRANTY: see the file PUBLIC <span class="k">for</span> details.
+Error: /syntaxerror in readxref
+Operand stack:
+</code></pre></div>
+<p><code>Error: /syntaxerror in readxref</code> とのこと．再現可能かどうか確かめてみるため，適当に<code>test.pdf</code>を用意してターミナルから以下を実行した．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>gs -dNOPAUSE -dBATCH -sDEVICE<span class="o">=</span>epswrite -dFirstPage<span class="o">=</span><span class="m">1</span> -dLastPage<span class="o">=</span><span class="m">1</span> -r20016 -sOutputFile<span class="o">=</span>test.eps test.pdf
+ESP Ghostscript 7.07 <span class="o">(</span>2003-07-12<span class="o">)</span>
+Copyright <span class="m">2003</span> artofcode LLC and Easy Software Products, all rights reserved.
+This software comes with NO WARRANTY: see the file PUBLIC <span class="k">for</span> details.
+Processing pages <span class="m">1</span> through 1.
+Page 1
+</code></pre></div>
+<p>実行が終了しなかったので中断した．解像度を下げて実行してみる．解像度の指定は<code>-r</code>の部分．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">gs -dNOPAUSE -dBATCH -sDEVICE<span class="o">=</span>epswrite -dFirstPage<span class="o">=</span><span class="m">1</span> -dLastPage<span class="o">=</span><span class="m">1</span> -r720 -sOutputFile<span class="o">=</span>test.eps test.pdf
+ESP Ghostscript 7.07 <span class="o">(</span>2003-07-12<span class="o">)</span>
+Copyright <span class="m">2003</span> artofcode LLC and Easy Software Products, all rights reserved.
+This software comes with NO WARRANTY: see the file PUBLIC <span class="k">for</span> details.
+Processing pages <span class="m">1</span> through 1.
+Page 1
+</code></pre></div>
+<p>実行できた．前回は解像度を高くしすぎたために実行に時間がかかっていただけのようだ．とりあえず，動くことはわかった．<code>/usr/local/bin/gs</code>は実行できるのでパスの問題ではないし，こうして動きもしたわけだから GS が悪いわけでもなさそう．<br>
+さて，じゃぁ一体なんだよ！となるわけだが．<a href="https://groups.google.com/forum/#!topic/fa.hylafax/z-qsRvVF8eY">[hylafax-users] /syntaxerror in readxref - Google Groups</a> を見てみると，先ほどのエラーはGSがPDFを扱うときに出力されるエラーらしい．GSのバージョンを最新にしてくれとかいてある．</p>
+
+<p>バージョンを調べる．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>gs -v
+ESP Ghostscript 7.07.1 <span class="o">(</span>2003-07-12<span class="o">)</span>
+Copyright <span class="m">2003</span> artofcode LLC and Easy Software Products, all rights reserved.
+</code></pre></div>
+<p>ん？古い&#8230;Homebewでインストールした GhostScriptは&#8230;？</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>brew install ghostscript
+Warning: ghostscript-9.15 already installed
+</code></pre></div>
+<p><strong>バージョンがちがう&#8230;</strong></p>
+
+<p>homebrewでインストールした以外にすでにghostscriptが入っていたのだと思われる．finderで検索をかけるとmacportsとsmにそれらしきものがヒット．おそらくやっていたのだろうけど覚えがない&#8230;MacTeXによるインストール時に一緒にインストールしてしまったのかな？<br>
+とりあえず，元のgsを削除し以下のようにシンボリックリンクを貼り直す．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ln -s /usr/local/Cellar/ghostscript/9.15/bin/gs /usr/local/bin/
+</code></pre></div>
+<p>確認．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"> gs -v
+GPL Ghostscript 9.15 <span class="o">(</span>2014-09-22<span class="o">)</span>
+Copyright <span class="o">(</span>C<span class="o">)</span> <span class="m">2014</span> Artifex Software, Inc.  All rights reserved.
+</code></pre></div>
+<p>無事出力できました．</p>
+
+<p><a href="http://qiita.com/hyuki/items/692105eb72e3c8174999">tex2imgを使って、LaTeXで書いた数式を画像に変換する例</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[TeX/LaTeXに関すること覚書]]></title>

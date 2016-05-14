@@ -4,7 +4,7 @@
   <title><![CDATA[tasuwo blog]]></title>
   <link href="http://tasuwo.github.io/atom.xml" rel="self"/>
   <link href="http://tasuwo.github.io/"/>
-  <updated>2016-05-14T11:41:45+09:00</updated>
+  <updated>2016-05-14T12:08:29+09:00</updated>
   <id>http://tasuwo.github.io/</id>
   <author>
     <name><![CDATA[tasuwo]]></name>
@@ -12,6 +12,274 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[TeX2img で Ghostscript Cannot Be Exexuted ではまる]]></title>
+    <link href="http://tasuwo.github.io/blog/2016/05/14/tex-to-img/"/>
+    <updated>2016-05-14T12:05:55+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2016/05/14/tex-to-img</id>
+    <content type="html"><![CDATA[<p>TeX2img を使おうとしたらはまったのでメモしておく．<br>
+具体的には，<code>tex2img : ghostscript cannot be executed.</code> ではまった．<br>
+以下に解決までの道のりを示しておく．結果をいうと，<strong>GhostScript のバージョンが古かった</strong> というだけの話．<br>
+実行時の環境は OS X Yosemite です．</p>
+
+<!-- more -->
+
+<h2>TeX2imgとは</h2>
+
+<p>入力したTeXコードを画像に出力する．<a href="http://island.geocities.jp/loveinequality/#download">TeX2img配布サイト</a> でダウンロードする．</p>
+
+<h2>テストしてみる</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\documentclass</span><span class="nb">{</span>jsarticle<span class="nb">}</span>
+</span><span class='line'><span class="k">\usepackage</span><span class="nb">{</span>amsmath<span class="nb">}</span>
+</span><span class='line'><span class="k">\pagestyle</span><span class="nb">{</span>empty<span class="nb">}</span>
+</span><span class='line'><span class="k">\begin</span><span class="nb">{</span>document<span class="nb">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">\section*</span><span class="nb">{</span>問題<span class="nb">}</span>
+</span><span class='line'>線形写像~<span class="s">$</span><span class="nb">f</span><span class="s">$</span>に対し、
+</span><span class='line'><span class="sb">\[</span><span class="nb"></span>
+</span><span class='line'><span class="nv">\text</span><span class="nb">{$f$~が単射である} </span><span class="nv">\Leftrightarrow</span><span class="nb"> </span><span class="nv">\ker</span><span class="o">(</span><span class="nb">f</span><span class="o">)=</span><span class="nv">\{</span><span class="m">0</span><span class="nv">\}</span><span class="nb"></span>
+</span><span class='line'><span class="s">\]</span>
+</span><span class='line'>を証明せよ。
+</span><span class='line'>
+</span><span class='line'><span class="k">\section*</span><span class="nb">{</span>解答<span class="nb">}</span>
+</span><span class='line'>
+</span><span class='line'>1.~<span class="s">$</span><span class="nv">\Rightarrow</span><span class="s">$</span>の対偶を示す。
+</span><span class='line'>
+</span><span class='line'><span class="s">$</span><span class="nb">f</span><span class="s">$</span>~が線型写像なら<span class="s">$</span><span class="nv">\ker</span><span class="o">(</span><span class="nb">f</span><span class="o">)</span><span class="nb"> </span><span class="nv">\ni</span><span class="nb"> </span><span class="m">0</span><span class="s">$</span>なので、<span class="s">$</span><span class="nv">\ker</span><span class="o">(</span><span class="nb">f</span><span class="o">)</span><span class="s">$</span>に属する<span class="s">$</span><span class="m">0</span><span class="s">$</span>~以外の元の存在を仮定し、それを<span class="s">$</span><span class="nb">a</span><span class="s">$</span>とする。
+</span><span class='line'>このとき、<span class="s">$</span><span class="nb">a </span><span class="nv">\neq</span><span class="nb"> </span><span class="m">0</span><span class="s">$</span>かつ<span class="s">$</span><span class="nb">f</span><span class="o">(</span><span class="nb">a</span><span class="o">)=</span><span class="nb">f</span><span class="o">(</span><span class="m">0</span><span class="o">)=</span><span class="m">0</span><span class="s">$</span>なので<span class="s">$</span><span class="nb">f</span><span class="s">$</span>~は単射ではない。
+</span><span class='line'>
+</span><span class='line'><span class="k">\medskip</span>
+</span><span class='line'>
+</span><span class='line'>2.~<span class="s">$</span><span class="nv">\Leftarrow</span><span class="s">$</span>を背理法で示す。
+</span><span class='line'>
+</span><span class='line'><span class="s">$</span><span class="nv">\ker</span><span class="o">(</span><span class="nb">f</span><span class="o">)=</span><span class="nv">\{</span><span class="m">0</span><span class="nv">\}</span><span class="s">$</span>かつ<span class="s">$</span><span class="nb">f</span><span class="s">$</span>は単射ではないと仮定する。
+</span><span class='line'><span class="s">$</span><span class="nb">f</span><span class="s">$</span>~は単射でないので<span class="s">$</span><span class="nb">a </span><span class="nv">\neq</span><span class="nb"> b</span><span class="s">$</span>かつ<span class="s">$</span><span class="nb">f</span><span class="o">(</span><span class="nb">a</span><span class="o">)=</span><span class="nb">f</span><span class="o">(</span><span class="nb">b</span><span class="o">)</span><span class="s">$</span>という<span class="s">$</span><span class="nb">a,b</span><span class="s">$</span>が存在する。
+</span><span class='line'><span class="s">$</span><span class="nb">f</span><span class="s">$</span>~は線型写像だから<span class="s">$</span><span class="nb">f</span><span class="o">(</span><span class="nb">a</span><span class="o">)-</span><span class="nb">f</span><span class="o">(</span><span class="nb">b</span><span class="o">)=</span><span class="nb">f</span><span class="o">(</span><span class="nb">a</span><span class="o">-</span><span class="nb">b</span><span class="o">)</span><span class="s">$</span>となり、<span class="s">$</span><span class="nb">f</span><span class="o">(</span><span class="nb">a</span><span class="o">)=</span><span class="nb">f</span><span class="o">(</span><span class="nb">b</span><span class="o">)</span><span class="s">$</span>から<span class="s">$</span><span class="nb">f</span><span class="o">(</span><span class="nb">a</span><span class="o">-</span><span class="nb">b</span><span class="o">)=</span><span class="m">0</span><span class="s">$</span>~がいえる。
+</span><span class='line'><span class="s">$</span><span class="nb">f</span><span class="o">(</span><span class="nb">a</span><span class="o">-</span><span class="nb">b</span><span class="o">)=</span><span class="m">0</span><span class="s">$</span>と<span class="s">$</span><span class="nv">\ker</span><span class="o">(</span><span class="nb">f</span><span class="o">)=</span><span class="nv">\{</span><span class="m">0</span><span class="nv">\}</span><span class="s">$</span>から<span class="s">$</span><span class="nb">a</span><span class="o">-</span><span class="nb">b</span><span class="o">=</span><span class="m">0</span><span class="s">$</span>がいえるが、これは<span class="s">$</span><span class="nb">a </span><span class="nv">\neq</span><span class="nb"> b</span><span class="s">$</span>と矛盾する。
+</span><span class='line'>
+</span><span class='line'><span class="k">\medskip</span>
+</span><span class='line'>
+</span><span class='line'>以上1.と2.により、<span class="s">$</span><span class="nv">\text</span><span class="nb">{線型写像~</span><span class="s">$</span>f<span class="s">$</span><span class="nb">が単射である}</span><span class="nv">\Leftrightarrow</span><span class="nb"> </span><span class="nv">\ker</span><span class="o">(</span><span class="nb">f</span><span class="o">)=</span><span class="nv">\{</span><span class="m">0</span><span class="nv">\}</span><span class="s">$</span>が示された。<span class="k">\rule</span><span class="nb">{</span>5pt<span class="nb">}{</span>10pt<span class="nb">}</span>
+</span><span class='line'><span class="k">\end</span><span class="nb">{</span>document<span class="nb">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>tex2img
+</span><span class='line'>    --kanji utf8
+</span><span class='line'>    --left-margin 50
+</span><span class='line'>    --right-margin 50
+</span><span class='line'>    --top-margin 50
+</span><span class='line'>    --bottom-margin 50
+</span><span class='line'>    ker.tex ker.png
+</span></code></pre></td></tr></table></div></figure>
+
+<p>エラーが出た．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>dyld: Library not loaded: /usr/X11/lib/libXt.6.dylib
+</span><span class='line'>  Referenced from: /usr/local/bin/gs
+</span><span class='line'>  Reason: image not found
+</span><span class='line'><span class="nv">$ </span>/usr/local/bin/gs -dNOPAUSE -dBATCH -sDEVICE<span class="o">=</span>eps2write -dNoOutputFonts -dFirstPage<span class="o">=</span><span class="m">1</span> -dLastPage<span class="o">=</span><span class="m">1</span> -r20016 -sOutputFile<span class="o">=</span>temp87367-7E615928-10FE-48F8-B95F-C37F37DEBE76.eps temp87367-7E615928-10FE-48F8-B95F-C37F37DEBE76.pdf  2&gt;<span class="p">&amp;</span>1
+</span><span class='line'>dyld: Library not loaded: /usr/X11/lib/libXt.6.dylib
+</span><span class='line'>  Referenced from: /usr/local/bin/gs
+</span><span class='line'>  Reason: image not found
+</span><span class='line'>sh: line 1: <span class="m">87394</span> Trace/BPT <span class="nb">trap</span>: <span class="m">5</span>       /usr/local/bin/gs -dNOPAUSE -dBATCH -sDEVICE<span class="o">=</span>eps2write -dNoOutputFonts -dFirstPage<span class="o">=</span><span class="m">1</span> -dLastPage<span class="o">=</span><span class="m">1</span> -r20016 -sOutputFile<span class="o">=</span>temp87367-7E615928-10FE-48F8-B95F-C37F37DEBE76.eps temp87367-7E615928-10FE-48F8-B95F-C37F37DEBE76.pdf 2&gt;<span class="p">&amp;</span>1
+</span><span class='line'>tex2img : ghostscript cannot be executed.
+</span><span class='line'>Check errors in the <span class="nb">source </span>code.
+</span></code></pre></td></tr></table></div></figure>
+
+<p><a href="http://tex.stackexchange.com/questions/208001/cant-compile-image-after-upgrading-to-os-x-yosemite">graphics - Can&#39;t compile image after upgrading to OS X Yosemite - TeX - LaTeX Stack Exchange</a> に似たようなエラーを確認．どうやら X11 のパスの問題らしい．自分の環境の場合，システム上に X11 が存在しないわけではないので，以下のようにシンボリックリンクを作成することで回避する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo ln -s /opt/X11 /usr/X11
+</span></code></pre></td></tr></table></div></figure>
+
+<p>しかし，まだ以下のようなエラーが出ていた．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>tex2img : ghostscript cannot be executed.
+</span></code></pre></td></tr></table></div></figure>
+
+<p><a href="http://acetaminophen.hatenablog.com/entry/tex2img-cui">TeX2img のコマンドライン版の使い方（改訂版） - Acetaminophen’s diary</a> の <strong>Ghostscriptのエラー回避</strong> の場所にあった<code>--quick</code>オプションを用いるととりあえずエラーメッセージは表示されなくなったが，結果がうまく出力されないので，何の解決にもなっていない．</p>
+
+<p><a href="http://acetaminophen.hatenablog.com/entry/2014/10/18/214403">TeX2img (Windows/Mac) の動作の詳細 - Acetaminophen’s diary</a> を参考にしてみると，内部処理は以下のようになっているらしい．</p>
+
+<p><strong>【JPEG/PNG出力(画質優先モード)の場合】</strong><br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+<span class='line-number'>2</span><br>
+<span class='line-number'>3</span><br>
+<span class='line-number'>4</span><br>
+<span class='line-number'>5</span><br>
+<span class='line-number'>6</span><br>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>TeX →<span class="o">[</span>platex<span class="o">]</span><br>
+</span><span class='line'>DVI →<span class="o">[</span>dvipdfmx<span class="o">]</span><br>
+</span><span class='line'>PDF →<span class="o">[</span>gs <span class="o">(</span>eps<span class="o">(</span>2<span class="o">)</span>write<span class="o">)</span>でアウトライン化＋クロップ<span class="o">]</span><br>
+</span><span class='line'>EPS →<span class="o">[</span>epstopdf <span class="o">(</span>gs<span class="o">)]</span><br>
+</span><span class='line'>PDF →<span class="o">[</span>OS X の APIでビットマップ化＋余白付与<span class="o">]</span><br>
+</span><span class='line'>JPEG/PNG<br>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p><strong>【JPEG/PNG出力(速度優先モードの場合)】</strong><br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+<span class='line-number'>2</span><br>
+<span class='line-number'>3</span><br>
+<span class='line-number'>4</span><br>
+<span class='line-number'>5</span><br>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>TeX →<span class="o">[</span>platex<span class="o">]</span><br>
+</span><span class='line'>DVI →<span class="o">[</span>dvipdfmx<span class="o">]</span><br>
+</span><span class='line'>PDF →<span class="o">[</span>pdfcropでクロップ＋余白付与<span class="o">]</span><br>
+</span><span class='line'>PDF →<span class="o">[</span>OS X のQuartz API<span class="o">]</span><br>
+</span><span class='line'>JPEG/PNG<br>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>さらに，</p>
+
+<blockquote>
+<p>EPS ファイルへの余白付与は EPS の BoundingBox 情報を書き換えることによって実装されている</p>
+</blockquote>
+
+<p>とのこと．GhostScript を使っている手順，つまり，<code>eps(2)write</code>の部分がうまくいってないのではないか？と考えられる．そこでログを見てみると，以下のような記述を発見．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>/usr/local/bin/gs -dNOPAUSE -dBATCH -sDEVICE<span class="o">=</span>epswrite -dFirstPage<span class="o">=</span><span class="m">1</span> -dLastPage<span class="o">=</span><span class="m">1</span> -r20016 -sOutputFile<span class="o">=</span>temp93003-D85DBCB1-8F3C-4AC6-8FFC-B7ADB9615615.eps temp93003-D85DBCB1-8F3C-4AC6-8FFC-B7ADB9615615.pdf  2&gt;<span class="p">&amp;</span>1
+</span><span class='line'>ESP Ghostscript 7.07 <span class="o">(</span>2003-07-12<span class="o">)</span>
+</span><span class='line'>Copyright <span class="m">2003</span> artofcode LLC and Easy Software Products, all rights reserved.
+</span><span class='line'>This software comes with NO WARRANTY: see the file PUBLIC <span class="k">for</span> details.
+</span><span class='line'>Error: /syntaxerror in readxref
+</span><span class='line'>Operand stack:
+</span></code></pre></td></tr></table></div></figure>
+
+<p><code>Error: /syntaxerror in readxref</code> とのこと．再現可能かどうか確かめてみるため，適当に<code>test.pdf</code>を用意してターミナルから以下を実行した．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>gs -dNOPAUSE -dBATCH -sDEVICE<span class="o">=</span>epswrite -dFirstPage<span class="o">=</span><span class="m">1</span> -dLastPage<span class="o">=</span><span class="m">1</span> -r20016 -sOutputFile<span class="o">=</span>test.eps test.pdf
+</span><span class='line'>ESP Ghostscript 7.07 <span class="o">(</span>2003-07-12<span class="o">)</span>
+</span><span class='line'>Copyright <span class="m">2003</span> artofcode LLC and Easy Software Products, all rights reserved.
+</span><span class='line'>This software comes with NO WARRANTY: see the file PUBLIC <span class="k">for</span> details.
+</span><span class='line'>Processing pages <span class="m">1</span> through 1.
+</span><span class='line'>Page 1
+</span></code></pre></td></tr></table></div></figure>
+
+<p>実行が終了しなかったので中断した．解像度を下げて実行してみる．解像度の指定は<code>-r</code>の部分．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>gs -dNOPAUSE -dBATCH -sDEVICE<span class="o">=</span>epswrite -dFirstPage<span class="o">=</span><span class="m">1</span> -dLastPage<span class="o">=</span><span class="m">1</span> -r720 -sOutputFile<span class="o">=</span>test.eps test.pdf
+</span><span class='line'>ESP Ghostscript 7.07 <span class="o">(</span>2003-07-12<span class="o">)</span>
+</span><span class='line'>Copyright <span class="m">2003</span> artofcode LLC and Easy Software Products, all rights reserved.
+</span><span class='line'>This software comes with NO WARRANTY: see the file PUBLIC <span class="k">for</span> details.
+</span><span class='line'>Processing pages <span class="m">1</span> through 1.
+</span><span class='line'>Page 1
+</span></code></pre></td></tr></table></div></figure>
+
+<p>実行できた．前回は解像度を高くしすぎたために実行に時間がかかっていただけのようだ．とりあえず，動くことはわかった．<code>/usr/local/bin/gs</code>は実行できるのでパスの問題ではないし，こうして動きもしたわけだから GS が悪いわけでもなさそう．<br>
+さて，じゃぁ一体なんだよ！となるわけだが．<a href="https://groups.google.com/forum/#!topic/fa.hylafax/z-qsRvVF8eY">[hylafax-users] /syntaxerror in readxref - Google Groups</a> を見てみると，先ほどのエラーはGSがPDFを扱うときに出力されるエラーらしい．GSのバージョンを最新にしてくれとかいてある．</p>
+
+<p>バージョンを調べる．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>gs -v
+</span><span class='line'>ESP Ghostscript 7.07.1 <span class="o">(</span>2003-07-12<span class="o">)</span>
+</span><span class='line'>Copyright <span class="m">2003</span> artofcode LLC and Easy Software Products, all rights reserved.
+</span></code></pre></td></tr></table></div></figure>
+
+<p>ん？古い&#8230;Homebewでインストールした GhostScriptは&#8230;？</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew install ghostscript
+</span><span class='line'>Warning: ghostscript-9.15 already installed
+</span></code></pre></td></tr></table></div></figure>
+
+<p><strong>バージョンがちがう&#8230;</strong></p>
+
+<p>homebrewでインストールした以外にすでにghostscriptが入っていたのだと思われる．finderで検索をかけるとmacportsとsmにそれらしきものがヒット．おそらくやっていたのだろうけど覚えがない&#8230;MacTeXによるインストール時に一緒にインストールしてしまったのかな？<br>
+とりあえず，元のgsを削除し以下のようにシンボリックリンクを貼り直す．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ln -s /usr/local/Cellar/ghostscript/9.15/bin/gs /usr/local/bin/
+</span></code></pre></td></tr></table></div></figure>
+
+<p>確認．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'> gs -v
+</span><span class='line'>GPL Ghostscript 9.15 <span class="o">(</span>2014-09-22<span class="o">)</span>
+</span><span class='line'>Copyright <span class="o">(</span>C<span class="o">)</span> <span class="m">2014</span> Artifex Software, Inc.  All rights reserved.
+</span></code></pre></td></tr></table></div></figure>
+
+<p>無事出力できました．</p>
+
+<p><a href="http://qiita.com/hyuki/items/692105eb72e3c8174999">tex2imgを使って、LaTeXで書いた数式を画像に変換する例</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[TeX/LaTeXに関すること覚書]]></title>
@@ -4284,361 +4552,6 @@ Win/Mac/Linux で使用可能．<br>
 </blockquote>
 
 <p>ありがとうございました．</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[開発モデルの話]]></title>
-    <link href="http://tasuwo.github.io/blog/2015/05/07/model/"/>
-    <updated>2015-05-07T09:48:27+09:00</updated>
-    <id>http://tasuwo.github.io/blog/2015/05/07/model</id>
-    <content type="html"><![CDATA[<p>開発モデルについて，調べる機会があったのでメモしておく．<br>
-調査記録なので，間違い等が含まれる可能性がある．</p>
-
-<!-- more -->
-
-<h1>はじめに</h1>
-
-<h2>開発プロセスとは</h2>
-
-<p>開発の企画からリリース，運用・保守までの作業段階．以下のように分けられる．</p>
-
-<ol>
-<li>要件定義
-
-<ul>
-<li>機能やパフォーマンス等の条件の明確化</li>
-</ul></li>
-<li>基本設計(外部設計)
-
-<ul>
-<li>UIや入出力等</li>
-</ul></li>
-<li>詳細設計(内部設計)
-
-<ul>
-<li>具体的な機能の設計</li>
-</ul></li>
-<li>実装</li>
-<li>単体テスト</li>
-<li>結合テスト</li>
-<li>総合テスト</li>
-<li>導入・運用</li>
-</ol>
-
-<h2>開発モデルとは</h2>
-
-<p>開発プロセスを実施する順番・形式をモデル化したもの．</p>
-
-<h1>1. ウォーターフォールモデル</h1>
-
-<p>最も基本的な開発モデル．前のプロセスの成果物を基に次のプロセスの作業を行う．</p>
-
-<ul>
-<li>主流．ドキュメントの作成量が多い．</li>
-<li>大規模システム開発に有効とされる</li>
-</ul>
-
-<h3>メリット</h3>
-
-<ul>
-<li>計画を立て易い
-
-<ul>
-<li>各開発プロセスの区切りが明確で，流れを把握しやすい</li>
-</ul></li>
-<li>進捗管理がし易い</li>
-</ul>
-
-<h3>デメリット</h3>
-
-<ul>
-<li>上流工程でしか要件定義をしない</li>
-<li>仕様変更の影響が強い
-
-<ul>
-<li>手戻りの発生</li>
-</ul></li>
-<li>成果物管理の稼働不可
-
-<ul>
-<li>成果物の作成が重みになる</li>
-</ul></li>
-</ul>
-
-<h1>2. プロトタイピングモデル</h1>
-
-<ul>
-<li>比較的小規模な開発向け．</li>
-<li>プロトタイプをユーザに提示し，システムの機能を確認してもらう
-
-<ul>
-<li>評価と改善を繰り替えし，要件に見合った製品を作り上げる</li>
-</ul></li>
-</ul>
-
-<h3>メリット</h3>
-
-<ul>
-<li>設計段階でユーザの意見が取り入れられるため，手戻りが少なくなる</li>
-</ul>
-
-<h3>デメリット</h3>
-
-<ul>
-<li>プロトタイプ作りから始めるため，手間と費用がかかる</li>
-</ul>
-
-<h1>3. 繰り返し型開発モデル</h1>
-
-<p>ウォーターフォールにおける，手戻りの大きいデメリットを改善するために考えられた．</p>
-
-<h2>3.1 スパイラルモデル</h2>
-
-<p>ソフトウェア全体を，独立性の高いサブシステムに分割する</p>
-
-<ul>
-<li><code>要件定義⇒設計⇒プログラミング⇒テスト</code> の流れを繰り返す</li>
-<li>開発のリスクが最小となるように改良しながらシステムを育てる
-
-<ol>
-<li>リスク分析・代替手段評価</li>
-<li>開発と検証</li>
-<li>次のフェーズの計画</li>
-<li>目標の設定・代替手段検討</li>
-</ol></li>
-</ul>
-
-<h3>メリット</h3>
-
-<ul>
-<li>リスクの現象が計れる</li>
-<li>大きな手戻りが発生しにくい
-
-<ul>
-<li>ユーザとの認識の違い，設計・要件定義のミスを早期発見可能</li>
-</ul></li>
-<li>仕様変更に対応しやすい</li>
-</ul>
-
-<h3>デメリット</h3>
-
-<ul>
-<li>システムの分割方法によっては運用しにくい</li>
-<li>ユーザに仕様変更の余地を与えてしまう</li>
-<li>プロジェクト全体の管理が困難
-
-<ul>
-<li>終了時期の見極めが難しい</li>
-</ul></li>
-</ul>
-
-<h2>3.2 インクリメンタルモデル(漸増型)</h2>
-
-<p>要求を一度に全て実現するのではなく，開発単位毎に新規の増分を追加していく．<br>
-スパイラルモデルとは，繰り返しの範囲が異なる．<br>
-スパイラルモデルは <code>要求定義〜テスト工程</code> を繰り返すが，インクリメンタルモデルは要求定義は最初の1回だけ行い，それ以後の <code>設計〜テスト工程</code> のみを繰り返す．</p>
-
-<ul>
-<li>最初にシステム全体の要求定義を行う
-
-<ul>
-<li>ソフトウェアを独立性の高い機能に分割する</li>
-</ul></li>
-<li>機能ごとに並行して開発を行う
-
-<ul>
-<li>各機能について段階的にリリースする</li>
-</ul></li>
-</ul>
-
-<h3>メリット</h3>
-
-<ul>
-<li>機能毎のソフトウェア構造がまったく異なるもの，依存関係のないものに適している
-
-<ul>
-<li>繰り返しの単位の独立性が保てる</li>
-</ul></li>
-<li>機能毎に開発する
-
-<ul>
-<li>全ての機能が揃っていなくても，最初のリリースからシステムの動作を確認できる</li>
-</ul></li>
-</ul>
-
-<h3>デメリット</h3>
-
-<ul>
-<li>開発単位間に共通した構造が存在した場合，二重に開発を行ってしまう
-
-<ul>
-<li>保守性に問題が生じる</li>
-</ul></li>
-<li>細部まで作り込んでしまうと，修正が大変</li>
-</ul>
-
-<h2>3.3 イテレーションモデル(反復型)</h2>
-
-<p>何度も薄く色を塗ることで，最終的にしっかりとした色へもっていくイメージ．<br>
-スパイラルモデルとの違いは，分割の仕方．<br>
-スパイラルモデルは <code>設計〜テスト工程</code> を繰り返すが，イテレーションモデルは <code>機能追加</code> の工程を繰り返し，各機能の完成度を高めていく．</p>
-
-<ul>
-<li>ソフトウェアの全体，あるいは部分について，最初は薄く作り，少しずつ肉付けしていく
-
-<ul>
-<li>システムの要素をとりあえず完成させ，段階的に要素を開発・追加してく</li>
-</ul></li>
-<li>OS の開発に向いている
-
-<ul>
-<li>どんなモジュールからも呼び出すカーネル(プロセス管理等)を先に開発する</li>
-<li>カーネルのモジュールを利用しながらシェルを追加して行く</li>
-</ul></li>
-</ul>
-
-<p>エヴォリューショナルモデルと同義(たぶん&#8230;)．</p>
-
-<h3>メリット</h3>
-
-<ul>
-<li>徐々に確認しながら肉付けし，中身を濃くしていける
-
-<ul>
-<li>非常に重要かつ複雑なソフトウェアの箇所に対して有効</li>
-</ul></li>
-</ul>
-
-<h3>デメリット</h3>
-
-<ul>
-<li>ユーザーの要求が発散してしまい，ソフトウェアがいつまでたっても完成しないリスクがある</li>
-</ul>
-
-<h2>UP(Unified Process)</h2>
-
-<p>開発モデルというわけじゃないけど，このタイミングで書いておく．<br>
-UP は有名な反復型プロセス(イテレーション + インクリメンタル)フレームワーク．<br>
-実際の現場では，インクリメンタルモデル，イテレーションモデルをミックスした戦略がよくとられる．</p>
-
-<ul>
-<li>機能単位の開発：インクリメンタル戦略</li>
-<li>コアアーキテクチャの開発：イテレーション戦略</li>
-</ul>
-
-<h3>最終目標</h3>
-
-<p>品質の高いソフトウェアを開発するためのガイドラインを提供する</p>
-
-<h3>思想</h3>
-
-<ul>
-<li>ユーザーの求める真の要求を満足させる</li>
-<li>要求や環境の変化に対応できる</li>
-<li>ソフトウエア開発のリスクを減少させる</li>
-<li>再利用可能なコンポーネントベースのシステムを実現する</li>
-</ul>
-
-<h3>アプローチ</h3>
-
-<ul>
-<li>ユースケース駆動
-
-<ul>
-<li>ユースケースを出発点として開発する</li>
-<li>反復の度に1つ以上のユースケースを実装していく</li>
-</ul></li>
-<li>アーキテクチャセントリック
-
-<ul>
-<li>アーキテクチャ中心で開発する</li>
-<li>開発早期でアーキテクチャを確立する</li>
-<li>開発者視点ではなく，ユーザ視点(ユースケース)から考える
-
-<ul>
-<li>開発者視点の関連モジュールではなく，ユースケースを実現するモジュール群を優先して開発する</li>
-</ul></li>
-</ul></li>
-<li>反復型開発
-
-<ul>
-<li>要求，成果物，人，リスク等を管理しつつ，マイルストーンを設定した計画のもとで反復開発を行う</li>
-</ul></li>
-</ul>
-
-<h3>フェーズ</h3>
-
-<ol>
-<li>インセプション(方向づけ)フェーズ
-
-<ul>
-<li>アイデアのプロトタイプの開発と評価</li>
-<li>開発を進めるべきか，止めるべきかを判断する</li>
-</ul></li>
-<li>エラボレーション(推敲)フェーズ
-
-<ul>
-<li>システム構築のための核となるアーキテクチャベースラインを作る</li>
-<li>骨組みと黄金ルート(必ず通る基本のルート)を作る</li>
-</ul></li>
-<li>コンストラクション(作成)フェーズ
-
-<ul>
-<li>システムとして仕上げる</li>
-<li>β版のリリースが目標</li>
-</ul></li>
-<li>トランジション(移行)フェーズ
-
-<ul>
-<li>β版のリリース</li>
-<li>フィールドでの評価結果の反映.</li>
-</ul></li>
-</ol>
-
-<h2>3.4 アジャイルプロセスモデル</h2>
-
-<ul>
-<li>重厚長大な開発手法(UP)に対するアンチテーゼ
-
-<ul>
-<li>小さいシステムはもっと簡単に作っても良い</li>
-</ul></li>
-<li>状況に対して柔軟かつ迅速に対応する</li>
-<li>イテレーションを区切り，必須度の高い機能から定義・開発して行く</li>
-</ul>
-
-<h3>メリット</h3>
-
-<ul>
-<li>最低限だが使用可能なソフトを早期リリース可能</li>
-<li>優先度の低い開発を後続のイテレーションに後回しに出来る</li>
-</ul>
-
-<h3>デメリット</h3>
-
-<ul>
-<li>大規模システムに向かない</li>
-<li>場当たり的なシステムになってしまう可能性がある</li>
-<li>習熟した技術者によってのみ成し遂げられる</li>
-</ul>
-
-<h1>参考文献</h1>
-
-<blockquote>
-<p><a href="http://www.linuxacademy.ne.jp/lablog/programmer/98/">開発手法の基礎、ウォーターフォールモデルの特徴とは</a><br>
-<a href="http://gihyo.jp/lifestyle/serial/01/ipa-terminology/0012">第12回　システム開発の工程とソフトウェア開発モデル | めざせ!情報処理技術者試験</a><br>
-<a href="http://monoist.atmarkit.co.jp/mn/articles/1011/25/news112.html">【問題5】ソフトウェア開発モデルについて</a><br>
-<a href="http://www.itmedia.co.jp/im/articles/0310/08/news001.html">第10回 開発プロセスの上手な組み合わせ</a><br>
-<a href="http://d.hatena.ne.jp/incarose86/20121117/1353144430">インクリメンタル開発とイテレーション開発</a><br>
-<a href="http://itpro.nikkeibp.co.jp/article/lecture/20070221/262716/">Part1　Unified Process，その生い立ちと構造を知る</a><br>
-<a href="http://hhhuang.homelinux.com/lectures/OO_Dalian/Lesson05.pdf">第5講 オブジェクト指向開発とは何か</a><br>
-<a href="http://itpro.nikkeibp.co.jp/article/lecture/20070221/262716/">Part1 Unified Process，その生い立ちと構造を知る</a><br>
-<a href="http://codezine.jp/article/detail/6423">第１回 RUPはどこに消えたのか？</a><br>
-<a href="http://blog.livedoor.jp/yasuyukimiyoshi/archives/51283739.html">テーマ０１：ソフトウェア開発モデル</a><br>
-<a href="http://stackoverflow.com/questions/3897335/whats-the-difference-between-incremental-software-process-model-evolutionary-m">What&#39;s the difference between incremental software process model, evolutionary model, and the spiral model?</a><br>
-<a href="http://www.it-shikaku.jp/top30.php?hidari=13-01-01.php&amp;migi=km13-01.php">1.ソフトウェア開発手法 - it-shikaku.jp</a></p>
-</blockquote>
 ]]></content>
   </entry>
   
