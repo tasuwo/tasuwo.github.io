@@ -1,0 +1,639 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Latex | tasuwo blog]]></title>
+  <link href="http://tasuwo.github.io/blog/categories/latex/atom.xml" rel="self"/>
+  <link href="http://tasuwo.github.io/"/>
+  <updated>2016-05-14T11:41:45+09:00</updated>
+  <id>http://tasuwo.github.io/</id>
+  <author>
+    <name><![CDATA[tasuwo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[TeX/LaTeXに関すること覚書]]></title>
+    <link href="http://tasuwo.github.io/blog/2016/05/14/latex/"/>
+    <updated>2016-05-14T10:46:37+09:00</updated>
+    <id>http://tasuwo.github.io/blog/2016/05/14/latex</id>
+    <content type="html"><![CDATA[<p>LaTeX とか TeX についていろいろまとめたので自分用メモ．<br>
+2014年にまとめたものなので，現在とは環境が異なっている場合があります．環境が新しい人は以下のサイトが参考になると思われます．</p>
+
+<p><a href="http://qiita.com/hideaki_polisci/items/3afd204449c6cdd995c9">El Capitan に 0 から TeX 環境を導入する人用</a></p>
+
+<p><a href="http://abenori.blogspot.com/2015/10/el-capitantexplatex-dvipdfmxpdflatexmac.html">Yosemite 時代から TeX を導入しており El Capitan になった人用</a></p>
+
+<!-- more -->
+
+<h1>1. TeXとは？</h1>
+
+<p>コンピュータ科学者 Donald E. Knuth によって生み出された文書整形システムで，特徴は以下．</p>
+
+<ul>
+<li>複雑な数式でも綺麗に書ける</li>
+<li>論文とかを書くのに適している</li>
+<li>多くのOS上で動作する</li>
+<li>TeXのソースはテキストファイル = 異なるシステムでもソースを共通に使える</li>
+<li>フリーウェア</li>
+</ul>
+
+<p>文書作成の流れは以下.</p>
+
+<ol>
+<li>字の種類, 大きさ, 印字位置等を制御する命令を挿入したテキストファイルの作成</li>
+<li>Texでコンパイルし, DVIファイルを作成</li>
+<li>プレビューでDVIファイルを確認. できていなければ 1. へ戻る</li>
+<li>プリンタに出力</li>
+</ol>
+
+<p><a href="http://www.juen.ac.jp/math/nakagawa/texguide.html">TeXを使って数式をきれいに書こう</a></p>
+
+<h2>1.1 簡単な用語説明</h2>
+
+<p><strong>TeX</strong> は組版エンジンであり一種のプログラミング言語であり，言語処理系である．自己拡張性を持つ．単一のアプリケーションではなく，プログラムやファイルの集合体．</p>
+
+<p>TeX だけでは組版が難しかったため，プログラミング言語でいうライブラリにあたるものが必要となった．そこでまず Knuth 自身が必要最低限の機能を追加したマクロパッケージ <strong>plain TeX</strong> を作成した．</p>
+
+<p>そこからさらに論文，レポート作成を簡単にできるよう拡張したのが，Leslie Lamport による <strong>LaTeX</strong> である．</p>
+
+<p>LaTeX はパッケージ(スタイルファイル)の読み込みにより機能拡張が容易になっている．パッケージはユーザ自身が作成することもでき，これを集めたサイトが<a href="http://www.ctan.org/">CTAN: Comprehensive TeX Archive Network</a>である．</p>
+
+<p>また，TeX や LaTeX は単一のアプリケーションではなく，膨大な数の実行形式ファイルやマクロ等の集合である．これらをパッケージングしたTeX/LaTeX ディストリビューションが <strong>TeX Live</strong> である．さらに，Macユーザ用に便利な周辺ツール等もまとめてパッケージングしたディストリビューションが <strong>Mac Tex</strong> である．</p>
+
+<h2>1.2 TeXディストリビューション</h2>
+
+<p>TeXには以下のようなものが含まれる．</p>
+
+<ul>
+<li>膨大な数の実行形式ファイル</li>
+<li>マクロ</li>
+<li>フォントファイル</li>
+<li>周辺ユーティリティ</li>
+</ul>
+
+<p>以上の集合体がTeXである．また，マクロやフォントファイル等は開発者が個々に開発している．そこで，これらの機能をまとめて用いるために，これらをうまく組み合わせて調整した配布物を，TeXディストリビューションという．</p>
+
+<table><thead>
+<tr>
+<th></th>
+<th>海外</th>
+<th>国内</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>UNIX用ソース</td>
+<td>teTeX，TeXLive</td>
+<td>ptetex3，ptexlive</td>
+</tr>
+<tr>
+<td>Windows用実行形式</td>
+<td>TexLive，MiKTeX，proTeXt</td>
+<td>W32TeX</td>
+</tr>
+</tbody></table>
+
+<p>現在は日本でも TeXLive が主流．また，TeX Liveは<code>tlmgr</code>というユーティリティで，オンラインアップデートが可能．</p>
+
+<h2>1.3 TeX エンジン</h2>
+
+<p>TeX エンジン．すなわち TeX の処理系とは， TeX を入力すると DVI やら PDF が出てくるプログラムのこと．</p>
+
+<ul>
+<li><p><strong>Tex</strong>．原点．モダンな TeX ディストリビューションの標準エンジンとして使われている．プレーンなフォーマットのみ仕様する場合，これが標準エンジンとして仕様される．最終的な更新は1990年のバージョン3であり，別名を TeX90 といった．その前のバージョン2は Tex82 という．前者は 8bit，後者は 7bit を入力に仕様していた</p></li>
+<li><p><strong>e-Tex</strong>．1990年代に登場．<code>Tex--XeT</code> と呼ばれる双方向植字拡張(右から左へ書く文字への対応)，レジスタ数拡張，TeXプログラミングを容易にする様々な機能を追加した．e-TeX の各条は新しいエンジンの多くに取り入れられているが，e-TeX 自体は広く使われているわけではない．ちなみに，LuaTeX は双方向植字に TeX&#8211;XeT を使用しておらず，これに関わらない部分についてのみ e-TeX のプリミティブを採用している．</p></li>
+<li><p><strong>pTeX</strong>．日本語を扱うための機能を実装した．日本語と欧文の混在や縦書き組版に対応している．</p></li>
+<li><p><strong>e-pTeX</strong>．e-Tex + pTeX．</p></li>
+<li><p><strong>upTeX</strong>，<strong>e-upTeX</strong>．pTeXの拡張で扱える日本語は，JIS第一，第二水準までであり，Unicode には対応していない．また，TeX の文書を UTF-8 で記述した場合に対応できない．platex を使用する際，<code>nkf</code>などで TeX を EUC に変換してから pTeX に捩込む案があり，<code>--kanji=utf8</code> オプションで実行できる．しかし依然として未収録の文字は扱えない．OTFパッケージもあったが微妙なので，内部文字コードを Unicode にしようという試みが行われた．これが upTeX．e-TeX とマージされたものが e-upTeX．</p>
+
+<ul>
+<li>OTFパッケージ．文字コードのようなものを直接入力することで未収録の文字も扱えるようにしたもの．</li>
+</ul></li>
+<li><p><strong>pdfTeX</strong>．e-Tex にPDFに関係するプリミティブの数々を追加したもの．pdfTeX は出力形式として dvi と pdf の両方をサポートしている．一番の特徴は，dvi を介さずに pdf を直接出力すること．また，現在の絶対値取得(<code>\pdfsavepos</code>)などの便利な機能も存在する．その他にも，PDFに影響を与えるプリミティブな命令が用意されているのがいいところ．例えばリンクの出力や，複雑な図の作成が行える．pdfTeX はモダンな TeX システムのデフォルトエンジンとしてよく使用されている．</p></li>
+<li><p><strong>XeTeX</strong>．e-TeX に対し，入力として UTF-8 をサポートし，さらにシステムフォントにアクセスできるようにしたもの．これまでは，「DVIファイルを出力し，フォントに関してはDVIを処理するアプリに任せる」という方針だった．e-pTeX などではフォント埋め込みする際には，TeX川の設定の後，dvipdfmx の設定をする必要があった．XeTeX はこのデバイス日依存の DVI を生成することを諦めた．内部的には XDV という DVI 拡張を経由し，xsvipdfmx と言う dvipfmx の改造品を使用してPDF を生成する．</p></li>
+<li><p><strong>LuaTeX</strong>．もともとは pdfTeX のバージョン2を目指していたが，現在は独立したアプローチをとっている．e-TeX の拡張と，UTF-8 の入力，そして Lua スクリプティングエンジンを採用している．pdfTeX のプリミティブをいくつか持つが，代わりに Lua スクリプトを使用して実現しているものもある．LuaTeX は Lua を使用してシステムフォントにアクセスできる．Omega と Aleph のアイデアを採用している．</p>
+
+<ul>
+<li><strong>Omega</strong>．Unicode 対応．多書字方向(左-&gt;右，上-&gt;下&#8230;)．その他自然言語処理との連携や XML 処理等の構想があったが，2003年に開発は中断した</li>
+</ul></li>
+</ul>
+
+<p><a href="http://oku.edu.mie-u.ac.jp/%7Eokumura/texfaq/intro.html">Introduction to LaTeX</a><br>
+<a href="http://www.fugenji.org/%7Ethomas/texlive-guide/why.html">なぜ TeX Live なのか</a><br>
+<a href="http://d.hatena.ne.jp/zrbabbler/20140321/1395360402">異様な LaTeX の話 - マクロツイーター</a><br>
+<a href="http://tandoori.hatenablog.com/entry/20130802/1375451791">Mac OS X にTeXをインストールする初心者向けメモ</a><br>
+<a href="http://tex.stackexchange.com/questions/13593/the-differences-between-tex-engines">tex core - The differences between TeX engines - TeX - LaTeX Stack Exchange</a><br>
+<a href="https://oku.edu.mie-u.ac.jp/texconf10/presentations/yato.pdf">日本人の知らないTeX - TeXの過去・現在・未来 - yato.pdf</a><br>
+<a href="http://qiita.com/yyu/items/6404656f822ce14db935">TeX処理系御伽話 - Qiita</a></p>
+
+<h1>2. TeX の歴史</h1>
+
+<h2>2.1 世界史</h2>
+
+<p>Donald E. Knuthは，SRIインターナショナル(世界で最も大きな研究機関の一つ)に所属していた.1974年に投稿論文の執筆を行っていたが，「論文の出来上がりがあまりにもひどく，見るに堪えなかった」ために執筆を中断する．その後1977年から組版についての研究を開始．自分自身で心ゆくまで組版を制御するためにTeXの開発を行った．伝統的な組版やその関連技術に関して幅広く調査を行い，その調査結果が反映され，TeXは商標品質の組版ができる柔軟で強力な組み版システムとなった．<br>
+plain TeXは，プロが使うと非常に便利なシステム．1984年，TeXの仕様書とも云うべき「TeXbook」が出版された．ここには様々なコマンドが記載されていたが，コマンドの使用は多岐に渡るため，一読しただけでは理解できない部分が多かった．<br>
+そこで登場したのがLaTeXである．TeX素人であっても，ある程度LaTeXの規則を学習すれば，TeXを使えるようになる．<br>
+TeXはフリーソフトであり，ソースコードも公開されているので，誰でも改良を加えることができる．改良版の配布も，TeXと区別できるような別名をつけさえすれば許される．<br>
+そのため，TeX/LaTeXには多数のバリエーションが存在する．しかし，TeX/LaTeXは単一のアプリケーションではない．そのため，個々のバリエーションも周辺ファイルと一揃えにして公開しなければならない．これは非常に効率が悪い．そこで，1992年にCTANの公開がスタートする．これにより，TeX/LaTeX関連のアーカイブを効率良く入手できる．<br>
+2006年まではteTeXと呼ばれるものがメジャーだった．コンパクトで，フリーなプログラムのみを含み，徹底的なデバッグが行われていたからである．<br>
+しかし，2006年5月にメンテナのThomas Esserはメンテナンスを終了し，TeX Liveの使用を推奨した．TeX Liveは1996年にスタートしたディストリビューションであり，巨大なアーカイブを有していた．そこから，debian GNU/LinuxやFedora Linuxのような大手LinuxディストリビューションがTeX Liveをdefaultとして採用するようになり，世間の標準もTex Liveに移行した．</p>
+
+<table><thead>
+<tr>
+<th>年号</th>
+<th>概要</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>1974</td>
+<td>Knuth が論文投稿を中断</td>
+</tr>
+<tr>
+<td>1977</td>
+<td>Knuth が組版の研究を開始</td>
+</tr>
+<tr>
+<td>1980</td>
+<td>TUG(TeX Users Group)発足</td>
+</tr>
+<tr>
+<td>1984</td>
+<td>TeXBook出版</td>
+</tr>
+<tr>
+<td>1992</td>
+<td>CTAN(Comprehensive Tex Archive Network)ができる</td>
+</tr>
+<tr>
+<td>~2006</td>
+<td>teTeXがメジャー</td>
+</tr>
+<tr>
+<td>2006/5~</td>
+<td>teTeX のメンテが終了し，TeXLiveが推奨</td>
+</tr>
+</tbody></table>
+
+<h2>2.2 日本史</h2>
+
+<table><thead>
+<tr>
+<th>年号</th>
+<th>概要</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>1980s</td>
+<td>主流は以下&lt;\br&gt;- NTT jTeX/NTT jLaTeX (斉藤康己 in NTT) <br> - pTeX/pLaTeX (ASCII Media Works) <strong>*1</strong></td>
+</tr>
+<tr>
+<td>2004</td>
+<td>ptetex3(teTeX-3.0へのパッチ)が土屋展之による公開 <br> UNIX系環境に日本語TeX/LaTeXを導入しやすくなった</td>
+</tr>
+<tr>
+<td>2006</td>
+<td>teTeXが終了したが，主流はptetex3</td>
+</tr>
+<tr>
+<td>2007</td>
+<td>ptexlive(TeXLiveへの日本語パッチ)が公開されたが，主流はpetex3 <strong>*2</strong> <br> e-pTeX, upTeX/upLaTeX の登場</td>
+</tr>
+<tr>
+<td>2010</td>
+<td>TeXLive2010 にpTeX/pLaTeXが収録され，babelも収録 <br> texencにより複数日本語文字コードに対応 <strong>*3</strong></td>
+</tr>
+<tr>
+<td>2011</td>
+<td>日本語フォントとしてIPAフォントがマージ <br> babelのjapaneseパッケージがマージ</td>
+</tr>
+<tr>
+<td>2011/11</td>
+<td>OTFパッケージがマージ</td>
+</tr>
+<tr>
+<td>2012/2</td>
+<td>japanese-otf-uptexがマージ</td>
+</tr>
+<tr>
+<td>2014</td>
+<td>upTeX/upLaTeXが収録</td>
+</tr>
+</tbody></table>
+
+<p><strong>*1</strong> : pTeX も jTeX もマルチバイト文字への対応を行っていた．pTeX は 16bit 以上の文字コードを扱えたが，オリジナルの TeX では用いられていなかったため，既存プログラムの多くは pTeX が出力する DVI を処理できなかった．jTeX は複数の 1byte 文字セットに分割することで対応しており，英語版からの変更が小さく，移植も比較的容易となっている．現在では以下の理由から pTeX の使用者が多い</p>
+
+<ul>
+<li>Unix系OS用の主な日本語対応TEX配布形態である ptexliveやptetex3がpTEXのみを採用している</li>
+<li>pTeXに関する資料の方が，NTT jTeXよりも多い</li>
+<li>pTeXは縦組に対応しているが，NTT jTeXはしていない</li>
+</ul>
+
+<p><strong>*2</strong> : babel という，他言語処理を実現する強力な環境がなかったためと言われている．</p>
+
+<p><strong>*3</strong> : 以下の理由から普及しにくかったと考えられる．2011年頃から導入され始めた</p>
+
+<ul>
+<li>OTFパッケージがない
+
+<ul>
+<li>LaTeXでAdobe-Japan1-6のすべての文字を使用できる</li>
+<li>門構えに月の「間」や，下の方が長い「吉」等を扱える</li>
+<li>OTFパッケージをロードし，コードで指定すれば簡単に使うことができる．</li>
+</ul></li>
+<li>upTeX/upLaTeXない
+
+<ul>
+<li>pTeX/pLaTeXの内部処理をUnicode化したもの</li>
+</ul></li>
+</ul>
+
+<p>これらは2011年頃から導入が開始される．現行のTeX Liveは，特にパッチを当てずとも日本語を問題なく扱うことができる．babelも扱えるし，レジスタや文字コードの問題，OTFパッケージの問題も解決されている．</p>
+
+<p><a href="http://oku.edu.mie-u.ac.jp/%7Eokumura/texwiki/?CTAN">TeX Wiki CTAN</a><br>
+<a href="http://tutimura.ath.cx/ptexlive/?TeX%A5%C7%A5%A3%A5%B9%A5%C8%A5%EA%A5%D3%A5%E5%A1%BC%A5%B7%A5%E7%A5%F3">TeX ディストリビューション †</a><br>
+<a href="http://www.fugenji.org/%7Ethomas/texlive-guide/why.html">なぜ TeX Live なのか</a><br>
+<a href="http://oku.edu.mie-u.ac.jp/%7Eokumura/texwiki/?TeX%E3%81%AE%E6%AD%B4%E5%8F%B2">TeX Wiki TeXの歴史</a></p>
+
+<h1>3. 環境構築</h1>
+
+<p>Mac OS X Yosemite(ver 10.10.1)で環境構築を行った場合，まとめ．必要なものは以下</p>
+
+<ul>
+<li>MacTeX</li>
+<li>GhostScript</li>
+</ul>
+
+<h2>3.1 MacTeX</h2>
+
+<p>MacTeX は OS X 用の TeXディストリビューション．TeXを使うための標準的なファイル一式をまとめたもので，TeXLive，TeXShop，GhostScript 等が含まれる．今回は主に TeXLive のインストールのために利用する．</p>
+
+<p>まず，<a href="http://www.tug.org/mactex/">MacTeX</a>をダウンロード．容量が2GB以上あるので結構時間がかかる．<br>
+インストール時に，カスタムで以下の二つは外しておく．GhostScript は homebrew 等他のパッケージ管理ツールで管理するのが楽らしいので後で個別にインストールする．</p>
+
+<ul>
+<li>GUI Application</li>
+<li>GhostScript</li>
+</ul>
+
+<p>また，MacTeXには様々なソフトウェアが含まれるが，個々のソフトウェアは更新されているので，MacTeXを最新の状態に更新しなくてはならない．以下のコマンドを入力．結構時間がかかるので注意．これは定期的にやったほうがいいらしい．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">sudo tlmgr update --self --all
+</code></pre></div>
+<p>パスが通っていない場合は，<code>echo $PATH</code>で<code>/usr/texbin</code>が含まれているか確認する．</p>
+
+<p><a href="http://oku.edu.mie-u.ac.jp/%7Eokumura/texwiki/?Mac#f5466652">TeX Wiki Mac</a><br>
+<a href="http://uenohara.hatenablog.jp/entry/2014/02/02/224140">OS X MavericksにTeX環境を構築した記録 - h_uenoharaのブログ 上ノ原秀晃（政治学）の研究メモ</a><br>
+<a href="http://what-alnk.hatenablog.com/entry/2014/11/02/182424">tlmgr update できなかった - 金魚亭日常</a><br>
+<a href="http://tutimura.ath.cx/ptetex/?%C2%BF%BD%C5TEXMF%A5%C4%A5%EA%A1%BC">多重TEXMFツリー †</a></p>
+
+<h2>3.2 GhostScript</h2>
+
+<p>GhostScript は，PostScript/Portable Document Format(PDF) インタプリタ．PostScript/PDF ファイルを読み込み，画面，プリンタ，その他様々な形式のファイルに出力できる．</p>
+
+<p>homebrewを使って管理したほうが楽らしい．homebrewが何かわからない場合 or 使いたくない場合はググって導入するか他の方法を考えること．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">$ brew install ghostscript
+</code></pre></div>
+<p><a href="https://oku.edu.mie-u.ac.jp/%7Eokumura/texwiki/?Ghostscript">TeX Wiki Ghostscript</a><br>
+<a href="http://xanadu62.blogspot.jp/2014/11/ghostscript_22.html">GhostScriptあれこれ</a><br>
+<a href="http://d.hatena.ne.jp/naruoga/20130110/1357827274">Ghostscript についてちょっとだけ</a></p>
+
+<h2>3.3 おまけ：フォント埋め込みの設定</h2>
+
+<p>デフォルトのフォントだと，明朝太字が太字にならない(自分の環境では代わりに？ゴシック体で表記された)．また，PDFには <em>フォント名だけが書き込まれた形式</em> と <em>フォントデータをPDF内に持っている形式</em> がある．前者の場合，他所に持って行って印刷した場合等に文字化け等の不具合が発生する可能性がある．後者のような形式を<strong>フォント埋め込み形式</strong>という．</p>
+
+<h3>3.3.1 フォントの確認</h3>
+
+<p>pdfにフォントが埋め込まれているかを確認する方法は<a href="http://ototorosama.hatenablog.com/entry/2013/02/14/055355">ここ</a>が参考になる．基本的に方法としては以下の三つ．</p>
+
+<ul>
+<li>Adobe Readerでプロパティを見る</li>
+<li>webサービスを使う(<a href="http://www.ddc.co.jp/tokupre/data-guide/pdf-font-checker.html">これ</a>とか)</li>
+<li>pdffontsコマンドを用いる</li>
+</ul>
+
+<p>今回は<code>pdffonts</code>コマンドを用いる方法を紹介．<code>pdffonts</code>はxpdfという，X Windows用のpdfビューワの一部．まずはxpdfをhomebrewでインストールする．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">$ brew install homebrew/x11/xpdf
+</code></pre></div>
+<p>使い方は以下．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">$ pdffonts hoge.pdf
+</code></pre></div>
+<p>使用例．emb欄でyesのものはフォントが埋め込まれている．和字のフォント(Ryumin-Light，GothicBBB)が埋め込まれていない．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">$  pdffonts  sample-noemb.pdf
+name                                 type         emb sub uni object ID
+------------------------------------ ------------ --- --- --- ---------
+GothicBBB-Medium-Identity-H          CID Type 0   no  no  no       8  0
+QEFPFE+CMBX12                        Type 1C      yes yes yes      9  0
+ORMRLI+CMR10                         Type 1C      yes yes yes     13  0
+ONEMZA+CMBX10                        Type 1C      yes yes yes     17  0
+CCLSCI+CMMI10                        Type 1C      yes yes yes     19  0
+Ryumin-Light-Identity-H              CID Type 0   no  no  no     261  0
+XSNNGN+CMSY10                        Type 1C      yes yes yes    285  0
+</code></pre></div>
+<p>和字フォント(IPAフォント)を埋め込むと以下のように表記が変わる．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">$  pdffonts  sample-emb.pdf
+name                                 type         emb sub uni object ID
+------------------------------------ ------------ --- --- --- ---------
+DZYRTV+IPAGothic                     CID TrueType yes yes no       8  0
+XMDHBY+CMBX12                        Type 1C      yes yes yes      9  0
+ULDJPJ+CMR10                         Type 1C      yes yes yes     13  0
+XPPTLU+CMBX10                        Type 1C      yes yes yes     17  0
+XOUXHN+CMMI10                        Type 1C      yes yes yes     19  0
+BCLQVY+IPAMincho                     CID TrueType yes yes no     261  0
+UKPGCN+CMSY10                        Type 1C      yes yes yes    285  0
+</code></pre></div>
+<p>エラーが出る場合は以下のサイトを参考に直すこと．</p>
+
+<p><a href="http://ototorosama.hatenablog.com/entry/2013/02/14/055355">pdfにフォントが埋め込まれてるか確認するコマンドpdffonts</a><br>
+<a href="http://www.math.kobe-u.ac.jp/%7Ekodama/tips-latex-pdf-embedding.html">LaTeX(DVI)から作成する PDF のフォント埋め込み</a></p>
+
+<h4>注意点 : TeX Live の変更について</h4>
+
+<p>TeX Liveのインストールディレクトリは以下．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">/usr/local/texlive
+</code></pre></div>
+<p>TeX Live 2014 をインストールした場合，<code>2014</code>というディレクトリと<code>texmf-local</code>というディレクトリがある．TeX Liveの改変を行う場合，<code>texmf-local</code>を変更した方が良い．<code>/usr/local/texlive/2014</code>内を改変すると，<code>tlmgr</code>によるオンラインアップデートによって改変部分が消えてしまう可能性がある．また，TeX Live 2015が出た時に今まで行った改変をやりなおすのはかしこくない．<br>
+<code>/usr/local/texlive/texmf-local</code>に改変部分を記述しておけば，もしもの時には<code>/usr/local/texlive/2014</code>をばっさり削除し再インストール等で不具合に対処することも可能になる．便利．</p>
+
+<h3>3.3.3 フォントのセットアップ</h3>
+
+<p>いくつかのフォントはセットアップなしで使用できる．使用できるフォントは以下のコマンドで確認する．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">$ kanji-config-updmap status
+CURRENT family : noEmbed
+Standby family : hiragino
+Standby family : hiragino-pron
+Standby family : ipa
+Standby family : ipaex
+</code></pre></div>
+<p><code>noEmbed</code>は何も選択していない場合に表示される．</p>
+
+<h3>3.3.4 フォントファイルを用意する</h3>
+
+<p>フォントをインストールする場合，インストール先は以下となる．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">/usr/local/texlive/texmf-local/fonts/
+</code></pre></div>
+<p>任意のフォルダを作成したりして，フォントの実態(.ttyとか.ttcとか)のシンボリックリンクをおけば良い．</p>
+
+<p>例として，ヒラギノを使いたい場合は以下のようにする．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">sudo mkdir -p /usr/local/texlive/texmf-local/fonts/opentype/public/hiragino/
+cd /usr/local/texlive/texmf-local/fonts/opentype/public/hiragino/
+
+sudo ln -s &quot;/Library/Fonts/ヒラギノ明朝 Pro W3.otf&quot; HiraMinPro-W3.otf
+sudo ln -s &quot;/Library/Fonts/ヒラギノ明朝 Pro W6.otf&quot; HiraMinPro-W6.otf
+sudo ln -s &quot;/Library/Fonts/ヒラギノ角ゴ Pro W3.otf&quot; HiraKakuPro-W3.otf
+sudo ln -s &quot;/Library/Fonts/ヒラギノ角ゴ Pro W6.otf&quot; HiraKakuPro-W6.otf
+sudo ln -s &quot;/Library/Fonts/ヒラギノ角ゴ Std W8.otf&quot; HiraKakuStd-W8.otf
+sudo ln -s &quot;/Library/Fonts/ヒラギノ丸ゴ Pro W4.otf&quot; HiraMaruPro-W4.otf
+sudo ln -s &quot;/System/Library/Fonts/ヒラギノ明朝 ProN W3.otf&quot; HiraMinProN-W3.otf
+sudo ln -s &quot;/System/Library/Fonts/ヒラギノ明朝 ProN W6.otf&quot; HiraMinProN-W6.otf
+sudo ln -s &quot;/System/Library/Fonts/ヒラギノ角ゴ ProN W3.otf&quot; HiraKakuProN-W3.otf
+sudo ln -s &quot;/System/Library/Fonts/ヒラギノ角ゴ ProN W6.otf&quot; HiraKakuProN-W6.otf
+sudo ln -s &quot;/Library/Fonts/ヒラギノ角ゴ StdN W8.otf&quot; HiraKakuStdN-W8.otf
+sudo ln -s &quot;/Library/Fonts/ヒラギノ丸ゴ ProN W4.otf&quot; HiraMaruProN-W4.otf
+</code></pre></div>
+<h3>3.3.5 データベースの更新を行う</h3>
+
+<p>TeX/LaTeXではおなじみ(らしい)．ls-Rデータベースの更新．以下のコマンドで行う．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">sudo mktexlsr
+</code></pre></div>
+<h3>3.3.6 フォントマップを用意する</h3>
+
+<p>フォントを用いることができるように設定を行う．しかし，LaTeX上でフォントを扱うソフトは複数存在する．DVIファイルの処理を行うだけでも&#8230;</p>
+
+<ul>
+<li>dvips</li>
+<li>dvipdfmx</li>
+<li>xdvi(&amp; pxdvi)</li>
+<li>pdftex</li>
+</ul>
+
+<p>&#8230; 等があり，ひとつひとつにフォントの設定を行うのは困難である．<br>
+そこで，いくつかのフォントを扱うソフトに対して統一的に設定を行える<code>updmap</code>というソフトがある．これはユーザ個人にのみ設定を反映させる．TeX Liveのシステム自体に設定を反映するには<code>updmap-sys</code>を用いる．<br>
+現行のTeX Liveにはupdmap-sysのラッパーであるperlスクリプト<code>kanji-config-updmap(-sys)</code>が収録されている．これを使用することで，簡単にデフォルトフォントセットを設定することができる．<br>
+システムに収録されているデフォルトフォントセットは以下にある．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">/usr/local/texlive/2014/texmf-dist/fonts/map/dvipdfmx/jfontmaps/
+</code></pre></div>
+<p>ここにある<code>otf-*.map</code>を読み込み，システムのデフォルトセットとして登録することができる．フォントセットを設定するには，頭の<code>otf-</code>を取った残りの部分を指定する．例えば，ヒラギノをセットしたい場合は以下．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">$ sudo updmap-sys --setoption kanjiEmbed hiragino
+$ kanji-config-updmap hiragino
+</code></pre></div>
+<p>逆に，埋め込みをやめたい場合は以下．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">$ kanji-config-updmap noEmbed
+</code></pre></div>
+<p><code>kanji-config-updmap</code>はユーザ個人にしか反映されない．システム全体に設定を行う場合は<code>kanji-config-updmap-sys</code>を用いる．</p>
+
+<p><a href="http://www.fugenji.org/%7Ethomas/texlive-guide/font_setup.html">日本語フォントのセットアップ</a><br>
+<a href="http://ichiro-maruta.blogspot.jp/2013/08/windows-tex-live-2013.html">Windows の TeX Live 2013 でヒラギノフォントを埋め込む方法</a><br>
+<a href="http://succzero.hatenablog.com/entry/2014/07/17/041211">MacTeX 2014 - 一歩前進</a><br>
+<a href="http://osksn2.hep.sci.osaka-u.ac.jp/%7Etaku/osx/embed_hiragino.html">教授でもできる、TeXShop + MacTeX /UpTeX でのヒラギノ フォントの埋め込み</a><br>
+<a href="https://sites.google.com/site/notitle221/tex/setup">導入&amp;初期設定</a></p>
+
+<h2>おまけ : Sublimeで環境構築</h2>
+
+<p>おまけ．SublimeText3で作業環境を整えた．CommandPalette(<code>⌘⇧P</code>)から<code>Install Package</code>を選択．<code>LaTexTools</code>をインストールする．<br>
+LaTexToolsの設定を変更する．設定ファイルは以下に存在する．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">~/Library/Application\ Support/Sublime\ Text\ 3/Packages/LaTeXTools/builders/traditionalBuilder.py
+</code></pre></div>
+<p>20行目前後に以下があるのでコメントアウト．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">DEFAULT_COMMAND_LATEXMK = [&quot;latexmk&quot;, &quot;-cd&quot;,
+                    &quot;-e&quot;, &quot;$pdflatex = &#39;%E -interaction=nonstopmode -synctex=1 %S %O’&quot;,
+                    &quot;-f&quot;, &quot;-pdf”]
+</code></pre></div>
+<p>以下を記述．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">DEFAULT_COMMAND_LATEXMK = [&quot;latexmk&quot;, &quot;-cd&quot;,
+                    &quot;-e&quot;, &quot;$latex = &#39;uplatex %O -interaction=nonstopmode -synctex=1 %S&#39;&quot;,
+                    &quot;-e&quot;, &quot;$biber = &#39;biber %O --bblencoding=utf8 -u -U --output_safechars %B&#39;&quot;,
+                    &quot;-e&quot;, &quot;$bibtex = &#39;upbibtex %O %B&#39;&quot;,
+                    &quot;-e&quot;, &quot;$makeindex = &#39;makeindex %O -o %D %S&#39;&quot;,
+                    &quot;-e&quot;, &quot;$dvipdf = &#39;dvipdfmx %O -o %D %S&#39;&quot;,
+                    &quot;-f&quot;, &quot;-norc&quot;, &quot;-gg&quot;, &quot;-pdfdvi&quot;]
+</code></pre></div>
+<p>エラーが出る場合がある．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">LaTeXTools: you need to migrate your preferences. See the README file for instructions.
+</code></pre></div>
+<p>その場合は<a href="http://yusuke0.hatenablog.com/entry/2014/04/06/111945">ここ</a>を参考に直す．</p>
+
+<p>これで，コンパイルしたい場合は.texファイルを開き<code>⌘B</code>押下でOK．ちなみに，upTeXを利用しているっぽい．</p>
+
+<p><a href="http://yusuke0.hatenablog.com/entry/2014/04/06/111945">【2014-3-12以降版】Mac Sublime Text2 or Sublime Text3 で Tex 導入の初歩から - みずぎわブログ</a></p>
+
+<h1>4. TeXの文法</h1>
+
+<h2>4.1 文書クラス</h2>
+
+<p>文書クラスとは，文書の大体の形を決めるもの．</p>
+<div class="highlight"><pre><code class="language-tex" data-lang="tex"><span class="k">\documentclass</span><span class="na">[option]</span><span class="nb">{</span>documentclass<span class="nb">}</span>
+
+<span class="k">\documentclass</span><span class="na">[10pt,a4paper]</span><span class="nb">{</span>jarticle<span class="nb">}</span>
+</code></pre></div>
+<ul>
+<li>article，jarticle，ujarticle
+
+<ul>
+<li>章を含まないような小さめの文書</li>
+</ul></li>
+<li>report，jreport，ujreport
+
+<ul>
+<li>章を含むような小さめの文書</li>
+</ul></li>
+<li>book，jbook，ujbook
+
+<ul>
+<li>帳面印刷を前提としている本の印刷用</li>
+</ul></li>
+</ul>
+
+<p>各々，[j]がつくとpTeXを用いることができる．<br>
+[uj]がつくとupTeXを用いることができる．<br>
+upTeXは，[j]をつけてオプションに[uplatex]を指定しても使用できる．<br>
+pTeXは日本語を利用できるようにしており，upTeXはそれに加えてUnicodeを用いられるようにした上位互換．</p>
+
+<ul>
+<li>オプション
+
+<ul>
+<li>a4e，a4j，a4paper
+
+<ul>
+<li>A4サイズ</li>
+</ul></li>
+<li>a5e，a5j，b5paper
+
+<ul>
+<li>A5サイズ</li>
+</ul></li>
+<li>b4j
+
+<ul>
+<li>B4サイズ</li>
+</ul></li>
+<li>b5j
+
+<ul>
+<li>B5サイズ</li>
+</ul></li>
+<li>twocolumn
+
+<ul>
+<li>二段組み</li>
+</ul></li>
+<li>onecolumen
+
+<ul>
+<li>一段組み</li>
+</ul></li>
+<li>twoside
+
+<ul>
+<li>両面印刷</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<p>a4paper，b5paperはLaTeX2eからできた新しいサイズ．語尾がeのものは欧米版，jのものはpTeX．<br>
+paperは上下左右の余白が広いので，本文領域を広くしたいのであれば，a4jやb5jを用いると良い．</p>
+
+<p><a href="http://qiita.com/SUZUKI_Masaya/items/e1ae2eb42626dc6d9155">pLaTeXからupLaTeXへの乗り換え方</a><br>
+<a href="http://www.fugenji.org/%7Ethomas/texlive-guide/why.html">なぜ TeX Live なのか</a><br>
+<a href="http://www.okomeda.net/?LaTeX%E6%96%87%E6%9B%B8%E3%82%AF%E3%83%A9%E3%82%B9">LaTeX文書クラス</a><br>
+<a href="http://blogs.yahoo.co.jp/koh_hotta/48345.html">a4paper と a4j および b5paper と b5j</a><br>
+<a href="http://www.wakayama-u.ac.jp/%7Etokoi/lecture/shori1/latex.html">LaTeX の概要</a></p>
+
+<h2>4.2 見出し</h2>
+<div class="highlight"><pre><code class="language-tex" data-lang="tex"><span class="k">\documentclass</span><span class="na">[a4j,onecolumn]</span><span class="nb">{</span>jreport<span class="nb">}</span>
+
+<span class="k">\begin</span><span class="nb">{</span>document<span class="nb">}</span>
+    <span class="k">\part</span><span class="nb">{</span>部見出し<span class="nb">}</span>
+    <span class="k">\chapter</span><span class="nb">{</span>章見出し<span class="nb">}</span>
+<span class="k">\end</span><span class="nb">{</span>document<span class="nb">}</span>
+</code></pre></div>
+<h2>4.3 参考文献 \cite, \bibitem</h2>
+<div class="highlight"><pre><code class="language-tex" data-lang="tex"><span class="c">% 本文</span>
+SysML<span class="k">\cite</span><span class="nb">{</span>sysml<span class="nb">}</span>のダイアグラムのひとつであるパラメトリック図では，~
+~ 制約を抽出しSMTソルバであるYices<span class="k">\cite</span><span class="nb">{</span>yices<span class="nb">}</span><span class="k">\cite</span><span class="nb">{</span>yices<span class="nb">_</span>tool<span class="nb">_</span>paper<span class="nb">}</span>
+
+<span class="c">% 参考文献</span>
+<span class="k">\begin</span><span class="nb">{</span>thebibliography<span class="nb">}{</span>10<span class="nb">}</span>
+<span class="k">\bibitem</span><span class="nb">{</span>sysml<span class="nb">}</span>
+Object Management Group, OMG Systems Modeling Language (SysML),<span class="k">\\</span>
+http://www.omgsysml.org/
+
+<span class="k">\bibitem</span><span class="nb">{</span>yices<span class="nb">}</span>
+Yices: An SMT Solver,<span class="k">\\</span>http://yices.csl.sri.com/
+
+<span class="k">\bibitem</span><span class="nb">{</span>yices<span class="nb">_</span>tool<span class="nb">_</span>paper<span class="nb">}</span>
+B. Dutertre and L. de Moura : The YICES SMT Solver, 2009.
+<span class="k">\\</span>http://yices.csl.sri.com/ から入手可能
+</code></pre></div>
+<h2>4.4 画像の貼り付け</h2>
+
+<p>TeXに画像を貼り付ける場合，画像の<strong>BB(BoundingBox)情報</strong>を指定する必要がある．単位は bp(big point) もしくは Postscript point という．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">1bp</span> <span class="o">=</span> 1/72inchi <span class="o">=</span> 0.535278mm <span class="o">=</span> 1.00375pt
+</code></pre></div>
+<p>BB情報を自動生成し，ファイルに書き出すことができる．用いるコマンドは<code>extractbb</code>．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>extractbb hoge.jpg
+</code></pre></div>
+<p>これによりBB情報が記述されたファイル(.xbb)が生成される．</p>
+
+<p>いちいちターミナルから生成するのが面倒な場合，TeX Live を用いているのなら，extractbb を自動的に起動し，.xbbファイルを自動生成させることができる．<code>/usr/local/texlive/texmf-local/web2c/texmf.cnf</code></p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">shell_escape_commands</span> <span class="o">=</span> <span class="se">\</span>
+bibtex,bibtex8,bibtexu,pbibtex,upbibtex,biber,<span class="se">\</span>
+kpsewhich,<span class="se">\</span>
+makeindex,mendex,texindy,<span class="se">\</span>
+mpost,pmpost,upmpost,<span class="se">\</span>
+repstopdf,epspdf,extractbb,<span class="se">\</span>
+</code></pre></div>
+<p>以下のコマンドでデータベースを更新し，設定を反映させる．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>sudo mktexlsr
+</code></pre></div>
+<p>以下のようなエラーが出た場合は，改行を加えることで回避する(これが正しい対処かどうかはわからない)．</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">warning: kpathsea: Last line of file ends with <span class="se">\.</span>
+</code></pre></div>
+<p>これで画像フォルダもスッキリする．すばらC．</p>
+
+<h2>4.5 ソースコードの記述</h2>
+
+<p>参考サイトみよう．<br>
+<a href="http://www.shaco-o.com/tex-program">Latexにプログラムっぽいフォントでソースコードを載せる簡単な方法</a></p>
+
+<h3>小話：画像貼り付けに関して，変わったこと</h3>
+
+<p>TeX Live 2013より，<code>dvipdfm</code>が使用できなくなった．以前は以下のように記述していたが&#8230;</p>
+<div class="highlight"><pre><code class="language-tex" data-lang="tex"><span class="k">\documentclass</span><span class="na">[a4j]</span><span class="nb">{</span>jarticle<span class="nb">}</span>
+<span class="k">\usepackage</span><span class="na">[dvipdfm]</span><span class="nb">{</span>graphicx<span class="nb">}</span>
+</code></pre></div>
+<p>これからは<code>dvipdfmx</code>を使う必要があるため，以下のようにする必要がある．</p>
+<div class="highlight"><pre><code class="language-tex" data-lang="tex"><span class="k">\documentclass</span><span class="na">[a4j]</span><span class="nb">{</span>jarticle<span class="nb">}</span>
+<span class="k">\usepackage</span><span class="na">[dvipdfmx]</span><span class="nb">{</span>graphicx<span class="nb">}</span>
+</code></pre></div>
+<p>これに伴い，.bbファイルではなく，.xbbファイルをが必要となった．ちょっと調べて<code>ebb</code>コマンド(.bbファイルを生成する)を用いて画像を扱っていたらコンパイルがうまくいかなかったので，道理で..．</p>
+
+<p><a href="http://oku.edu.mie-u.ac.jp/%7Eokumura/texwiki/?Mac#h357d047">texmf.cnf への extractbb などの追加 †</a><br>
+<a href="http://www.ic.daito.ac.jp/%7Emizutani/tex/image.html">画像ファイルの取り扱い</a><br>
+<a href="http://www.moxbit.com/2014/03/mac-tex-st2-latex-2014.html">【2014年版】『MacTex 2013』と『Sublime Text 2』でpLaTeX環境をつくる</a></p>
+
+<h2>4.6 TeXのパッケージ</h2>
+
+<p>パッケージの実態はテキストファイルで，コマンドの定義が記述されている．拡張子は基本的には&quot;.sty&quot;．<br>
+パッケージファイルの場所は，LaTeXシステム一式をインストールした場合は&#8230;<br>
+TeXLiveの場合<br>
+<code><br>
+/usr/local/texlive/2014/texmf-dist/tex/latex/tools<br>
+</code></p>
+
+<p>W32TeXの場合は知らない．Windowsでは以下らしい．<br>
+<code><br>
+c:/w32tex/share/texmf-dist/tex/latex/tools/multicol.sty<br>
+</code></p>
+
+<h2>おまけ：古いコマンド</h2>
+
+<p>古いコマンドを使わないほうがいいらしい．以下を用いて発見しよう．</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">\RequirePackage[l2tabu, orthodox]{nag}
+</code></pre></div>
+<p><a href="http://oku.edu.mie-u.ac.jp/%7Eokumura/texwiki/?TeX%E5%85%A5%E9%96%80%2F%E5%90%84%E7%A8%AE%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8%E3%81%AE%E5%88%A9%E7%94%A8">TeX Wiki TeX入門/各種パッケージの利用</a><br>
+<a href="http://www.latex-cmd.com">LaTeXコマンド集</a></p>
+]]></content>
+  </entry>
+  
+</feed>
