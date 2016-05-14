@@ -5,14 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Emacs の色表示がおかしかったのでなおした - tasuwo blog</title>
+  <title>Emacs における Path 問題を解決した - tasuwo blog</title>
   <meta name="author" content="tasuwo">
 
   
-  <meta name="description" content="結論から言うと，悪いのは emacs ではなく， screen が 256 色表示に対応していなかったせいだった． 256色表示できているか確かめる(参考サイト参照) ターミナル上 screen上 screen のバージョン確認 1
-2
-$ screen -v
-Screen version 4. &hellip;">
+  <meta name="description" content="Emacs のパスがおかしかったので修正． まず，TeX 環境を Emacs で整えようと，以下のサイトを参考にシェルスクリプトを記述し，/usr/local/bin 直下に配置した． モダンな日本語 TeX 環境を整える - Qiita その後，Emacs から C-c t j によって TeX &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +18,7 @@ Screen version 4. &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://tasuwo.github.io/blog/2015/08/16/title">
+  <link rel="canonical" href="http://tasuwo.github.io/blog/2016/05/14/emacs-path">
   <link href="/favicon.ico" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="tasuwo blog" type="application/atom+xml">
@@ -82,7 +79,7 @@ Screen version 4. &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Emacs の色表示がおかしかったのでなおした</h1>
+      <h1 class="entry-title">Emacs における Path 問題を解決した</h1>
     
     
       <p class="meta">
@@ -91,7 +88,7 @@ Screen version 4. &hellip;">
 
 
 
-<time class='entry-date' datetime='2015-08-16T15:25:56+09:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>3:25 pm</span></time>
+<time class='entry-date' datetime='2016-05-14T15:48:12+09:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>3:48 pm</span></time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://tasuwo.github.io">Comments</a>
@@ -101,55 +98,75 @@ Screen version 4. &hellip;">
   </header>
 
 
-<div class="entry-content"><p>結論から言うと，悪いのは emacs ではなく， screen が 256 色表示に対応していなかったせいだった．</p>
+<div class="entry-content"><p>Emacs のパスがおかしかったので修正．</p>
 
 <!-- more -->
 
-<p>256色表示できているか確かめる(参考サイト参照)</p>
+<p>まず，TeX 環境を Emacs で整えようと，以下のサイトを参考にシェルスクリプトを記述し，<code>/usr/local/bin</code> 直下に配置した．</p>
 
-<ul>
-<li>ターミナル上</li>
-</ul>
+<p><a href="http://qiita.com/ynakayama/items/706ae9e59c1b6fd3e3d2">モダンな日本語 TeX 環境を整える - Qiita</a></p>
 
-<p><img src="/images/terminal_color.png" alt="terminal_color"></p>
-
-<ul>
-<li>screen上</li>
-</ul>
-
-<p><img src="/images/screen_color.png" alt="screen_color"></p>
-
-<p>screen のバージョン確認</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>screen -v
-</span><span class='line'>Screen version 4.00.03 <span class="o">(</span>FAU<span class="o">)</span> 23-Oct-06
-</span></code></pre></td></tr></table></div></figure>
-
-<p>homebrew で最新版を導入する</p>
+<p>その後，Emacs から <code>C-c t j</code> によって TeX ファイルをコンパイルしようとすると，以下のエラーが生じた．</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew tap homebrew/dupes
-</span><span class='line'><span class="nv">$ </span>brew install screen
-</span><span class='line'>...
-</span><span class='line'><span class="nv">$ </span>screen -v
-</span><span class='line'>Screen version 4.03.00 <span class="o">(</span>GNU<span class="o">)</span> 27-May-15
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>Call <span class="sb">`</span>platex2pdf ipsj_11t4054x.tex<span class="err">&#39;</span>
+</span><span class='line'>/usr/local/bin/platex2pdf: line 18: platex: <span class="nb">command </span>not found
+</span><span class='line'>/usr/local/bin/platex2pdf: line 19: dvipdfmx: <span class="nb">command </span>not found
+</span><span class='line'>
+</span><span class='line'><span class="nb">typeset </span>exited abnormally with code <span class="m">127</span> at Sat May <span class="m">14</span> 15:50:32 <span class="o">(</span>0.06 secs<span class="o">)</span>
 </span></code></pre></td></tr></table></div></figure>
 
-<p>これでおk．</p>
+<p>パスが通っていないっぽいので，下記サイトを参考に <code>exec-path-from-shell</code> を導入した．</p>
 
-<h2>参考</h2>
+<p><a href="https://github.com/purcell/exec-path-from-shell">purcell/exec-path-from-shell: Make Emacs use the $PATH set up by the user&#39;s shell</a><br>
+<a href="http://qiita.com/catatsuy/items/3dda714f4c60c435bb25">EmacsでPATHの設定が引き継がれない問題をエレガントに解決する - Qiita</a></p>
 
-<blockquote>
-<p><a href="http://qiita.com/trapple/items/8ad1b0a7c4fa5b8341b0">OSXに256color対応Screenをインストールする - Qiita</a><br>
-<a href="http://kiyotakagoto.hatenablog.com/entry/2013/02/17/210834">Mac OS X + iTerm2 + tmux + emacs で256色表示 - 人生ずっと勉強</a><br>
-<a href="http://qiita.com/sesame/items/e752b53ebf478d0d081f">emacsclientを使用するとテーマのmode-lineが効かない - Qiita</a></p>
-</blockquote>
+<p>それでもうまくパスが通っていないように見えた．emacs上から <code>M-x getenv</code> して <code>PATH</code> を選択すると，emacs 上の環境変数の内容を確認できる．確認したところ，自分が普段使用している zsh の <code>.zprofile</code> ではなく，<code>.bash_profile</code> が参照されていることがわかった．</p>
+
+<p>これは，普段使いは homebrew でインストールした zsh なのだが，OS のデフォルトシェルが bash になっていたためだった．ちなみに，デフォルトシェルは <code>echo $SHELL</code> で確認できる．</p>
+
+<p>シェルを変更するには <code>chsh</code> コマンドを使用する．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>cush -s /usr/local/bin/zsh
+</span></code></pre></td></tr></table></div></figure>
+
+<p>ただし，homebrew 等でインストールしたシェルを設定するには，<code>/etc/shells</code> にそれを追記する必要がある．</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># List of acceptable shells for chpass(1).</span>
+</span><span class='line'><span class="c"># Ftpd will not allow users to connect who are not using</span>
+</span><span class='line'><span class="c"># one of these shells.</span>
+</span><span class='line'>
+</span><span class='line'>/bin/bash
+</span><span class='line'>/bin/csh
+</span><span class='line'>/bin/ksh
+</span><span class='line'>/bin/sh
+</span><span class='line'>/bin/tcsh
+</span><span class='line'>/bin/zsh
+</span><span class='line'>/usr/local/bin/zsh <span class="c"># &lt;- これを追加</span>
+</span></code></pre></td></tr></table></div></figure>
+
+<p>設定後はPCを<strong>再起動</strong>すること．<br>
+その後，無事 TeX ファイルをコンパイルできた．</p>
+
+<p>Terminal の設定で <code>/usr/local/bin/zsh</code> を起動するようにしていたので，気づかなかった&#8230;</p>
+
+<p><a href="http://rcmdnk.github.io/blog/2015/05/25/computer-mac-bash-zsh/">Macでログインシェルを確認/変更するいくつかの方法</a></p>
 </div>
 
 
@@ -165,12 +182,12 @@ Screen version 4. &hellip;">
 
 
 
-<time class='entry-date' datetime='2015-08-16T15:25:56+09:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>3:25 pm</span></time>
+<time class='entry-date' datetime='2016-05-14T15:48:12+09:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>3:48 pm</span></time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/emacs/'>emacs,</a>, <a class='category' href='/blog/categories/terminal/'>terminal</a>
+    <a class='category' href='/blog/categories/emacs/'>emacs</a>
   
 </span>
 
@@ -179,7 +196,7 @@ Screen version 4. &hellip;">
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2015/08/16/title/" data-via="" data-counturl="http://tasuwo.github.io/blog/2015/08/16/title/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tasuwo.github.io/blog/2016/05/14/emacs-path/" data-via="" data-counturl="http://tasuwo.github.io/blog/2016/05/14/emacs-path/" >Tweet</a>
   
   
   
@@ -189,10 +206,8 @@ Screen version 4. &hellip;">
     <br />
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2015/06/26/title/" title="Previous Post: Vim をさわってみた感想">&laquo; Vim をさわってみた感想</a>
+        <a class="basic-alignment left" href="/blog/2016/05/14/tex-to-img/" title="Previous Post: TeX2img で ghostscript cannot be exexuted ではまる">&laquo; TeX2img で ghostscript cannot be exexuted ではまる</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2015/08/16/xcode-plugin/" title="Next Post: Xcode のプラグイン導入についてメモ">Xcode のプラグイン導入についてメモ &raquo;</a>
       
     </p>
   </footer>
@@ -275,8 +290,8 @@ Screen version 4. &hellip;">
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://tasuwo.github.io/blog/2015/08/16/title/';
-        var disqus_url = 'http://tasuwo.github.io/blog/2015/08/16/title/';
+        var disqus_identifier = 'http://tasuwo.github.io/blog/2016/05/14/emacs-path/';
+        var disqus_url = 'http://tasuwo.github.io/blog/2016/05/14/emacs-path/';
         var disqus_script = 'embed.js';
       
     (function () {
